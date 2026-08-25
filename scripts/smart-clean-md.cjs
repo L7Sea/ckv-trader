@@ -7,6 +7,20 @@ function estimateTokens(text) {
   return Math.ceil(text.length / 3.8);
 }
 
+/* Làm gọn MỘT đoạn văn xuôi (đã chắc chắn nằm ngoài code block). */
+function lamGonVanXuoi(text) {
+  /* Nối dòng bị ngắt vụn giữa câu. Chốt chặn (?!\s*\d+[.)]) để KHÔNG nuốt
+     mục danh sách đánh số: "1. Bước một" + "2. Bước hai" phải nằm 2 dòng. */
+  text = text.replace(/([^\n#|\-*>`\d.])\n(?!\s*\d+[.)]\s)([a-zA-Z0-9à-ỹÀ-Ỹ])/g, '$1 $2');
+  /* Nén khoảng trắng GIỮA câu nhưng giữ nguyên thụt lề đầu dòng — danh sách
+     lồng cần 2-4 dấu cách, bóp về 1 là mất cấp. */
+  text = text.split('\n').map(function (line) {
+    const m = line.match(/^([ \t]*)(.*)$/);
+    return m[1] + m[2].replace(/[ \t]+/g, ' ');
+  }).join('\n');
+  return text.replace(/\n{3,}/g, '\n\n');
+}
+
 function smartCleanText(rawText) {
   if (!rawText) return '';
   const lines = rawText.split(/\r?\n/);
@@ -53,10 +67,14 @@ function smartCleanText(rawText) {
     cleanedLines.push(line);
   }
 
-  let result = cleanedLines.join('\n');
-  result = result.replace(/([^\n#\|\-\*\>\`\d\.])\n([a-zA-Z0-9à-ỹÀ-Ỹ])/g, '$1 $2');
-  result = result.replace(/[ \t]+/g, ' ');
-  result = result.replace(/\n{3,}/g, '\n\n');
+  /* Gộp dòng + nén khoảng trắng — CHỈ cho văn xuôi, KHÔNG cho code block.
+     Vòng lặp trên đã giữ nguyên code, nhưng 3 phép replace chạy trên CẢ chuỗi
+     sẽ xoá công đó: nối dòng lệnh vào dòng chú thích "#" (lệnh mất tác dụng)
+     và bóp thụt lề. Nên phải tách hàng rào ``` ra trước rồi mới xử lý. */
+  const segments = cleanedLines.join('\n').split(/(```[\s\S]*?```)/g);
+  const result = segments
+    .map(function (seg) { return seg.startsWith('```') ? seg : lamGonVanXuoi(seg); })
+    .join('');
   return result.trim() + '\n';
 }
 
@@ -72,6 +90,11 @@ function processFile(inputPath, outputPath) {
   const saved = tokensBefore - tokensAfter;
   const pct = tokensBefore > 0 ? ((saved / tokensBefore) * 100).toFixed(1) : 0;
   const out = outputPath || inputPath.replace(/\.[^.]+$/, '') + '.clean.md';
+  /* Chặn ghi đè bản gốc: công cụ này xoá bớt nội dung, ghi đè là mất luôn. */
+  if (path.resolve(out) === path.resolve(inputPath)) {
+    console.error('Loi: file dau ra trung file dau vao — se ghi de mat ban goc. Dat ten khac.');
+    process.exit(1);
+  }
   fs.writeFileSync(out, cleaned, 'utf8');
 
   console.log('==================================================');

@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "npm --prefix frontend install && npm --prefix frontend run build",
-    "deploy:pages": "npx wrangler pages deploy frontend/dist --project-name=ckv-trader"
+    "deploy:pages": "npx wrangler pages deploy frontend/dist --project-name=ckv-trader",
+    "clean:md": "node scripts/smart-clean-md.cjs"
   }
 }
