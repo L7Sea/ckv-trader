@@ -48,35 +48,15 @@ const DAU_GOC =
 const TAI_TRAI = 'M 40 58 C 30 40, 44 30, 58 40 C 64 46, 64 54, 60 60 Z';
 const TAI_PHAI = 'M 160 58 C 170 40, 156 30, 142 40 C 136 46, 136 54, 140 60 Z';
 
-/* ── MẮT ── */
+/* ── MẮT CHUẨN GỐC: CHỈ CÓ CHẤM TRÒN HOẶC 2 GẠCH NHỎ ── */
 function VeMat({ kieu, x }: { kieu: Mat; x: number }) {
   const y = MAT_Y;
-  switch (kieu) {
-    case 'thuong':
-      return <rect x={x - 8} y={y - 3.5} width="16" height="7" rx="3.5" fill={NET} />;
-    case 'nhamCuoi':
-      return <path d={`M${x - 9} ${y + 3} Q${x} ${y - 7} ${x + 9} ${y + 3}`} stroke={NET} strokeWidth="6" fill="none" strokeLinecap="round" />;
-    case 'nhamChat':
-      return <line x1={x - 9} y1={y} x2={x + 9} y2={y} stroke={NET} strokeWidth="6" strokeLinecap="round" />;
-    case 'lim':
-      return <path d={`M${x - 9} ${y - 1} Q${x} ${y + 5} ${x + 9} ${y - 1}`} stroke={NET} strokeWidth="6" fill="none" strokeLinecap="round" />;
-    case 'trongTron':
-      return <circle cx={x} cy={y} r="8.5" fill={NET} />;
-    case 'kinhNgac':
-      return <>
-        <circle cx={x} cy={y} r="10.5" fill={NET} />
-        <circle cx={x + 3} cy={y - 3.5} r="2.8" fill="#fff" />
-      </>;
-    case 'tim':
-      return <path d={`M${x} ${y + 7} C${x - 11} ${y - 3} ${x - 6} ${y - 11} ${x} ${y - 4} C${x + 6} ${y - 11} ${x + 11} ${y - 3} ${x} ${y + 7} Z`} fill="#e0455f" />;
-    case 'chuX':
-      return <>
-        <line x1={x - 7} y1={y - 7} x2={x + 7} y2={y + 7} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
-        <line x1={x + 7} y1={y - 7} x2={x - 7} y2={y + 7} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
-      </>;
-    default:
-      return <rect x={x - 8} y={y - 3.5} width="16" height="7" rx="3.5" fill={NET} />;
+  // Dạng 2: Gạch nhỏ (khi nhắm mắt, cười, ngủ, chớp mắt)
+  if (kieu === 'nhamCuoi' || kieu === 'nhamChat' || kieu === 'lim' || kieu === 'thuong' || kieu === 'buon') {
+    return <line x1={x - 7} y1={y} x2={x + 7} y2={y} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />;
   }
+  // Dạng 1: Chấm tròn đen đặc trưng (khi mở mắt, nhìn, ngơ ngác, tập trung)
+  return <circle cx={x} cy={y} r="6" fill={NET} />;
 }
 
 /* ── MŨI + MIỆNG GỐC: CHỮ T + CHỮ Y NGƯỢC ── */
