@@ -16,7 +16,8 @@ import {
   DollarSign,
   PieChart,
   ExternalLink,
-  Globe
+  Globe,
+  RefreshCw
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 import { VN50_WATCHLIST, WatchlistStock } from './MarketBoard';
@@ -32,28 +33,28 @@ interface TickTrade {
 
 export const TechnicalChart: React.FC = () => {
   const { positions, selectedSymbol, setSelectedStock, watchlist } = useTradingStore();
-  const [activeTab, setActiveTab] = useState<'TRADINGVIEW' | 'VNDIRECT' | 'ORDERBOOK' | 'DEAL_ANALYTICS'>('TRADINGVIEW');
+  const [activeTab, setActiveTab] = useState<'VNDIRECT' | 'TRADINGVIEW' | 'ORDERBOOK' | 'DEAL_ANALYTICS'>('VNDIRECT');
   const [activeTimeframe, setActiveTimeframe] = useState<'D' | 'W' | 'M' | '60' | '15'>('D');
 
-  const activeSymbol = selectedSymbol || positions[0]?.symbol || 'TPB';
+  const activeSymbol = selectedSymbol || positions[0]?.symbol || 'FPT';
   const foundStock = watchlist.find((s) => s.symbol === activeSymbol) || VN50_WATCHLIST.find((s) => s.symbol === activeSymbol);
   const currentPos = positions.find((p) => p.symbol === activeSymbol);
 
-  // Xác định sàn giao dịch chuẩn xác cho TradingView (HOSE / HNX / UPCOM)
-  const hnxSymbols = ['SHS', 'IDC', 'PVS', 'CEO', 'MBS', 'NVB', 'TNG', 'VCS', 'DTD', 'BVS'];
-  const upcomSymbols = ['BSR', 'VGI', 'C4G', 'ABB', 'QNS', 'MCH', 'VEA', 'OIL', 'SSH', 'NAB'];
+  // Xác định sàn giao dịch chuẩn xác cho mã cổ phiếu (HOSE / HNX / UPCOM)
+  const hnxSymbols = ['SHS', 'IDC', 'PVS', 'CEO', 'MBS', 'NVB', 'TNG', 'VCS', 'DTD', 'BVS', 'HUT', 'TIG'];
+  const upcomSymbols = ['BSR', 'VGI', 'C4G', 'ABB', 'QNS', 'MCH', 'VEA', 'OIL', 'SSH', 'NAB', 'DDV', 'ACV'];
   const exchange = hnxSymbols.includes(activeSymbol) ? 'HNX' : upcomSymbols.includes(activeSymbol) ? 'UPCOM' : 'HOSE';
   const tvSymbol = `${exchange}:${activeSymbol}`;
 
   // Giá và thông số thị trường thực tế
-  const currentPrice = currentPos?.market_price || foundStock?.price || 18500;
+  const currentPrice = currentPos?.market_price || foundStock?.price || 70622;
   const refPrice = foundStock?.refPrice || Math.round(currentPrice * 0.985); // Tham chiếu
   const ceilPrice = Math.round(refPrice * 1.07); // Trần +7%
   const floorPrice = Math.round(refPrice * 0.93); // Sàn -7%
   const highPrice = Math.round(currentPrice * 1.012);
   const lowPrice = Math.round(currentPrice * 0.978);
   const avgPrice = Math.round((highPrice + lowPrice) / 2);
-  const totalVolume = foundStock?.volume || 14850000;
+  const totalVolume = foundStock?.volume || 1422160;
   const totalValue = Math.round((totalVolume * currentPrice) / 1000000000 * 10) / 10; // Tỷ đồng
 
   const change = currentPrice - refPrice;
@@ -65,77 +66,45 @@ export const TechnicalChart: React.FC = () => {
     const p = currentPrice;
     return {
       buyLevels: [
-        { price: p - 50, volume: 48600, pct: 35 },
-        { price: p - 100, volume: 184500, pct: 75 },
-        { price: p - 150, volume: 216700, pct: 90 }
+        { price: p - 100, volume: 58600, pct: 45 },
+        { price: p - 200, volume: 144500, pct: 75 },
+        { price: p - 300, volume: 226700, pct: 90 }
       ],
-      currentTrade: { price: p, volume: 2000, change: changePct },
+      currentTrade: { price: p, volume: 2500, change: changePct },
       sellLevels: [
-        { price: p + 50, volume: 24600, pct: 20 },
-        { price: p + 100, volume: 11200, pct: 12 },
-        { price: p + 150, volume: 38100, pct: 32 }
+        { price: p + 100, volume: 34600, pct: 25 },
+        { price: p + 200, volume: 61200, pct: 42 },
+        { price: p + 300, volume: 118100, pct: 68 }
       ],
-      totalBuyOrder: 449800,
-      totalSellOrder: 73900
+      totalBuyOrder: 429800,
+      totalSellOrder: 213900
     };
   }, [currentPrice, changePct]);
 
   // 2. NHẬT KÝ KHỚP LỆNH THEO GIÂY (TIME & SALES TICKS)
   const [ticks, setTicks] = useState<TickTrade[]>([
-    { id: '1', time: '14:45:01', type: 'BUY', price: currentPrice, quantity: 2000, change: +0.45 },
-    { id: '2', time: '14:45:01', type: 'BUY', price: currentPrice, quantity: 5000, change: +0.45 },
-    { id: '3', time: '14:45:00', type: 'SELL', price: currentPrice - 50, quantity: 1200, change: -0.15 },
-    { id: '4', time: '14:44:58', type: 'BUY', price: currentPrice, quantity: 10000, change: +0.45 },
-    { id: '5', time: '14:44:55', type: 'BUY', price: currentPrice, quantity: 3500, change: +0.45 },
-    { id: '6', time: '14:44:50', type: 'SELL', price: currentPrice - 50, quantity: 800, change: -0.15 }
+    { id: '1', time: '14:45:01', type: 'BUY', price: currentPrice, quantity: 2500, change: +0.39 },
+    { id: '2', time: '14:45:01', type: 'BUY', price: currentPrice, quantity: 6000, change: +0.39 },
+    { id: '3', time: '14:45:00', type: 'SELL', price: currentPrice - 100, quantity: 1200, change: -0.15 },
+    { id: '4', time: '14:44:58', type: 'BUY', price: currentPrice, quantity: 15000, change: +0.39 },
+    { id: '5', time: '14:44:55', type: 'BUY', price: currentPrice, quantity: 3800, change: +0.39 },
+    { id: '6', time: '14:44:50', type: 'SELL', price: currentPrice - 100, quantity: 900, change: -0.15 }
   ]);
 
   const tradingViewContainerRef = useRef<HTMLDivElement>(null);
 
-  // Nhúng TradingView Advanced Chart Widget chính thức hỗ trợ toàn bộ 300 mã cổ phiếu Việt Nam
+  // Nhúng TradingView Direct Widget mà KHÔNG BỊ POPUP CHẶN
   useEffect(() => {
     if (activeTab !== 'TRADINGVIEW') return;
 
     if (tradingViewContainerRef.current) {
-      tradingViewContainerRef.current.innerHTML = '';
-
-      const container = document.createElement('div');
-      container.className = 'tradingview-widget-container';
-      container.style.height = '100%';
-      container.style.width = '100%';
-
-      const widget = document.createElement('div');
-      widget.className = 'tradingview-widget-container__widget';
-      widget.style.height = 'calc(100% - 32px)';
-      widget.style.width = '100%';
-      container.appendChild(widget);
-
-      const script = document.createElement('script');
-      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-      script.type = 'text/javascript';
-      script.async = true;
-      script.innerHTML = JSON.stringify({
-        autosize: true,
-        symbol: tvSymbol,
-        interval: activeTimeframe,
-        timezone: 'Asia/Ho_Chi_Minh',
-        theme: 'dark',
-        style: '1',
-        locale: 'vi_VN',
-        allow_symbol_change: true,
-        enable_publishing: false,
-        backgroundColor: '#0e1117',
-        gridColor: 'rgba(36, 41, 56, 0.4)',
-        hide_top_toolbar: false,
-        hide_legend: false,
-        save_image: false,
-        calendar: false,
-        hide_volume: false,
-        support_host: 'https://www.tradingview.com'
-      });
-      container.appendChild(script);
-
-      tradingViewContainerRef.current.appendChild(container);
+      tradingViewContainerRef.current.innerHTML = `
+        <iframe
+          src="https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(tvSymbol)}&interval=${activeTimeframe}&theme=dark&style=1&timezone=Asia%2FHo_Chi_Minh&locale=vi_VN&studies=%5B%5D&hide_side_toolbar=0&allow_symbol_change=1"
+          style="width: 100%; height: 100%; border: none;"
+          title="TradingView ${tvSymbol}"
+        ></iframe>
+      `;
     }
   }, [tvSymbol, activeTab, activeTimeframe]);
 
@@ -152,7 +121,7 @@ export const TechnicalChart: React.FC = () => {
               value={activeSymbol}
               onChange={(e) => {
                 const s = watchlist.find((item) => item.symbol === e.target.value) || VN50_WATCHLIST.find((item) => item.symbol === e.target.value);
-                setSelectedStock(e.target.value, s?.price || 18500, 'BUY');
+                setSelectedStock(e.target.value, s?.price || 70622, 'BUY');
               }}
               className="bg-[#181d29] border border-[#2b3245] text-white font-mono font-black text-lg rounded-xl px-3 py-1.5 focus:outline-none focus:border-emerald-500 cursor-pointer"
             >
@@ -214,26 +183,26 @@ export const TechnicalChart: React.FC = () => {
         {/* View Tabs */}
         <div className="flex items-center p-1 bg-[#181d29] rounded-xl border border-[#2b3245] text-xs font-sans">
           <button
-            onClick={() => setActiveTab('TRADINGVIEW')}
+            onClick={() => setActiveTab('VNDIRECT')}
             className={`px-3 py-1 rounded-lg font-bold transition flex items-center gap-1.5 ${
-              activeTab === 'TRADINGVIEW'
+              activeTab === 'VNDIRECT'
                 ? 'bg-emerald-500 text-slate-950 shadow'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <Activity className="h-3.5 w-3.5" />
-            <span>TradingView ({tvSymbol})</span>
+            <Globe className="h-3.5 w-3.5" />
+            <span>VNDIRECT DStock ({activeSymbol})</span>
           </button>
           <button
-            onClick={() => setActiveTab('VNDIRECT')}
+            onClick={() => setActiveTab('TRADINGVIEW')}
             className={`px-3 py-1 rounded-lg font-bold transition flex items-center gap-1.5 ${
-              activeTab === 'VNDIRECT'
-                ? 'bg-amber-500 text-slate-950 shadow'
+              activeTab === 'TRADINGVIEW'
+                ? 'bg-cyan-500 text-slate-950 shadow'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <Globe className="h-3.5 w-3.5" />
-            <span>VNDIRECT / SSI DStock</span>
+            <Activity className="h-3.5 w-3.5" />
+            <span>TradingView Direct</span>
           </button>
           <button
             onClick={() => setActiveTab('ORDERBOOK')}
@@ -249,8 +218,8 @@ export const TechnicalChart: React.FC = () => {
         </div>
       </div>
 
-      {/* ══ 2. CHẾ ĐỘ 1: BIỂU ĐỒ NẾN TRADINGVIEW REALTIME (ĐỒNG BỘ MÃ & TIMEFRAME) ══ */}
-      {activeTab === 'TRADINGVIEW' && (
+      {/* ══ 2. CHẾ ĐỘ 1: BIỂU ĐỒ KỸ THUẬT VNDIRECT D-CHART REALTIME (MẶC ĐỊNH - CHUẨN 100% VN STOCKS, 0 POPUP) ══ */}
+      {activeTab === 'VNDIRECT' && (
         <div className="p-3 bg-[#0e1117]">
           {/* Timeframe Selector Bar */}
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#212636] text-xs font-mono">
@@ -271,51 +240,65 @@ export const TechnicalChart: React.FC = () => {
               ))}
             </div>
 
-            <div className="text-[11px] text-slate-400 font-sans flex items-center gap-1.5">
+            <div className="text-[11px] text-slate-400 font-sans flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Dữ liệu: <b className="text-emerald-400 font-mono">{tvSymbol}</b> • Khung: <b className="text-cyan-300 font-mono">{activeTimeframe === 'D' ? '1D' : activeTimeframe}</b></span>
+              <span>Đang xem: <b className="text-emerald-400 font-mono">{activeSymbol}</b> ({exchange}) • Khung: <b className="text-cyan-300 font-mono">{activeTimeframe === 'D' ? '1D' : activeTimeframe}</b></span>
+              <a
+                href={`https://dchart.vndirect.com.vn/?symbol=${activeSymbol}`}
+                target="_blank"
+                rel="noreferrer"
+                className="ml-2 text-cyan-400 hover:underline flex items-center gap-1 text-[11px]"
+              >
+                Mở VNDIRECT <ExternalLink className="h-3 w-3" />
+              </a>
             </div>
           </div>
 
-          {/* TradingView Container */}
+          {/* VNDIRECT DChart Iframe Container */}
+          <iframe
+            key={`${activeSymbol}_${activeTimeframe}`}
+            src={`https://dchart.vndirect.com.vn/?symbol=${activeSymbol}&interval=${activeTimeframe === 'D' ? '1D' : activeTimeframe}&theme=dark`}
+            title={`VNDIRECT DChart ${activeSymbol}`}
+            className="w-full h-[540px] rounded-xl border border-[#212636] bg-[#121620]"
+          />
+        </div>
+      )}
+
+      {/* ══ 2.1. CHẾ ĐỘ 2: TRADINGVIEW DIRECT VIEW ══ */}
+      {activeTab === 'TRADINGVIEW' && (
+        <div className="p-3 bg-[#0e1117]">
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#212636] text-xs font-mono">
+            <div className="flex items-center gap-1">
+              <span className="text-slate-500 font-sans mr-2">Khung thời gian:</span>
+              {(['15', '60', 'D', 'W', 'M'] as const).map((tf) => (
+                <button
+                  key={tf}
+                  onClick={() => setActiveTimeframe(tf)}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition ${
+                    activeTimeframe === tf
+                      ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-[#181d29]'
+                  }`}
+                >
+                  {tf === 'D' ? '1 Ngày' : tf === 'W' ? '1 Tuần' : tf === 'M' ? '1 Tháng' : `${tf}m`}
+                </button>
+              ))}
+            </div>
+
+            <div className="text-[11px] text-slate-400 font-sans flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span>TradingView Live: <b className="text-cyan-300 font-mono">{tvSymbol}</b></span>
+            </div>
+          </div>
+
           <div
             ref={tradingViewContainerRef}
-            className="w-full h-[520px] rounded-xl overflow-hidden bg-[#0e1117] border border-[#212636]"
+            className="w-full h-[540px] rounded-xl overflow-hidden bg-[#0e1117] border border-[#212636]"
           />
         </div>
       )}
 
-      {/* ══ 2.1. CHẾ ĐỘ 1.1: BIỂU ĐỒ VNDIRECT D-CHART & SSI IBOARD IFRAME ══ */}
-      {activeTab === 'VNDIRECT' && (
-        <div className="p-3 bg-[#0e1117]">
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#212636] text-xs">
-            <div className="flex items-center gap-2">
-              <span className="text-amber-400 font-bold flex items-center gap-1">
-                <Globe className="h-4 w-4" /> Biểu Đồ Kỹ Thuật Chuyên Sâu VNDIRECT DChart:
-              </span>
-              <span className="px-2 py-0.5 bg-[#181d29] rounded font-mono font-bold text-white border border-[#2b3245]">
-                {activeSymbol}
-              </span>
-            </div>
-            <a
-              href={`https://dchart.vndirect.com.vn/?symbol=${activeSymbol}`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-[11px] text-cyan-400 hover:underline flex items-center gap-1"
-            >
-              Mở toàn màn hình VNDIRECT <ExternalLink className="h-3 w-3" />
-            </a>
-          </div>
-
-          <iframe
-            src={`https://dchart.vndirect.com.vn/?symbol=${activeSymbol}`}
-            title={`VNDIRECT DChart ${activeSymbol}`}
-            className="w-full h-[520px] rounded-xl border border-[#212636] bg-[#121620]"
-          />
-        </div>
-      )}
-
-      {/* ══ 3. CHẾ ĐỘ 2: SỔ LỆNH 3 BÊN & KHỚP LỆNH TICK THEO GIÂY (DNSE ENTRADE X STYLE) ══ */}
+      {/* ══ 3. CHẾ ĐỘ 3: SỔ LỆNH 3 BÊN & KHỚP LỆNH TICK THEO GIÂY (DNSE ENTRADE X STYLE) ══ */}
       {activeTab === 'ORDERBOOK' && (
         <div className="p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 bg-[#0e1117]">
           {/* CỘT TRÁI: BẢNG BƯỚC GIÁ 3 CẤP MUA / BÁN (7 COLS) */}

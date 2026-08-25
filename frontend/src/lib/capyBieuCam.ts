@@ -169,14 +169,19 @@ const THOAI: Record<GreetingStyle, Record<Nhom, string[]>> = {
   },
 };
 
-/** Lấy câu thoại: Kết hợp ma trận 7 ngày x 6 buổi + kho biểu cảm */
+import { layThoaiChuanCamXuc } from './capy500Quotes';
+
+/** Lấy câu thoại: Khớp 100% với cảm xúc nếu là biểu cảm đặc biệt (vui, sợ, giận, đau, yêu, tự hào) */
 export function layThoai(bc: BieuCam, style: GreetingStyle): string {
-  // 60% lấy theo ma trận 4 phong cách x 7 ngày x 6 buổi (rất phong phú và đúng thời điểm)
-  if (Math.random() < 0.6) {
+  const camXucDacBiet: Nhom[] = ['so', 'gian', 'dau', 'vui', 'yeu', 'tuHao', 'buonNgu'];
+  if (camXucDacBiet.includes(bc.nhom)) {
+    return layThoaiChuanCamXuc(bc.nhom, style);
+  }
+  // Phiên bản trung tính / làm việc: 50% theo ma trận ngày-buổi, 50% theo kho thoại cảm xúc
+  if (Math.random() < 0.5) {
     return layThoaiTheoMaTran4x7x6(style);
   }
-  const ds = THOAI[style]?.[bc.nhom] ?? THOAI.vui[bc.nhom];
-  return ds[Math.floor(Math.random() * ds.length)] ?? ds[0]!;
+  return layThoaiChuanCamXuc(bc.nhom, style);
 }
 
 export function bocBieuCam(nhom?: Nhom[]): BieuCam {

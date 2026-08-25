@@ -332,13 +332,13 @@ export default function Capy() {
     setAimInfo({ active: false, angleDeg: 0, powerPct: 0, lineLength: 0 });
 
     if (isGunnyMode && dist >= 20) {
-      // 🚀 BẮN PHÁO GUNNY SIÊU MẠNH (Lực cực đại, nảy 3-4 lần)
+      // 🚀 BẮN PHÁO GUNNY SIÊU MẠNH GẤP 10 LẦN (Vận tốc cực đại, nảy 4-6 lần quanh 4 cạnh)
       const launchAngle = Math.atan2(-pullY, -pullX);
-      const power = Math.min(68, Math.max(32, dist * 0.52));
+      const power = Math.min(280, Math.max(90, dist * 2.2));
 
       s.vx = Math.cos(launchAngle) * power;
       s.vy = Math.sin(launchAngle) * power;
-      s.vXoay = (s.vx >= 0 ? 1 : -1) * (26 + Math.random() * 18);
+      s.vXoay = (s.vx >= 0 ? 1 : -1) * (45 + Math.random() * 30);
       s.soLanNay = 0;
 
       setTrangThai('bay');
@@ -346,7 +346,7 @@ export default function Capy() {
 
       const flyEmotion = bocBieuCam(['so', 'gian']);
       setBieuCam(flyEmotion);
-      noiCauTuyChinh('Aaaaa! Bắn éc éc! Đập tường vỡ đầu rồi!', 3.8, flyEmotion);
+      noiCauTuyChinh('Aaaaa! Bắn éc éc! Đập tường vỡ đầu rồi sếp ôi!', 3.8, flyEmotion);
     } else {
       // Kéo thả bình thường hoặc chạm nhẹ
       s.vx = 0; s.vy = 0;

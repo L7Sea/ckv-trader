@@ -10,10 +10,10 @@
    Hàm thuần, không đụng DOM, không đụng React → chạy thẳng bằng Node.
    ═══════════════════════════════════════════════════════════════ */
 
-export const MA_SAT = 0.972;     // hãm từ từ để đập tường 3-4 lần
-export const NAY_LAI = 0.82;     // hệ số nảy mạnh khi đập mép màn hình
+export const MA_SAT = 0.982;     // hãm từ từ cho tốc độ siêu cao
+export const NAY_LAI = 0.86;     // nảy mạnh liên tục quanh 4 cạnh
 export const TOC_BOI = 0.55;     // tốc độ bơi lững thững (px/khung)
-export const NGUONG_BAY = 0.35;  // dưới mức này coi như đã dừng, chuyển sang bơi
+export const NGUONG_BAY = 0.40;  // dưới mức này coi như đã dừng, chuyển sang bơi
 
 export interface TrangThaiVatLy {
   x: number; y: number;
@@ -32,11 +32,7 @@ export function dangBay(s: TrangThaiVatLy): boolean {
 }
 
 /**
- * Tiến 1 khung hình. SỬA TRỰC TIẾP `s` (không tạo object mới) vì hàm này
- * chạy 60 lần/giây — cấp phát object mỗi khung là rác cho bộ dọn bộ nhớ.
- *
- * `chonDich` được gọi khi bé bơi tới nơi và cần điểm đến mới. Truyền vào
- * thay vì gọi Math.random() bên trong, để test cắm được số cố định.
+ * Tiến 1 khung hình với sub-stepping khi tốc độ cực đại để không xuyên tường.
  */
 export function buocVatLy(
   s: TrangThaiVatLy,
@@ -46,19 +42,24 @@ export function buocVatLy(
   chonDich: () => { x: number; y: number },
 ): void {
   if (dangBay(s)) {
-    /* ── Bay sau cú ném ── */
-    s.x += s.vx; s.y += s.vy;
-    s.vx *= MA_SAT; s.vy *= MA_SAT;
-    s.xoay += s.vXoay;
-    s.vXoay *= 0.97;
+    /* ── Bay sau cú nã pháo Gunny siêu mạnh (Sub-stepping) ── */
+    const speed = Math.hypot(s.vx, s.vy);
+    const steps = Math.min(4, Math.max(1, Math.ceil(speed / 30)));
+    const dt = 1 / steps;
 
-    /* Đập mép thì nảy lại. PHẢI kẹp toạ độ về trong khung TRƯỚC khi đảo
-       vận tốc, nếu không bé lún ra ngoài rồi mỗi khung lại nảy một lần,
-       kẹt luôn ngoài màn hình. */
-    if (s.x < 0)    { s.x = 0;    s.vx = -s.vx * NAY_LAI; s.vXoay = -s.vXoay; }
-    if (s.x > maxX) { s.x = maxX; s.vx = -s.vx * NAY_LAI; s.vXoay = -s.vXoay; }
-    if (s.y < 0)    { s.y = 0;    s.vy = -s.vy * NAY_LAI; }
-    if (s.y > maxY) { s.y = maxY; s.vy = -s.vy * NAY_LAI; }
+    for (let i = 0; i < steps; i++) {
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+      s.vx *= Math.pow(MA_SAT, dt);
+      s.vy *= Math.pow(MA_SAT, dt);
+      s.xoay += s.vXoay * dt;
+      s.vXoay *= Math.pow(0.975, dt);
+
+      if (s.x < 0)    { s.x = 0;    s.vx = -s.vx * NAY_LAI; s.vXoay = -s.vXoay; }
+      if (s.x > maxX) { s.x = maxX; s.vx = -s.vx * NAY_LAI; s.vXoay = -s.vXoay; }
+      if (s.y < 0)    { s.y = 0;    s.vy = -s.vy * NAY_LAI; }
+      if (s.y > maxY) { s.y = maxY; s.vy = -s.vy * NAY_LAI; }
+    }
     return;
   }
 
