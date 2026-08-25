@@ -4,7 +4,7 @@ import { getStyle } from '@/lib/greeting';
 import { bocBieuCam, layThoai, BIEU_CAM, type BieuCam, type Nhom } from '@/lib/capyBieuCam';
 import { buocVatLy, dangBay } from '@/lib/capyVatLy';
 import { layThoaiHanhDong, type HanhDong } from '@/lib/capyThoaiHanhDong';
-import { chonBoDo, type NguCanh } from '@/lib/capyBoDo';
+import { chonBoDo, type NguCanh, layKieuAoTheoBuoi } from '@/lib/capyBoDo';
 import type { BoDo } from '@/lib/capyBoDo';
 import { docKho } from '@/lib/capyMemeKho';
 import type { CongThucMeme } from '@/lib/capyMemeSpec';
@@ -226,6 +226,7 @@ export default function Capy() {
           tuThe={memeDang?.tuThe ?? boDo.tuThe}
           phuKien={memeDang?.phuKien ?? boDo.phuKien}
           lopThem={memeDang?.lopThem}
+          kieuAo={boDo.kieuAo}
         />
       </div>
     </div>

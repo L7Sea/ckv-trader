@@ -1,39 +1,61 @@
-/* ═══════════════════════════════════════════════════════════════
-   TỦ ĐỒ CỦA BÉ CAPY — lớp PHỤ KIỆN trong kiến trúc búp bê giấy.
-
-   Mỗi món chỉ là một mẩu SVG + cho biết nó BÁM VÀO ĐÂU:
-     'dau'  — nằm trong nhóm đầu, đầu dời thì món dời theo (cam, mũ,
-              kính, nơ...). Toạ độ tính theo đầu chuẩn quanh (100, 96).
-     'canh' — nằm ở toạ độ tuyệt đối trên khung 200×250 (cặp táp đặt
-              cạnh chân, ly trà sữa để bên hông...).
-
-   Thêm một món mới = thêm ĐÚNG MỘT dòng vào bảng dưới. Không phải sửa
-   component, không phải sửa test, không phải upload file lên đâu cả.
-
-   Đây là thiết kế gốc — không cắt từ bộ sticker nào.
-   ═══════════════════════════════════════════════════════════════ */
-
 export type NeoVao = 'dau' | 'canh';
 
 export interface PhuKien {
   ten: string;
   neo: NeoVao;
-  /** Mẩu SVG. Dùng chuỗi để bảng này là DỮ LIỆU THUẦN — test được bằng Node. */
   hinh: string;
-  /** Món này che mắt (kính) → vẽ SAU khuôn mặt */
   tren?: boolean;
 }
 
-const NET = '#1c1c1c';   // nét viền ĐEN, khớp với thân bé trong CapyMat
+const NET = '#231F20';
 
 const _PK = {
-  /* ── Đội trên đầu ── */
+  /* ── 1 Quả cam trên đầu ── */
   cam: {
     ten: 'Quả cam trên đầu', neo: 'dau',
-    hinh: `<circle cx="100" cy="26" r="15" fill="#f59331" stroke="${NET}" stroke-width="3.5"/>
-           <path d="M100 12 q7 -7 13 -3" stroke="#4c8b3a" stroke-width="4" fill="none" stroke-linecap="round"/>
-           <ellipse cx="94" cy="21" rx="4" ry="3" fill="#fff" opacity=".45"/>`,
+    hinh: `<circle cx="100" cy="27" r="14" fill="#FF8A00" stroke="${NET}" stroke-width="4.5"/>
+           <path d="M100 13 Q102 7 106 6" stroke="#5D4037" stroke-width="3" fill="none" stroke-linecap="round"/>
+           <path d="M102 9 Q112 7 111 15 Q104 14 102 9 Z" fill="#4CAF50" stroke="${NET}" stroke-width="2.2"/>
+           <ellipse cx="96" cy="23" rx="4" ry="2.2" fill="#FFA726" transform="rotate(-30 96 23)"/>`,
   },
+
+  /* ── Tháp 3 quả cam chồng lên đầu (như ảnh 4/5) ── */
+  thap3Cam: {
+    ten: 'Tháp 3 quả cam', neo: 'dau',
+    hinh: `<g>
+      <circle cx="92" cy="30" r="11" fill="#FF8A00" stroke="${NET}" stroke-width="3.8"/>
+      <circle cx="108" cy="30" r="11" fill="#FF8A00" stroke="${NET}" stroke-width="3.8"/>
+      <circle cx="100" cy="14" r="10" fill="#FF8A00" stroke="${NET}" stroke-width="3.8"/>
+      <path d="M100 4 Q102 0 105 0" stroke="#5D4037" stroke-width="2.5" fill="none"/>
+      <path d="M101 2 Q108 1 107 7 Z" fill="#4CAF50" stroke="${NET}" stroke-width="1.8"/>
+    </g>`,
+  },
+
+  /* ── Khăn tắm gấp vuông đắp đầu (Onsen) ── */
+  khanTam: {
+    ten: 'Khăn tắm trên đầu', neo: 'dau',
+    hinh: `<rect x="76" y="24" width="48" height="16" rx="5" fill="#F8FAFC" stroke="${NET}" stroke-width="4"/>
+           <line x1="76" y1="32" x2="124" y2="32" stroke="#CBD5E1" stroke-width="2"/>`,
+  },
+
+  /* ── Vịt vàng trên đầu ── */
+  vitVang: {
+    ten: 'Vịt vàng trên đầu', neo: 'dau',
+    hinh: `<ellipse cx="100" cy="30" rx="16" ry="12" fill="#f7d046" stroke="${NET}" stroke-width="3.5"/>
+           <circle cx="110" cy="21" r="9" fill="#f7d046" stroke="${NET}" stroke-width="3.5"/>
+           <path d="M118 20 l9 3 -9 4 z" fill="#f0912e" stroke="${NET}" stroke-width="2.4" stroke-linejoin="round"/>
+           <circle cx="112" cy="19" r="2" fill="${NET}"/>`,
+  },
+
+  /* ── Chim nhỏ ── */
+  chim: {
+    ten: 'Chim nhỏ', neo: 'dau',
+    hinh: `<ellipse cx="100" cy="28" rx="13" ry="11" fill="#f7d046" stroke="${NET}" stroke-width="3"/>
+           <path d="M112 26 l8 3 -8 3 z" fill="#f0912e" stroke="${NET}" stroke-width="2.2" stroke-linejoin="round"/>
+           <circle cx="105" cy="24" r="2" fill="${NET}"/>`,
+  },
+
+  /* ── Cài hoa ── */
   hoa: {
     ten: 'Cài hoa', neo: 'dau',
     hinh: `<g transform="translate(64 30)">
@@ -41,121 +63,82 @@ const _PK = {
              <circle cx="0" cy="0" r="6" fill="#f5c542" stroke="${NET}" stroke-width="2.6"/>
            </g>`,
   },
-  vitVang: {
-    ten: 'Vịt vàng trên đầu', neo: 'dau',
-    hinh: `<ellipse cx="100" cy="30" rx="16" ry="12" fill="#f7d046" stroke="${NET}" stroke-width="3"/>
-           <circle cx="110" cy="21" r="9" fill="#f7d046" stroke="${NET}" stroke-width="3"/>
-           <path d="M118 20 l9 3 -9 4 z" fill="#f0912e" stroke="${NET}" stroke-width="2.4" stroke-linejoin="round"/>
-           <circle cx="112" cy="19" r="2" fill="${NET}"/>`,
-  },
-  chim: {
-    ten: 'Chim nhỏ trên đầu', neo: 'dau',
-    hinh: `<ellipse cx="100" cy="28" rx="13" ry="11" fill="#f7d046" stroke="${NET}" stroke-width="3"/>
-           <path d="M112 26 l8 3 -8 3 z" fill="#f0912e" stroke="${NET}" stroke-width="2.2" stroke-linejoin="round"/>
-           <circle cx="105" cy="24" r="2" fill="${NET}"/>
-           <path d="M92 28 q7 -6 13 0" stroke="${NET}" stroke-width="2.2" fill="none"/>`,
-  },
-  muLen: {
-    ten: 'Mũ len mùa đông', neo: 'dau',
-    hinh: `<path d="M52 48 C 52 20 148 20 148 48 Z" fill="#c0455f" stroke="${NET}" stroke-width="3.6" stroke-linejoin="round"/>
-           <rect x="46" y="44" width="108" height="14" rx="7" fill="#e8e2d8" stroke="${NET}" stroke-width="3.4"/>
-           <circle cx="100" cy="16" r="10" fill="#e8e2d8" stroke="${NET}" stroke-width="3.2"/>`,
-  },
-  nonBaoHo: {
-    ten: 'Nón bảo hộ công trường', neo: 'dau',
-    hinh: `<path d="M54 50 C 54 20 146 20 146 50 Z" fill="#f2b21c" stroke="${NET}" stroke-width="3.6" stroke-linejoin="round"/>
-           <rect x="44" y="46" width="112" height="10" rx="5" fill="#f2b21c" stroke="${NET}" stroke-width="3.4"/>
-           <path d="M100 22 L100 48" stroke="${NET}" stroke-width="2.6"/>`,
-  },
-  muDauBep: {
-    ten: 'Mũ đầu bếp', neo: 'dau',
-    hinh: `<path d="M64 46 C 50 46 48 22 66 22 C 68 8 132 8 134 22 C 152 22 150 46 136 46 Z" fill="#fff" stroke="${NET}" stroke-width="3.4" stroke-linejoin="round"/>
-           <rect x="64" y="42" width="72" height="12" rx="4" fill="#fff" stroke="${NET}" stroke-width="3.2"/>`,
+
+  /* ── Nơ đỏ ── */
+  no: {
+    ten: 'Nơ đỏ', neo: 'dau',
+    hinh: `<path d="M100 36 L78 24 L78 48 Z M100 36 L122 24 L122 48 Z" fill="#e0455f" stroke="${NET}" stroke-width="3" stroke-linejoin="round"/>
+           <circle cx="100" cy="36" r="6" fill="#e0455f" stroke="${NET}" stroke-width="3"/>`,
   },
 
-  /* ── Đeo trên mặt (vẽ ĐÈ lên mắt) ── */
+  /* ── Kính râm cực ngầu ── */
   kinhRam: {
-    ten: 'Kính râm', neo: 'dau', tren: true,
-    hinh: `<path d="M52 78 L148 78" stroke="${NET}" stroke-width="4"/>
-           <rect x="52" y="70" width="42" height="30" rx="12" fill="#22303f" stroke="${NET}" stroke-width="4"/>
-           <rect x="106" y="70" width="42" height="30" rx="12" fill="#22303f" stroke="${NET}" stroke-width="4"/>
-           <path d="M60 78 l10 12" stroke="#fff" stroke-width="3" opacity=".45"/>`,
+    ten: 'Kính râm cực ngầu', neo: 'dau', tren: true,
+    hinh: `<path d="M50 92 h34 v18 h-34 z M116 92 h34 v18 h-34 z M84 99 h32" stroke="${NET}" stroke-width="5" fill="#1E293B" stroke-linejoin="round"/>
+           <line x1="58" y1="96" x2="72" y2="106" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+           <line x1="124" y1="96" x2="138" y2="106" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>`,
   },
+
+  /* ── Kính cận trí thức ── */
   kinhCan: {
     ten: 'Kính cận', neo: 'dau', tren: true,
-    hinh: `<circle cx="74" cy="84" r="21" fill="#fff" fill-opacity=".2" stroke="${NET}" stroke-width="4"/>
-           <circle cx="126" cy="84" r="21" fill="#fff" fill-opacity=".2" stroke="${NET}" stroke-width="4"/>
-           <path d="M95 84 L105 84" stroke="${NET}" stroke-width="4"/>`,
+    hinh: `<circle cx="68" cy="98" r="15" fill="none" stroke="${NET}" stroke-width="4.5"/>
+           <circle cx="132" cy="98" r="15" fill="none" stroke="${NET}" stroke-width="4.5"/>
+           <line x1="83" y1="98" x2="117" y2="98" stroke="${NET}" stroke-width="4.5"/>`,
   },
 
-  /* ── Quàng / đeo ở cổ ── */
-  khanQuang: {
-    ten: 'Khăn quàng cổ', neo: 'canh',
-    hinh: `<path d="M56 148 C 80 164 120 164 144 148 L 148 166 C 120 182 80 182 52 166 Z" fill="#c0455f" stroke="${NET}" stroke-width="3.6" stroke-linejoin="round"/>
-           <path d="M138 166 L 152 210 L 132 214 L 124 172 Z" fill="#c0455f" stroke="${NET}" stroke-width="3.4" stroke-linejoin="round"/>`,
+  /* ── Nón bảo hộ ── */
+  nonBaoHo: {
+    ten: 'Nón bảo hộ', neo: 'dau',
+    hinh: `<path d="M38 52 C38 20 162 20 162 52 Z" fill="#f5c542" stroke="${NET}" stroke-width="4.5" stroke-linejoin="round"/>
+           <path d="M26 52 h148 v8 h-148 z" fill="#f5c542" stroke="${NET}" stroke-width="4.5"/>`,
   },
+
+  /* ── Cà vạt ── */
   caVat: {
     ten: 'Cà vạt', neo: 'canh',
-    hinh: `<path d="M92 156 L108 156 L104 168 L96 168 Z" fill="#c0455f" stroke="${NET}" stroke-width="3" stroke-linejoin="round"/>
-           <path d="M96 168 L104 168 L110 200 L100 208 L90 200 Z" fill="#c0455f" stroke="${NET}" stroke-width="3.2" stroke-linejoin="round"/>`,
-  },
-  no: {
-    ten: 'Nơ cổ', neo: 'canh',
-    hinh: `<path d="M100 162 L76 150 L76 176 Z" fill="#e0455f" stroke="${NET}" stroke-width="3.2" stroke-linejoin="round"/>
-           <path d="M100 162 L124 150 L124 176 Z" fill="#e0455f" stroke="${NET}" stroke-width="3.2" stroke-linejoin="round"/>
-           <circle cx="100" cy="163" r="7" fill="#c0344c" stroke="${NET}" stroke-width="3"/>`,
+    hinh: `<path d="M96 172 l8 0 l4 24 l-8 12 l-8 -12 z" fill="#e0455f" stroke="${NET}" stroke-width="3.5" stroke-linejoin="round"/>`,
   },
 
-  /* ── Cầm / để bên cạnh ── */
-  traSua: {
-    ten: 'Ly trà sữa', neo: 'canh',
-    hinh: `<path d="M158 178 L 186 178 L 181 232 L 163 232 Z" fill="#e6c9a8" stroke="${NET}" stroke-width="3.4" stroke-linejoin="round"/>
-           <rect x="156" y="172" width="32" height="8" rx="3" fill="#fff" stroke="${NET}" stroke-width="3"/>
-           <path d="M176 172 L 182 142" stroke="${NET}" stroke-width="5" stroke-linecap="round"/>
-           ${[[168, 218], [178, 220], [172, 226]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4" fill="${NET}"/>`).join('')}`,
-  },
-  capTap: {
-    ten: 'Cặp táp đi làm', neo: 'canh',
-    hinh: `<rect x="150" y="196" width="44" height="34" rx="5" fill="#8a5a34" stroke="${NET}" stroke-width="3.6"/>
-           <path d="M164 196 q8 -12 16 0" stroke="${NET}" stroke-width="3.4" fill="none"/>
-           <rect x="166" y="208" width="12" height="8" rx="2" fill="#e0b060" stroke="${NET}" stroke-width="2.6"/>`,
-  },
-  tamDa: {
-    ten: 'Tấm đá mẫu', neo: 'canh',
-    hinh: `<rect x="8" y="180" width="40" height="52" rx="3" fill="#e8e2d8" stroke="${NET}" stroke-width="3.6"/>
-           <path d="M12 198 q10 -6 18 2 q8 8 14 2 M12 216 q12 6 20 -2 q8 -8 14 -1" stroke="#9aa3ad" stroke-width="2.6" fill="none"/>`,
-  },
-  laptop: {
-    ten: 'Máy tính xách tay', neo: 'canh',
-    hinh: `<path d="M62 208 L 138 208 L 146 232 L 54 232 Z" fill="#8f9aa8" stroke="${NET}" stroke-width="3.4" stroke-linejoin="round"/>
-           <rect x="70" y="164" width="60" height="46" rx="4" fill="#22303f" stroke="${NET}" stroke-width="3.6"/>
-           <rect x="76" y="170" width="48" height="34" rx="2" fill="#4d94ff"/>`,
-  },
+  /* ── Miếng dưa hấu ── */
   duaHau: {
     ten: 'Miếng dưa hấu', neo: 'canh',
-    hinh: `<path d="M150 226 A 40 40 0 0 1 194 190 L 194 226 Z" fill="#e8455f" stroke="${NET}" stroke-width="3.4" stroke-linejoin="round"/>
-           <path d="M152 228 A 42 42 0 0 1 194 188" stroke="#4c8b3a" stroke-width="7" fill="none"/>
-           ${[[172, 214], [182, 206], [176, 200]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="2.6" ry="4" fill="${NET}"/>`).join('')}`,
+    hinh: `<path d="M30 186 A 22 22 0 0 0 74 186 Z" fill="#e0455f" stroke="${NET}" stroke-width="3.5"/>
+           <path d="M30 186 A 22 22 0 0 0 74 186" stroke="#4c8b3a" stroke-width="5" fill="none"/>
+           <circle cx="46" cy="194" r="1.8" fill="${NET}"/><circle cx="58" cy="194" r="1.8" fill="${NET}"/>`,
   },
 
-  /* ── Hiệu ứng quanh bé ── */
-  phaoGiay: {
-    ten: 'Pháo giấy ăn mừng', neo: 'canh',
-    hinh: `${[['#f5c542', 22, 40], ['#e0455f', 172, 34], ['#4d94ff', 40, 96], ['#4c8b3a', 176, 104], ['#f07f9c', 14, 150], ['#f2b21c', 188, 156]]
-      .map(([m, x, y]) => `<rect x="${x}" y="${y}" width="11" height="11" rx="2" fill="${m}" transform="rotate(${(Number(x) * 7) % 90} ${x} ${y})"/>`).join('')}`,
+  /* ── Ly trà sữa ── */
+  traSua: {
+    ten: 'Ly trà sữa', neo: 'canh',
+    hinh: `<path d="M26 190 L32 230 L52 230 L58 190 Z" fill="#f3d5b5" stroke="${NET}" stroke-width="3"/>
+           <line x1="42" y1="176" x2="42" y2="200" stroke="#52525b" stroke-width="4" stroke-linecap="round"/>
+           <circle cx="38" cy="222" r="2.5" fill="${NET}"/><circle cx="46" cy="222" r="2.5" fill="${NET}"/>`,
   },
+
+  /* ── Pháo giấy ăn mừng ── */
+  phaoGiay: {
+    ten: 'Pháo giấy', neo: 'canh',
+    hinh: `<g>
+             <circle cx="28" cy="170" r="3.5" fill="#e0455f"/>
+             <circle cx="40" cy="158" r="3" fill="#f5c542"/>
+             <circle cx="160" cy="164" r="3.5" fill="#3b82f6"/>
+             <circle cx="172" cy="176" r="3" fill="#10b981"/>
+           </g>`,
+  },
+
+  /* ── Mưa ── */
   mua: {
     ten: 'Mưa buồn', neo: 'canh',
-    hinh: `<path d="M46 22 C 46 6 96 2 104 18 C 130 12 146 28 138 44 L 52 44 C 38 44 38 26 46 22 Z" fill="#9aa9bb" stroke="${NET}" stroke-width="3.2" stroke-linejoin="round"/>
-           ${[[62, 54], [86, 60], [110, 54], [132, 60]].map(([x, y]) => `<path d="M${x} ${y} l-4 16" stroke="#6ec5f0" stroke-width="4" stroke-linecap="round"/>`).join('')}`,
+    hinh: `<g stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round">
+             <line x1="26" y1="20" x2="20" y2="40"/>
+             <line x1="56" y1="10" x2="50" y2="30"/>
+             <line x1="150" y1="16" x2="144" y2="36"/>
+             <line x1="178" y1="30" x2="172" y2="50"/>
+           </g>`,
   },
-} satisfies Record<string, PhuKien>;
+} as const;
 
-/* Khai báo 2 bước: `satisfies` giữ được TÊN từng món (gõ sai tên là TS
-   báo lỗi ngay), còn kiểu Record bên dưới cho mỗi món đủ mọi trường của
-   PhuKien — kể cả trường tuỳ chọn `tren` mà không phải món nào cũng có.
-   Viết gộp một dòng `as const satisfies` thì TS thu hẹp quá tay: món nào
-   không khai `tren` sẽ bị coi như KHÔNG CÓ trường đó. */
-export const PHU_KIEN: Record<TenPhuKien, PhuKien> = _PK;
 export type TenPhuKien = keyof typeof _PK;
-export const DS_PHU_KIEN = Object.keys(_PK) as TenPhuKien[];
+export const PHU_KIEN: Record<TenPhuKien, PhuKien> = _PK;
+export const DS_PHU_KIEN = Object.keys(PHU_KIEN) as TenPhuKien[];

@@ -3,20 +3,20 @@ import type { BieuCam, Mat, Mieng, Phu } from '@/lib/capyBieuCam';
 import { TU_THE, type TuThe } from '@/lib/capyTuThe';
 import { PHU_KIEN, type TenPhuKien } from '@/lib/capyPhuKien';
 import type { LopThem } from '@/lib/capyMemeSpec';
+import type { KieuAo } from '@/lib/capyBoDo';
 
 /* ═══════════════════════════════════════════════════════════════
    BÉ CAPY CHUẨN GỐC — DỰA 100% THEO ẢNH GỐC CỦA ANH HẢI (L7Sea).
    
-   ĐẶC TRƯNG NHẬN DIỆN KHÔNG THỂ NHẦM LẪN:
+   ĐẶC TRƯNG NHẬN DIỆN:
      1. ĐẦU hình ổ bánh mì dẹt ngang, má phính bầu bĩnh.
-     2. MŨI VÀ MIỆNG: Chữ T (mũi thanh ngang + thân dọc) kết hợp
-        với chữ Y NGƯỢC (hai nhánh rẽ xuống) nằm gọn trong MÕM NÂU SẪM.
+     2. MŨI VÀ MIỆNG: Chữ T kết hợp với chữ Y NGƯỢC (chữ lambda).
      3. MẮT: Hai gạch ngang nhỏ bo tròn, lim dim thần thái siêu chill.
      4. MÁ HỒNG: 3 gạch chéo /// màu hồng xinh xắn hai bên má.
      5. RÂU: 3 gạch ngắn phác thảo bên má trái.
      6. PHỤ KIỆN GỐC: Quả quýt nhỏ đội đầu có cuống lá xanh.
-     7. ÁO: Áo polo xanh dương tươi sáng, cổ viền trắng + 2 cúc áo.
-     8. NÉT VẼ: Nét viền đen dày dặn đậm chất truyện tranh/sticker.
+     7. QUY ĐỊNH MẶC ĐỒ THEO BUỔI:
+        - 1 Buổi chỉ mặc 1 dạng áo duy nhất (Polo xanh, Áo đỏ tím, Vest, Hoodie, Không mặc đồ).
    ═══════════════════════════════════════════════════════════════ */
 
 const LONG_GOC = '#C4A47C';       // Màu lông nâu tan gốc chuẩn
@@ -26,6 +26,9 @@ const NET = '#231F20';            // Nét vẽ đen than dày dặn
 const HONG_MA = '#F48FB1';        // Hồng má 3 gạch
 const AO_XANH = '#0288D1';        // Xanh dương tươi áo polo
 const AO_VIEN = '#29B6F6';        // Màu mặt cổ áo
+const AO_DO = '#E11D48';          // Áo đỏ tài lộc
+const AO_VEST = '#1E293B';        // Áo vest trader
+const AO_HOODIE = '#F59E0B';      // Áo hoodie vàng ấm
 const CAM_QUA = '#FF8A00';        // Quả quýt đội đầu
 const LA_XANH = '#4CAF50';        // Lá cây trên quả quýt
 
@@ -81,12 +84,9 @@ function VeMieng({ kieu }: { kieu: Mieng }) {
   const gx = 100;
   const chanY = 144;
 
-  // Cấu trúc miệng gốc: Chữ T kết hợp chữ Y ngược
   const miengGocTYNguoc = (
     <g>
-      {/* Thân dọc chữ T */}
       <line x1={gx} y1={MUI_Y + 7} x2={gx} y2={chanY} stroke={NET} strokeWidth="6" strokeLinecap="round" />
-      {/* Nhánh chữ Y ngược rẽ sang 2 bên */}
       <path d={`M ${gx} ${chanY} L ${gx - 9} ${chanY + 11} M ${gx} ${chanY} L ${gx + 9} ${chanY + 11}`} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
     </g>
   );
@@ -138,12 +138,10 @@ function VeMieng({ kieu }: { kieu: Mieng }) {
 function VeMaHong() {
   return (
     <g stroke={HONG_MA} strokeWidth="3.2" strokeLinecap="round">
-      {/* Má trái: 3 gạch chéo */}
       <line x1="46" y1="122" x2="43" y2="133" />
       <line x1="52" y1="122" x2="49" y2="133" />
       <line x1="58" y1="122" x2="55" y2="133" />
 
-      {/* Má phải: 3 gạch chéo */}
       <line x1="142" y1="122" x2="139" y2="133" />
       <line x1="148" y1="122" x2="145" y2="133" />
       <line x1="154" y1="122" x2="151" y2="133" />
@@ -151,21 +149,7 @@ function VeMaHong() {
   );
 }
 
-/* ── QUẢ QUÝT ĐỘI ĐẦU CHUẨN GỐC ── */
-function VeQuaCam() {
-  return (
-    <g id="cp-quacam-goc">
-      {/* Thân quả cam */}
-      <circle cx="100" cy="27" r="14" fill={CAM_QUA} stroke={NET} strokeWidth="4.5" />
-      <ellipse cx="96" cy="23" rx="4" ry="2.2" fill="#FFA726" transform="rotate(-30 96 23)" />
-      {/* Cuống và lá xanh */}
-      <path d="M 100 13 Q 102 7 106 6" stroke="#5D4037" strokeWidth="3" fill="none" strokeLinecap="round" />
-      <path d="M 102 9 Q 112 7 111 15 Q 104 14 102 9 Z" fill={LA_XANH} stroke={NET} strokeWidth="2.2" />
-    </g>
-  );
-}
-
-/* ── RÂU MÁ TRÁI CHUẨN ẢNH GỐC ── */
+/* ── RÂU MÁ TRÁI ── */
 function VeRauGoc() {
   return (
     <g stroke={NET} strokeWidth="4.2" strokeLinecap="round" fill="none">
@@ -213,54 +197,98 @@ interface Props {
   tuThe?: TuThe;
   phuKien?: TenPhuKien[];
   lopThem?: LopThem[];
+  kieuAo?: KieuAo;
 }
 
-export default function CapyMat({ bc, size, tuThe = 'dung', phuKien = [], lopThem = [] }: Props) {
+export default function CapyMat({ bc, size, tuThe = 'dung', phuKien = [], lopThem = [], kieuAo = 'poloXanh' }: Props) {
   const tt = TU_THE[tuThe] ?? TU_THE.dung;
   const [dx, dy] = tt.dauDich;
 
   const netChinh = { stroke: NET, strokeWidth: DAY_NET, strokeLinejoin: 'round' as const };
+  const pkDau = phuKien.filter((p) => PHU_KIEN[p]?.neo === 'dau');
+  const pkCanh = phuKien.filter((p) => PHU_KIEN[p]?.neo === 'canh');
+  const mau = (ds: TenPhuKien[]) => ds.map((p) => PHU_KIEN[p].hinh).join('');
+
+  const coMacAo = tt.coAo && kieuAo !== 'khongMac';
 
   return (
     <svg viewBox="0 0 200 250" width={size} height={size * 1.25} aria-hidden="true"
       style={{ display: 'block', overflow: 'visible' }}>
 
-      {/* ══ 1. TAY / CÁNH TAY RA PHÍA SAU (NẰM DƯỚI THÂN) ══ */}
-      <g stroke={NET} strokeWidth={DAY_NET} strokeLinejoin="round" fill={LONG_TOI}>
-        {/* Cánh tay thu về sau lưng đúng thần thái ảnh mẫu */}
-        <path d="M 36 178 Q 25 200 36 220" strokeLinecap="round" />
-        <path d="M 164 178 Q 175 200 164 220" strokeLinecap="round" />
-      </g>
+      {/* ══ 1. CẢNH PHÍA SAU (BỒN GỖ/PHAO) ══ */}
+      {tt.sau && <path d={tt.sau} fill={tt.mauSau ?? '#78350f'} {...netChinh} />}
 
-      {/* ══ 2. THÂN & ÁO POLO XANH DƯƠNG CHUẨN GỐC ══ */}
+      {/* ══ 2. TAY VẼ PHÍA SAU THÂN ══ */}
+      {tt.tay && (
+        <g stroke={NET} strokeWidth={DAY_NET} strokeLinejoin="round" fill={LONG_TOI}>
+          <path d={tt.tay[0]} />
+          <path d={tt.tay[1]} />
+        </g>
+      )}
+
+      {/* ══ 3. CHÂN ══ */}
+      {tt.chan.map((d, i) => <path key={'c' + i} d={d} fill={LONG_TOI} {...netChinh} />)}
+
+      {/* ══ 4. THÂN & ÁO THEO QUY ĐỊNH BUỔI ══ */}
       <g>
-        {/* Thân áo polo */}
-        <path d="M 38 160 L 36 244 Q 100 252 164 244 L 162 160 Z" fill={AO_XANH} {...netChinh} />
+        {/* Nền thân */}
+        <path d={tt.than} fill={LONG_GOC} {...netChinh} />
 
-        {/* Cổ áo polo trắng & viền xanh */}
-        <path d="M 100 174 Q 65 168 46 186 Q 72 202 94 184 Z" fill={AO_VIEN} stroke="#FFFFFF" strokeWidth="4.5" />
-        <path d="M 100 174 Q 65 168 46 186 Q 72 202 94 184 Z" fill="none" stroke={NET} strokeWidth="4" />
+        {/* Trang phục theo buổi */}
+        {coMacAo && (
+          <>
+            {/* KIỂU 1: ÁO POLO XANH CMC GỐC */}
+            {kieuAo === 'poloXanh' && (
+              <>
+                <path d="M 38 160 L 36 244 Q 100 252 164 244 L 162 160 Z" fill={AO_XANH} {...netChinh} />
+                <path d="M 100 174 Q 65 168 46 186 Q 72 202 94 184 Z" fill={AO_VIEN} stroke="#FFFFFF" strokeWidth="4.5" />
+                <path d="M 100 174 Q 65 168 46 186 Q 72 202 94 184 Z" fill="none" stroke={NET} strokeWidth="4" />
+                <path d="M 100 174 Q 135 168 154 186 Q 128 202 106 184 Z" fill={AO_VIEN} stroke="#FFFFFF" strokeWidth="4.5" />
+                <path d="M 100 174 Q 135 168 154 186 Q 128 202 106 184 Z" fill="none" stroke={NET} strokeWidth="4" />
+                <rect x="94" y="182" width="12" height="28" rx="3.5" fill="#01579B" stroke={NET} strokeWidth="2.8" />
+                <circle cx="100" cy="190" r="2.4" fill="#FFFFFF" />
+                <circle cx="100" cy="202" r="2.4" fill="#FFFFFF" />
+              </>
+            )}
 
-        <path d="M 100 174 Q 135 168 154 186 Q 128 202 106 184 Z" fill={AO_VIEN} stroke="#FFFFFF" strokeWidth="4.5" />
-        <path d="M 100 174 Q 135 168 154 186 Q 128 202 106 184 Z" fill="none" stroke={NET} strokeWidth="4" />
+            {/* KIỂU 2: ÁO ĐỎ TÍM TÀI LỘC */}
+            {kieuAo === 'aoDoTim' && (
+              <>
+                <path d="M 38 160 L 36 244 Q 100 252 164 244 L 162 160 Z" fill={AO_DO} {...netChinh} />
+                <path d="M 70 172 Q 100 184 130 172" stroke="#FFFFFF" strokeWidth="4.5" fill="none" strokeLinecap="round" />
+                <circle cx="100" cy="204" r="8" fill="#FBBF24" stroke={NET} strokeWidth="2.5" />
+                <text x="100" y="208" fontSize="11" fontWeight="900" fill={NET} textAnchor="middle">★</text>
+              </>
+            )}
 
-        {/* Nẹp áo và 2 cúc trắng */}
-        <rect x="94" y="182" width="12" height="28" rx="3.5" fill="#01579B" stroke={NET} strokeWidth="2.8" />
-        <circle cx="100" cy="190" r="2.4" fill="#FFFFFF" />
-        <circle cx="100" cy="202" r="2.4" fill="#FFFFFF" />
+            {/* KIỂU 3: ÁO VEST TRADER DOANH NHÂN */}
+            {kieuAo === 'vestTrader' && (
+              <>
+                <path d="M 38 160 L 36 244 Q 100 252 164 244 L 162 160 Z" fill={AO_VEST} {...netChinh} />
+                <polygon points="100,172 82,212 118,212" fill="#FFFFFF" />
+                <polygon points="97,174 103,174 106,204 100,214 94,204" fill="#E11D48" stroke={NET} strokeWidth="2" />
+              </>
+            )}
+
+            {/* KIỂU 4: ÁO HOODIE VÀNG ẤM ÁP */}
+            {kieuAo === 'hoodie' && (
+              <>
+                <path d="M 38 160 L 36 244 Q 100 252 164 244 L 162 160 Z" fill={AO_HOODIE} {...netChinh} />
+                <ellipse cx="100" cy="174" rx="30" ry="10" fill="#D97706" stroke={NET} strokeWidth="3" />
+                <rect x="68" y="212" width="64" height="22" rx="8" fill="#D97706" stroke={NET} strokeWidth="3" />
+              </>
+            )}
+          </>
+        )}
       </g>
 
-      {/* ══ 3. ĐẦU & MẶT (CHỒNG LÊN THÂN ĐỂ KHÔNG BỊ NGẤN CỔ) ══ */}
+      {/* ══ 5. ĐẦU & MẶT ══ */}
       <g transform={`translate(${dx} ${dy})`}>
         {/* Tai trái & phải */}
         <path d={TAI_TRAI} fill={LONG_TOI} {...netChinh} />
         <path d={TAI_PHAI} fill={LONG_TOI} {...netChinh} />
-        {/* Lớp lòng tai đậm hơn */}
         <path d="M 44 54 C 38 45 46 38 52 45 Z" fill="#6D4C41" />
         <path d="M 156 54 C 162 45 154 38 148 45 Z" fill="#6D4C41" />
-
-        {/* Quả quýt đội đầu chuẩn gốc */}
-        <VeQuaCam />
 
         {/* Đầu bánh mì dẹt ngang má phính */}
         <path d={DAU_GOC} fill={LONG_GOC} {...netChinh} />
@@ -284,9 +312,18 @@ export default function CapyMat({ bc, size, tuThe = 'dung', phuKien = [], lopThe
         {/* Má hồng 3 gạch /// */}
         <VeMaHong />
 
-        {/* Hiệu ứng cảm xúc phụ trợ nếu có */}
+        {/* Phụ kiện trên đầu */}
+        {pkDau.length > 0 && <g dangerouslySetInnerHTML={{ __html: mau(pkDau) }} />}
+
+        {/* Hiệu ứng cảm xúc */}
         {(bc.phu ?? []).map((p) => <VePhuTro key={p} kieu={p} />)}
       </g>
+
+      {/* ══ 6. CẢNH PHÍA TRƯỚC (NƯỚC/THÀNH BỒN/LAPTOP) ══ */}
+      {tt.truoc && <path d={tt.truoc} fill={tt.mauTruoc ?? '#38bdf8'} {...netChinh} fillRule="evenodd" />}
+
+      {/* ══ 7. PHỤ KIỆN BÊN CẠNH ══ */}
+      {pkCanh.length > 0 && <g dangerouslySetInnerHTML={{ __html: mau(pkCanh) }} />}
     </svg>
   );
 }
