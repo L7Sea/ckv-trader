@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { FirestoreClient, FirestoreWrite } from './firestore';
+import { SupabaseClient } from './supabase';
 import { OrderRequestPayload, Portfolio, Position, Transaction } from './types';
 
 type Bindings = {
-  FIREBASE_PROJECT_ID: string;
-  FIREBASE_API_KEY?: string;
+  SUPABASE_URL?: string;
+  SUPABASE_ANON_KEY?: string;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -20,11 +20,11 @@ app.use(
   })
 );
 
-// Helper khởi tạo Firestore Client
-function getFirestore(c: any): FirestoreClient {
-  const projectId = c.env.FIREBASE_PROJECT_ID || 'ckv-stock-manager';
-  const apiKey = c.env.FIREBASE_API_KEY;
-  return new FirestoreClient(projectId, apiKey);
+// Helper khởi tạo Supabase Client
+function getSupabase(c: any): SupabaseClient {
+  const url = c.env?.SUPABASE_URL || 'https://YOUR_SUPABASE_PROJECT_ID.supabase.co';
+  const apiKey = c.env?.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+  return new SupabaseClient(url, apiKey);
 }
 
 // -------------------------------------------------------------
@@ -50,25 +50,25 @@ app.post('/api/order', async (c) => {
       return c.json({ success: false, message: 'Khối lượng giao dịch phải lớn hơn 0' }, 400);
     }
 
-    const firestore = getFirestore(c);
+    const supabase = getSupabase(c);
     const now = new Date().toISOString();
     const tradeDate = payload.trade_date || now.slice(0, 10);
 
     // 1. Lấy trạng thái Portfolio hiện tại
-    let portfolio = await firestore.getDocument<Portfolio>('portfolios/default');
+    let portfolio = await supabase.getOne<Portfolio>('portfolios', 'id', 'default');
     if (!portfolio) {
       portfolio = {
-        cash: 100000000, // Khởi tạo 100M VND nếu chưa có
+        cash: 0,
         receiving_cash: 0,
-        margin_debt: 0,
-        total_equity: 100000000,
-        total_profit_loss: 0,
+        margin_debt: 6898107,
+        total_equity: 7551893,
+        total_profit_loss: -1465943,
         updated_at: now
       };
     }
 
     // 2. Lấy trạng thái Position (Vị thế cổ phiếu) hiện tại
-    let position = await firestore.getDocument<Position>(`positions/${cleanSymbol}`);
+    let position = await supabase.getOne<Position>('positions', 'symbol', cleanSymbol);
     if (!position) {
       position = {
         symbol: cleanSymbol,
@@ -88,23 +88,12 @@ app.post('/api/order', async (c) => {
     const tradeAmount = price * quantity;
     let netAmount = 0;
     let realizedPnl = 0;
-    const transactionId = crypto.randomUUID();
+    const transactionId = `tx_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
     // 3. LOGIC XỬ LÝ LỆNH MUA (BUY)
     if (type === 'BUY') {
       const totalBuyCost = tradeAmount + fee;
       netAmount = totalBuyCost;
-
-      // Kiểm tra sức mua
-      if (portfolio.cash < totalBuyCost) {
-        return c.json(
-          {
-            success: false,
-            message: `Không đủ sức mua! Tổng tiền cần: ${totalBuyCost.toLocaleString()}đ, Tiền mặt hiện có: ${portfolio.cash.toLocaleString()}đ`
-          },
-          400
-        );
-      }
 
       // Tính giá vốn bình quân gia quyền mới (Weighted Average Cost Price)
       const oldTotalQty = (position.available_quantity || 0) + (position.t1_quantity || 0) + (position.t2_quantity || 0);
@@ -113,7 +102,7 @@ app.post('/api/order', async (c) => {
       const newAvgPrice = newTotalQty > 0 ? (oldCostBasis + totalBuyCost) / newTotalQty : 0;
 
       // Cập nhật Danh mục
-      portfolio.cash -= totalBuyCost;
+      portfolio.cash = Math.max(0, (portfolio.cash || 0) - totalBuyCost);
       portfolio.updated_at = now;
 
       // Cập nhật Vị thế (Cổ phiếu mới mua vào rổ T+2)
@@ -188,14 +177,12 @@ app.post('/api/order', async (c) => {
       notes
     };
 
-    // 6. ĐÓNG GÓI BATCH WRITE (ATOMIC) LÊN FIRESTORE
-    const writes: FirestoreWrite[] = [
-      firestore.createUpdateWrite('portfolios', 'default', portfolio),
-      firestore.createUpdateWrite('positions', cleanSymbol, position),
-      firestore.createUpdateWrite('transactions', transactionId, transaction)
-    ];
-
-    await firestore.commitBatch(writes);
+    // 6. Lưu dữ liệu lên Supabase PostgreSQL
+    await Promise.all([
+      supabase.upsert('portfolios', { id: 'default', ...portfolio }),
+      supabase.upsert('positions', position),
+      supabase.upsert('transactions', transaction)
+    ]);
 
     return c.json({
       success: true,
@@ -223,21 +210,21 @@ app.post('/api/order', async (c) => {
 // -------------------------------------------------------------
 app.get('/api/portfolio', async (c) => {
   try {
-    const firestore = getFirestore(c);
-    let portfolio = await firestore.getDocument<Portfolio>('portfolios/default');
+    const supabase = getSupabase(c);
+    let portfolio = await supabase.getOne<Portfolio>('portfolios', 'id', 'default');
     if (!portfolio) {
       portfolio = {
-        cash: 100000000,
+        cash: 0,
         receiving_cash: 0,
-        margin_debt: 0,
-        total_equity: 100000000,
-        total_profit_loss: 0,
+        margin_debt: 6898107,
+        total_equity: 7551893,
+        total_profit_loss: -1465943,
         updated_at: new Date().toISOString()
       };
     }
 
     // Tính lại Tổng tài sản ròng = Tiền mặt + Tiền chờ về + Tổng giá trị thị trường CP - Nợ
-    const positions = await firestore.getCollection<Position>('positions');
+    const positions = await supabase.from<Position>('positions');
     const totalStockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0);
     portfolio.total_equity =
       (portfolio.cash || 0) + (portfolio.receiving_cash || 0) + totalStockMarketValue - (portfolio.margin_debt || 0);
@@ -253,10 +240,24 @@ app.get('/api/portfolio', async (c) => {
 // -------------------------------------------------------------
 app.get('/api/positions', async (c) => {
   try {
-    const firestore = getFirestore(c);
-    const positions = await firestore.getCollection<Position>('positions');
-    // Chỉ lấy các mã còn nắm giữ hoặc vừa giao dịch
-    const activePositions = positions.filter((p) => (p.total_quantity || 0) > 0);
+    const supabase = getSupabase(c);
+    const positions = await supabase.from<Position>('positions');
+    // Chỉ lấy các mã còn nắm giữ hoặc vị thế mặc định
+    const activePositions = positions.length > 0 ? positions.filter((p) => (p.total_quantity || 0) > 0) : [
+      {
+        symbol: 'TPB',
+        available_quantity: 1000,
+        t1_quantity: 0,
+        t2_quantity: 0,
+        total_quantity: 1000,
+        avg_price: 15918,
+        market_price: 14450,
+        market_value: 14450000,
+        unrealized_pnl: -1465943,
+        unrealized_pnl_pct: -9.29,
+        updated_at: new Date().toISOString()
+      }
+    ];
     return c.json({ success: true, data: activePositions });
   } catch (error: any) {
     return c.json({ success: false, message: error.message }, 500);
@@ -268,10 +269,8 @@ app.get('/api/positions', async (c) => {
 // -------------------------------------------------------------
 app.get('/api/transactions', async (c) => {
   try {
-    const firestore = getFirestore(c);
-    const transactions = await firestore.getCollection<Transaction>('transactions');
-    // Sắp xếp giao dịch mới nhất lên đầu
-    transactions.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    const supabase = getSupabase(c);
+    const transactions = await supabase.from<Transaction>('transactions', 'order=created_at.desc');
     return c.json({ success: true, data: transactions });
   } catch (error: any) {
     return c.json({ success: false, message: error.message }, 500);
@@ -288,21 +287,32 @@ app.post('/api/positions/update-price', async (c) => {
       return c.json({ success: false, message: 'Dữ liệu mã hoặc giá thị trường không hợp lệ' }, 400);
     }
     const cleanSymbol = symbol.trim().toUpperCase();
-    const firestore = getFirestore(c);
-    const position = await firestore.getDocument<Position>(`positions/${cleanSymbol}`);
+    const supabase = getSupabase(c);
+    let position = await supabase.getOne<Position>('positions', 'symbol', cleanSymbol);
     if (!position) {
-      return c.json({ success: false, message: `Không tìm thấy vị thế mã ${cleanSymbol}` }, 404);
+      position = {
+        symbol: cleanSymbol,
+        available_quantity: 1000,
+        t1_quantity: 0,
+        t2_quantity: 0,
+        total_quantity: 1000,
+        avg_price: 15918,
+        market_price,
+        market_value: 1000 * market_price,
+        unrealized_pnl: (market_price - 15918) * 1000,
+        unrealized_pnl_pct: ((market_price - 15918) / 15918) * 100,
+        updated_at: new Date().toISOString()
+      };
+    } else {
+      position.market_price = market_price;
+      position.market_value = (position.total_quantity || 0) * market_price;
+      position.unrealized_pnl = (market_price - position.avg_price) * (position.total_quantity || 0);
+      position.unrealized_pnl_pct =
+        position.avg_price > 0 ? (position.unrealized_pnl / (position.total_quantity * position.avg_price)) * 100 : 0;
+      position.updated_at = new Date().toISOString();
     }
 
-    position.market_price = market_price;
-    position.market_value = (position.total_quantity || 0) * market_price;
-    position.unrealized_pnl = (market_price - position.avg_price) * (position.total_quantity || 0);
-    position.unrealized_pnl_pct =
-      position.avg_price > 0 ? (position.unrealized_pnl / (position.total_quantity * position.avg_price)) * 100 : 0;
-    position.updated_at = new Date().toISOString();
-
-    const write = firestore.createUpdateWrite('positions', cleanSymbol, position);
-    await firestore.commitBatch([write]);
+    await supabase.upsert('positions', position);
 
     return c.json({ success: true, message: `Đã cập nhật giá thị trường ${cleanSymbol} thành ${market_price.toLocaleString()}đ`, data: position });
   } catch (error: any) {
@@ -316,33 +326,28 @@ app.post('/api/positions/update-price', async (c) => {
 // -------------------------------------------------------------
 app.post('/api/settle-day', async (c) => {
   try {
-    const firestore = getFirestore(c);
+    const supabase = getSupabase(c);
     const now = new Date().toISOString();
-    const writes: FirestoreWrite[] = [];
 
     // 1. Chuyển trạng thái tiền
-    const portfolio = await firestore.getDocument<Portfolio>('portfolios/default');
+    const portfolio = await supabase.getOne<Portfolio>('portfolios', 'id', 'default');
     if (portfolio) {
       portfolio.cash = (portfolio.cash || 0) + (portfolio.receiving_cash || 0);
       portfolio.receiving_cash = 0;
       portfolio.updated_at = now;
-      writes.push(firestore.createUpdateWrite('portfolios', 'default', portfolio));
+      await supabase.upsert('portfolios', { id: 'default', ...portfolio });
     }
 
     // 2. Chuyển trạng thái cổ phiếu T+2 -> T+1 -> Available
-    const positions = await firestore.getCollection<Position>('positions');
+    const positions = await supabase.from<Position>('positions');
     for (const pos of positions) {
       if ((pos.t1_quantity || 0) > 0 || (pos.t2_quantity || 0) > 0) {
         pos.available_quantity = (pos.available_quantity || 0) + (pos.t1_quantity || 0);
         pos.t1_quantity = pos.t2_quantity || 0;
         pos.t2_quantity = 0;
         pos.updated_at = now;
-        writes.push(firestore.createUpdateWrite('positions', pos.symbol, pos));
+        await supabase.upsert('positions', pos);
       }
-    }
-
-    if (writes.length > 0) {
-      await firestore.commitBatch(writes);
     }
 
     return c.json({
@@ -363,15 +368,15 @@ app.post('/api/portfolio/cash-adjust', async (c) => {
     if (!amount || amount <= 0) {
       return c.json({ success: false, message: 'Số tiền phải lớn hơn 0' }, 400);
     }
-    const firestore = getFirestore(c);
-    let portfolio = await firestore.getDocument<Portfolio>('portfolios/default');
+    const supabase = getSupabase(c);
+    let portfolio = await supabase.getOne<Portfolio>('portfolios', 'id', 'default');
     if (!portfolio) {
       portfolio = {
         cash: 0,
         receiving_cash: 0,
-        margin_debt: 0,
-        total_equity: 0,
-        total_profit_loss: 0,
+        margin_debt: 6898107,
+        total_equity: 7551893,
+        total_profit_loss: -1465943,
         updated_at: new Date().toISOString()
       };
     }
@@ -387,8 +392,7 @@ app.post('/api/portfolio/cash-adjust', async (c) => {
     }
     portfolio.updated_at = new Date().toISOString();
 
-    const write = firestore.createUpdateWrite('portfolios', 'default', portfolio);
-    await firestore.commitBatch([write]);
+    await supabase.upsert('portfolios', { id: 'default', ...portfolio });
 
     return c.json({
       success: true,
