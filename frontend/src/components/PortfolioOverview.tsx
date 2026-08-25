@@ -7,13 +7,7 @@ import {
   Scale,
   Eye,
   EyeOff,
-  PlusCircle,
-  Zap,
-  RefreshCw,
   CalendarCheck,
-  ArrowUpRight,
-  ShieldCheck,
-  CreditCard,
   Sparkles
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
@@ -23,12 +17,7 @@ export const PortfolioOverview: React.FC = () => {
     portfolio,
     positions,
     isBalanceHidden,
-    toggleBalanceVisibility,
-    openCashModal,
-    settleDay,
-    syncLiveMarketData,
-    isLiveSyncing,
-    setSelectedStock
+    toggleBalanceVisibility
   } = useTradingStore();
 
   const cash = portfolio?.cash || 0;
@@ -50,7 +39,7 @@ export const PortfolioOverview: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* ══ 1. MASTER ASSET CARD (SANG TRỌNG & CÂN ĐỐI TUYỆT ĐỐI) ══ */}
+      {/* ══ MASTER ASSET CARD (SANG TRỌNG, GỌN GÀNG & CÂN ĐỐI TUYỆT ĐỐI) ══ */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950/60 to-slate-950 border border-indigo-500/30 p-5 sm:p-6 shadow-2xl backdrop-blur-xl">
         {/* Ambient Glows */}
         <div className="absolute -right-16 -top-16 w-64 h-64 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -145,89 +134,6 @@ export const PortfolioOverview: React.FC = () => {
               <span className="text-[10px] text-slate-500 font-sans mt-0.5">Hợp đồng Deal Margin</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* ══ 2. HÀNG 6 NÚT THAO TÁC NHANH (MOMO / SHOPEE STYLE) ══ */}
-      <div className="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-3 sm:p-4 shadow-sm backdrop-blur-md">
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 text-center">
-          {/* Nút 1: Thêm mã mới */}
-          <button
-            onClick={() => {
-              const el = document.getElementById('search-stock-input');
-              if (el) el.focus();
-            }}
-            className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl hover:bg-slate-800/80 transition group"
-          >
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-cyan-600 to-cyan-400 text-slate-950 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition">
-              <PlusCircle className="h-6 w-6 stroke-[2.2]" />
-            </div>
-            <span className="text-[11px] font-bold text-slate-200 group-hover:text-cyan-300">Thêm Mã</span>
-          </button>
-
-          {/* Nút 2: 150 Thuật toán */}
-          <button
-            onClick={() => {
-              const btn = document.querySelector('[data-tab="ALGORITHMS"]') as HTMLElement;
-              if (btn) btn.click();
-            }}
-            className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl hover:bg-slate-800/80 transition group"
-          >
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-400 text-white flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition">
-              <Zap className="h-6 w-6 stroke-[2.2]" />
-            </div>
-            <span className="text-[11px] font-bold text-slate-200 group-hover:text-indigo-300">150 Algos</span>
-          </button>
-
-          {/* Nút 3: Nạp / Rút tiền */}
-          <button
-            onClick={openCashModal}
-            className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl hover:bg-slate-800/80 transition group"
-          >
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-emerald-400 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition">
-              <DollarSign className="h-6 w-6 stroke-[2.2]" />
-            </div>
-            <span className="text-[11px] font-bold text-slate-200 group-hover:text-emerald-300">Nạp / Rút</span>
-          </button>
-
-          {/* Nút 4: Đặt lệnh mua bán */}
-          <button
-            onClick={() => {
-              const el = document.getElementById('order-form-container');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl hover:bg-slate-800/80 transition group"
-          >
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition">
-              <ArrowUpRight className="h-6 w-6 stroke-[2.2]" />
-            </div>
-            <span className="text-[11px] font-bold text-slate-200 group-hover:text-amber-300">Đặt Lệnh</span>
-          </button>
-
-          {/* Nút 5: Đồng bộ giá trực tiếp */}
-          <button
-            onClick={syncLiveMarketData}
-            disabled={isLiveSyncing}
-            className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl hover:bg-slate-800/80 transition group"
-          >
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-400 text-slate-950 flex items-center justify-center shadow-lg shadow-rose-500/20 group-hover:scale-105 transition">
-              <RefreshCw className={`h-6 w-6 stroke-[2.2] ${isLiveSyncing ? 'animate-spin' : ''}`} />
-            </div>
-            <span className="text-[11px] font-bold text-slate-200 group-hover:text-rose-300">
-              {isLiveSyncing ? 'Đang Tải...' : 'Đồng Bộ Giá'}
-            </span>
-          </button>
-
-          {/* Nút 6: Chốt ngày T+2.5 */}
-          <button
-            onClick={settleDay}
-            className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl hover:bg-slate-800/80 transition group"
-          >
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-purple-400 text-white flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-105 transition">
-              <CalendarCheck className="h-6 w-6 stroke-[2.2]" />
-            </div>
-            <span className="text-[11px] font-bold text-slate-200 group-hover:text-purple-300">Chốt T+2.5</span>
-          </button>
         </div>
       </div>
     </div>
