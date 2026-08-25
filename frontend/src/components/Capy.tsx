@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type { BieuCam } from '@/lib/capyBieuCam';
 import { bocBieuCam, layThoai } from '@/lib/capyBieuCam';
+import { layThoaiGunnyTheoLuc } from '@/lib/capyGunnyQuotes';
 import { chonBoDo, type BoDo, type NguCanh } from '@/lib/capyBoDo';
 import { buocVatLy, dangBay, NGUONG_BAY } from '@/lib/capyVatLy';
 import { getStyle, type GreetingStyle } from '@/lib/greeting';
@@ -348,13 +349,8 @@ export default function Capy() {
       const flyEmotion = bocBieuCam(['so', 'gian']);
       setBieuCam(flyEmotion);
       const pctDisplay = Math.round(pNorm * 100);
-      if (pctDisplay >= 80) {
-        noiCauTuyChinh(`Aaaaa! Bắn ${pctDisplay}% lực max! Đập tường vỡ đầu rồi sếp ôi!`, 3.8, flyEmotion);
-      } else if (pctDisplay >= 40) {
-        noiCauTuyChinh(`Bắn ${pctDisplay}% lực! Bay tít mù khơi luôn sếp ôi!`, 3.2, flyEmotion);
-      } else {
-        noiCauTuyChinh(`Bắn nhẹ ${pctDisplay}% lực nè sếp!`, 2.5, bocBieuCam(['toMo', 'vui']));
-      }
+      const cauNoiGunny = layThoaiGunnyTheoLuc(pctDisplay, getStyle());
+      noiCauTuyChinh(cauNoiGunny, 3.8, pctDisplay < 15 ? bocBieuCam(['toMo', 'vui']) : flyEmotion);
     } else {
       // Kéo thả bình thường hoặc chạm nhẹ
       s.vx = 0; s.vy = 0;
