@@ -1,13 +1,17 @@
 import { create } from 'zustand';
 import { api } from '../services/api';
 import { localTradingEngine } from '../services/localTradingEngine';
+import { marketDataService, StockMarketInfo } from '../services/marketDataService';
 import { OrderRequestPayload, Portfolio, Position, Transaction } from '../types';
 
 interface TradingState {
   portfolio: Portfolio | null;
   positions: Position[];
   transactions: Transaction[];
+  watchlist: StockMarketInfo[];
   isLoading: boolean;
+  isLiveSyncing: boolean;
+  isBalanceHidden: boolean;
   error: string | null;
   successMessage: string | null;
   
@@ -31,6 +35,12 @@ interface TradingState {
   resetCleanSlate: (startingCash?: number) => void;
   resetToUserExactData: () => void;
   
+  // Super-App Features
+  toggleBalanceVisibility: () => void;
+  syncLiveMarketData: () => Promise<void>;
+  addCustomStock: (symbol: string) => Promise<StockMarketInfo>;
+  removeCustomStock: (symbol: string) => void;
+  
   setSelectedStock: (symbol: string, price: number, action?: 'BUY' | 'SELL') => void;
   openCashModal: () => void;
   closeCashModal: () => void;
@@ -43,7 +53,10 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   portfolio: null,
   positions: [],
   transactions: [],
+  watchlist: marketDataService.getWatchlist(),
   isLoading: false,
+  isLiveSyncing: false,
+  isBalanceHidden: false,
   error: null,
   successMessage: null,
 
@@ -55,6 +68,10 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   isPriceModalOpen: false,
   priceModalSymbol: '',
   priceModalCurrentPrice: 0,
+
+  toggleBalanceVisibility: () => {
+    set((state) => ({ isBalanceHidden: !state.isBalanceHidden }));
+  },
 
   fetchData: async () => {
     set({ isLoading: true, error: null });
@@ -73,10 +90,67 @@ export const useTradingStore = create<TradingState>((set, get) => ({
         transactions = exact.transactions;
       }
 
-      set({ portfolio, positions, transactions, isLoading: false });
+      set({
+        portfolio,
+        positions,
+        transactions,
+        watchlist: marketDataService.getWatchlist(),
+        isLoading: false
+      });
     } catch (err: any) {
       set({ error: err.message || 'Lỗi tải dữ liệu', isLoading: false });
     }
+  },
+
+  syncLiveMarketData: async () => {
+    set({ isLiveSyncing: true });
+    try {
+      await marketDataService.syncAllLivePrices();
+      const updatedWatchlist = marketDataService.getWatchlist();
+      
+      // Tự động cập nhật thị giá các vị thế nắm giữ
+      const currentPositions = get().positions;
+      for (const pos of currentPositions) {
+        const found = updatedWatchlist.find((s) => s.symbol === pos.symbol);
+        if (found && found.price !== pos.market_price) {
+          await get().updatePrice(pos.symbol, found.price);
+        }
+      }
+
+      set({
+        watchlist: updatedWatchlist,
+        isLiveSyncing: false,
+        successMessage: `Đã đồng bộ giá trực tiếp thời gian thực cho ${updatedWatchlist.length} mã!`
+      });
+    } catch (e: any) {
+      set({ isLiveSyncing: false, error: 'Lỗi đồng bộ giá: ' + e.message });
+    }
+  },
+
+  addCustomStock: async (symbol: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const stock = await marketDataService.addOrFetchStock(symbol);
+      set({
+        watchlist: marketDataService.getWatchlist(),
+        selectedSymbol: stock.symbol,
+        selectedPrice: stock.price,
+        isLoading: false,
+        successMessage: `Đã tìm thấy và nạp thành công mã ${stock.symbol} (${stock.name}) vào danh mục theo dõi!`
+      });
+      return stock;
+    } catch (err: any) {
+      set({ error: err.message || 'Không thể thêm mã', isLoading: false });
+      throw err;
+    }
+  },
+
+  removeCustomStock: (symbol: string) => {
+    marketDataService.removeStock(symbol);
+    set({
+      watchlist: marketDataService.getWatchlist(),
+      successMessage: `Đã xóa mã ${symbol} khỏi danh mục theo dõi`
+    });
   },
 
   resetCleanSlate: (startingCash = 0) => {
@@ -192,7 +266,7 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   },
 
   setSelectedStock: (symbol: string, price: number, action: 'BUY' | 'SELL' = 'BUY') => {
-    set({ selectedSymbol: symbol, selectedPrice: price, selectedAction: action });
+    set({ selectedSymbol: symbol.toUpperCase(), selectedPrice: price, selectedAction: action });
   },
 
   openCashModal: () => set({ isCashModalOpen: true }),

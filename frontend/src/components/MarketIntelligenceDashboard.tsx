@@ -28,13 +28,13 @@ import {
 type SubTab = 'NEWS' | 'COMPANY_BCTC' | 'EXPERT_REPORTS';
 
 export const MarketIntelligenceDashboard: React.FC = () => {
-  const { selectedSymbol, setSelectedStock } = useTradingStore();
+  const { selectedSymbol, setSelectedStock, watchlist } = useTradingStore();
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('NEWS');
   const [newsCategory, setNewsCategory] = useState<string>('ALL');
   const [newsSearch, setNewsSearch] = useState<string>('');
 
   const activeSym = selectedSymbol || 'TPB';
-  const foundStock = FULL_VN50_DATABASE.find((s) => s.symbol === activeSym);
+  const foundStock = watchlist.find((s) => s.symbol === activeSym);
   const currentPrice = foundStock?.price || 14450;
 
   const companyProfile: CompanyIntelligenceProfile = useMemo(() => {
@@ -81,12 +81,12 @@ export const MarketIntelligenceDashboard: React.FC = () => {
           <select
             value={activeSym}
             onChange={(e) => {
-              const s = FULL_VN50_DATABASE.find((item) => item.symbol === e.target.value);
+              const s = watchlist.find((item) => item.symbol === e.target.value);
               setSelectedStock(e.target.value, s?.price || 14450, 'BUY');
             }}
             className="bg-slate-950 border border-slate-700 text-white font-bold font-mono text-base rounded-xl px-3 py-1.5 focus:outline-none focus:border-cyan-500 cursor-pointer w-full lg:w-48"
           >
-            {FULL_VN50_DATABASE.map((item) => (
+            {watchlist.map((item) => (
               <option key={item.symbol} value={item.symbol}>
                 {item.symbol} - {item.name}
               </option>
@@ -205,8 +205,9 @@ export const MarketIntelligenceDashboard: React.FC = () => {
                     <span
                       key={tag}
                       onClick={() => {
-                        if (FULL_VN50_DATABASE.some((s) => s.symbol === tag)) {
-                          setSelectedStock(tag, 15000, 'BUY');
+                        const found = watchlist.find((s) => s.symbol === tag);
+                        if (found) {
+                          setSelectedStock(tag, found.price, 'BUY');
                         }
                       }}
                       className="text-[10px] px-2 py-0.5 rounded-lg bg-slate-900 text-slate-400 border border-slate-800 font-mono hover:text-cyan-300 hover:border-cyan-500/40 cursor-pointer transition"
