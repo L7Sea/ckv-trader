@@ -11,6 +11,7 @@ import { AnalyticsReport } from './components/AnalyticsReport';
 import { PositionDecisionEngine } from './components/PositionDecisionEngine';
 import { FiftyAlgorithmsReport } from './components/FiftyAlgorithmsReport';
 import { QuickRadarSearch } from './components/QuickRadarSearch';
+import { MarketIntelligenceDashboard } from './components/MarketIntelligenceDashboard';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
 import { PinLockScreen } from './components/PinLockScreen';
 import Capy from './components/Capy';
@@ -28,10 +29,11 @@ import {
   Award,
   Scale,
   Cpu,
-  Zap
+  Zap,
+  Newspaper
 } from 'lucide-react';
 
-type TabType = 'TRADE' | 'DECISION' | 'ALGORITHMS' | 'MARKET' | 'CHARTS' | 'ANALYTICS';
+type TabType = 'TRADE' | 'DECISION' | 'ALGORITHMS' | 'MARKET' | 'INTELLIGENCE' | 'CHARTS' | 'ANALYTICS';
 
 export const AppContent: React.FC = () => {
   const { fetchData, error, successMessage, clearMessages } = useTradingStore();
@@ -128,6 +130,18 @@ export const AppContent: React.FC = () => {
             </button>
 
             <button
+              onClick={() => setActiveTab('INTELLIGENCE')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+                activeTab === 'INTELLIGENCE'
+                  ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/20'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Newspaper className="h-4 w-4" />
+              <span>TIN TỨC & BCTC DOANH NGHIỆP</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('CHARTS')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
                 activeTab === 'CHARTS'
@@ -156,7 +170,6 @@ export const AppContent: React.FC = () => {
         {/* TAB 1: GIAO DỊCH & VỊ THẾ */}
         {activeTab === 'TRADE' && (
           <div className="space-y-6">
-            {/* Ô DỰ TOÁN NHANH AI TRUY VẾT 52 MÃ */}
             <QuickRadarSearch />
             <PositionDecisionEngine />
             <TechnicalChart />
@@ -197,7 +210,14 @@ export const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 5: PHÂN BỔ TÀI SẢN & BIỂU ĐỒ NAV */}
+        {/* TAB 5: TIN TỨC & BÁO CÁO TÀI CHÍNH BCTC DOANH NGHIỆP */}
+        {activeTab === 'INTELLIGENCE' && (
+          <div className="space-y-6">
+            <MarketIntelligenceDashboard />
+          </div>
+        )}
+
+        {/* TAB 6: PHÂN BỔ TÀI SẢN & BIỂU ĐỒ NAV */}
         {activeTab === 'CHARTS' && (
           <div className="space-y-6">
             <PortfolioCharts />
@@ -205,7 +225,7 @@ export const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 6: HIỆU SUẤT & XUẤT BÁO CÁO EXCEL */}
+        {/* TAB 7: HIỆU SUẤT & XUẤT BÁO CÁO EXCEL */}
         {activeTab === 'ANALYTICS' && (
           <div className="space-y-6">
             <AnalyticsReport />

@@ -1,5 +1,5 @@
 import type { GreetingStyle } from './greeting';
-import { layThoaiTheoMaTran7Ngay } from './capy7DaysMatrix';
+import { layThoaiTheoMaTran4x7x6 } from './capy7DaysMatrix';
 
 /* ═══════════════════════════════════════════════════════════════
    50 BIỂU CẢM CỦA BÉ CAPY + KHO THOẠI 7 NGÀY × 6 BUỔI CHỨNG KHOÁN
@@ -171,9 +171,9 @@ const THOAI: Record<GreetingStyle, Record<Nhom, string[]>> = {
 
 /** Lấy câu thoại: Kết hợp ma trận 7 ngày x 6 buổi + kho biểu cảm */
 export function layThoai(bc: BieuCam, style: GreetingStyle): string {
-  // 50% lấy theo ma trận 7 ngày x 6 buổi (rất phong phú và đúng thời điểm)
-  if (Math.random() < 0.5) {
-    return layThoaiTheoMaTran7Ngay();
+  // 60% lấy theo ma trận 4 phong cách x 7 ngày x 6 buổi (rất phong phú và đúng thời điểm)
+  if (Math.random() < 0.6) {
+    return layThoaiTheoMaTran4x7x6(style);
   }
   const ds = THOAI[style]?.[bc.nhom] ?? THOAI.vui[bc.nhom];
   return ds[Math.floor(Math.random() * ds.length)] ?? ds[0]!;
