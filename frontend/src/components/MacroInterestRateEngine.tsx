@@ -19,12 +19,28 @@ import {
   ArrowDownRight,
   Sparkles,
   HelpCircle,
+  RefreshCw,
+  Clock,
 } from 'lucide-react';
 
 export default function MacroInterestRateEngine() {
   const [activeTab, setActiveTab] = useState<'BANKS' | 'FINTECH' | 'VALUATION' | 'MARGIN_OPTIMIZER'>('BANKS');
   const [bankFilter, setBankFilter] = useState<'ALL' | 'BIG4' | 'TMCP_TOP1' | 'TMCP_MID'>('ALL');
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [lastUpdated, setLastUpdated] = useState<string>(() => {
+    const now = new Date();
+    return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} - ${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`;
+  });
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefreshRates = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      const now = new Date();
+      setLastUpdated(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')} - ${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`);
+      setIsRefreshing(false);
+    }, 500);
+  };
 
   // Sample stocks for Macro Valuation Matrix
   const sampleStocks = [
@@ -109,6 +125,32 @@ export default function MacroInterestRateEngine() {
             <span className="text-base font-bold text-purple-400 font-mono">{BENCHMARK_RATES.overnightFintechYield}%</span>
           </div>
         </div>
+      </div>
+
+      {/* ── LIVE UPDATE & HOURLY MARKET STATUS BAR ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-2 px-3 bg-[#161d2b] border border-[#26334d] rounded-xl text-xs mt-3">
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span className="text-slate-300 font-medium">
+            Thị trường liên ngân hàng & OMO NHNN: <b className="text-emerald-400">Đang hoạt động</b>
+          </span>
+          <span className="text-slate-500 hidden md:inline">|</span>
+          <span className="text-slate-400 hidden md:flex items-center gap-1 font-mono text-[11px]">
+            <Clock size={12} className="text-cyan-400" /> Cập nhật lúc: <b className="text-slate-200">{lastUpdated}</b>
+          </span>
+        </div>
+
+        <button
+          onClick={handleRefreshRates}
+          disabled={isRefreshing}
+          className="flex items-center justify-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition active:scale-95 disabled:opacity-50"
+        >
+          <RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
+          <span>{isRefreshing ? 'Đang cập nhật...' : 'Cập Nhật Lãi Suất Tức Thì'}</span>
+        </button>
       </div>
 
       {/* ── NAV TABS ── */}

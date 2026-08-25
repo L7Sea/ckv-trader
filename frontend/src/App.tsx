@@ -14,6 +14,7 @@ import { QuickRadarSearch } from './components/QuickRadarSearch';
 import { MarketIntelligenceDashboard } from './components/MarketIntelligenceDashboard';
 import { DailyAIRecommendations } from './components/DailyAIRecommendations';
 import MacroInterestRateEngine from './components/MacroInterestRateEngine';
+import { CashModal } from './components/CashModal';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
 import { PinLockScreen } from './components/PinLockScreen';
 import Capy from './components/Capy';
@@ -272,17 +273,17 @@ export const AppContent: React.FC = () => {
       {/* Floating Mascot Capy */}
       <Capy />
 
-      {/* Mobile Bottom Navigation (Siêu ứng dụng 5 nút) */}
+      {/* Mobile Bottom Navigation (Siêu ứng dụng 6 nút có Lãi Suất Vĩ Mô) */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0e1117]/95 border-t border-[#212636] backdrop-blur-xl px-2 py-2 shadow-2xl">
-        <div className="grid grid-cols-5 gap-1 text-center">
+        <div className="grid grid-cols-6 gap-1 text-center">
           <button
             onClick={() => setActiveTab('TRADE')}
             className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
               activeTab === 'TRADE' ? 'text-emerald-400 font-bold' : 'text-slate-400'
             }`}
           >
-            <TrendingUp className="h-5 w-5" />
-            <span className="text-[10px]">Giao Dịch</span>
+            <TrendingUp className="h-4 w-4" />
+            <span className="text-[9px]">Lệnh</span>
           </button>
 
           <button
@@ -291,8 +292,8 @@ export const AppContent: React.FC = () => {
               activeTab === 'DECISION' ? 'text-amber-400 font-bold' : 'text-slate-400'
             }`}
           >
-            <Scale className="h-5 w-5" />
-            <span className="text-[10px]">Hòa Vốn</span>
+            <Scale className="h-4 w-4" />
+            <span className="text-[9px]">Hòa Vốn</span>
           </button>
 
           <button
@@ -301,8 +302,8 @@ export const AppContent: React.FC = () => {
               activeTab === 'ALGORITHMS' ? 'text-indigo-400 font-bold' : 'text-slate-400'
             }`}
           >
-            <Cpu className="h-5 w-5" />
-            <span className="text-[10px]">150 Algos</span>
+            <Cpu className="h-4 w-4" />
+            <span className="text-[9px]">150 Algos</span>
           </button>
 
           <button
@@ -311,8 +312,18 @@ export const AppContent: React.FC = () => {
               activeTab === 'MARKET' ? 'text-cyan-400 font-bold' : 'text-slate-400'
             }`}
           >
-            <LayoutGrid className="h-5 w-5" />
-            <span className="text-[10px]">Bảng Giá</span>
+            <LayoutGrid className="h-4 w-4" />
+            <span className="text-[9px]">Bảng Giá</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('MACRO')}
+            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
+              activeTab === 'MACRO' ? 'text-emerald-400 font-bold' : 'text-slate-400'
+            }`}
+          >
+            <Landmark className="h-4 w-4" />
+            <span className="text-[9px]">Lãi Suất</span>
           </button>
 
           <button
@@ -321,11 +332,14 @@ export const AppContent: React.FC = () => {
               activeTab === 'CHARTS' ? 'text-purple-400 font-bold' : 'text-slate-400'
             }`}
           >
-            <PieChart className="h-5 w-5" />
-            <span className="text-[10px]">Tài Sản</span>
+            <PieChart className="h-4 w-4" />
+            <span className="text-[9px]">Tài Sản</span>
           </button>
         </div>
       </div>
+
+      {/* Cash Deposit / Withdraw Modal */}
+      <CashModal />
 
       {/* Quick Price Update Modal */}
       <PriceUpdateModal />

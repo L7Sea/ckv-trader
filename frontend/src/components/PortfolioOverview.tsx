@@ -17,7 +17,8 @@ export const PortfolioOverview: React.FC = () => {
     portfolio,
     positions,
     isBalanceHidden,
-    toggleBalanceVisibility
+    toggleBalanceVisibility,
+    openCashModal
   } = useTradingStore();
 
   const cash = portfolio?.cash || 0;
@@ -94,14 +95,23 @@ export const PortfolioOverview: React.FC = () => {
 
           {/* Bottom Row: 4 Balanced Sub-Balances (Cân đối 4 cột đồng đều) */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 font-mono text-xs">
-            {/* Box 1 */}
-            <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 flex flex-col justify-between">
+            {/* Box 1 - Tiền Mặt Khả Dụng (Có nút Nạp / Rút) */}
+            <div
+              onClick={openCashModal}
+              className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 hover:border-emerald-500/50 cursor-pointer transition flex flex-col justify-between group"
+              title="Nhấn để Nạp / Rút Tiền Mặt"
+            >
               <div className="flex items-center justify-between text-slate-400">
-                <span className="font-sans text-[11px]">Tiền Mặt Khả Dụng</span>
-                <DollarSign className="h-4 w-4 text-emerald-400" />
+                <span className="font-sans text-[11px] group-hover:text-emerald-400 transition">Tiền Mặt Khả Dụng</span>
+                <span className="text-[10px] text-emerald-400 font-sans font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                  Nạp / Rút
+                </span>
               </div>
               <b className="text-base text-emerald-400 font-bold mt-1.5 block">{formatVND(cash)}</b>
-              <span className="text-[10px] text-slate-500 font-sans mt-0.5">Sẵn sàng đặt lệnh</span>
+              <span className="text-[10px] text-slate-500 font-sans mt-0.5 flex items-center justify-between">
+                <span>Sẵn sàng đặt lệnh</span>
+                <span className="text-emerald-400 opacity-0 group-hover:opacity-100 transition text-[9px] font-bold">Mở ví →</span>
+              </span>
             </div>
 
             {/* Box 2 */}
