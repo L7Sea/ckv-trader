@@ -5,71 +5,17 @@ const POSITIONS_KEY = 'ckv_local_positions';
 const TRANSACTIONS_KEY = 'ckv_local_transactions';
 
 const initialPortfolio: Portfolio = {
-  cash: 150000000,
+  cash: 0, // Mặc định sổ cái sạch
   receiving_cash: 0,
   margin_debt: 0,
-  total_equity: 272250000,
-  total_profit_loss: 3950000,
+  total_equity: 0,
+  total_profit_loss: 0,
+  current_simulated_date: new Date().toISOString().slice(0, 10),
   updated_at: new Date().toISOString()
 };
 
-const initialPositions: Position[] = [
-  {
-    symbol: 'HPG',
-    total_quantity: 2500,
-    available_quantity: 1500,
-    t1_quantity: 500,
-    t2_quantity: 500,
-    avg_price: 27800,
-    market_price: 28500,
-    market_value: 71250000,
-    unrealized_pnl: 1750000,
-    unrealized_pnl_pct: 2.52,
-    updated_at: new Date().toISOString()
-  },
-  {
-    symbol: 'FPT',
-    total_quantity: 400,
-    available_quantity: 400,
-    t1_quantity: 0,
-    t2_quantity: 0,
-    avg_price: 122000,
-    market_price: 127500,
-    market_value: 51000000,
-    unrealized_pnl: 2200000,
-    unrealized_pnl_pct: 4.51,
-    updated_at: new Date().toISOString()
-  }
-];
-
-const initialTransactions: Transaction[] = [
-  {
-    id: 'tx_init_1',
-    type: 'BUY',
-    symbol: 'HPG',
-    price: 27500,
-    quantity: 1500,
-    fee: 61875,
-    tax: 0,
-    total_amount: 41250000,
-    net_amount: 41311875,
-    timestamp: new Date(Date.now() - 86400000 * 3).toISOString(),
-    trade_date: new Date(Date.now() - 86400000 * 3).toISOString().slice(0, 10)
-  },
-  {
-    id: 'tx_init_2',
-    type: 'BUY',
-    symbol: 'FPT',
-    price: 122000,
-    quantity: 400,
-    fee: 73200,
-    tax: 0,
-    total_amount: 48800000,
-    net_amount: 48873200,
-    timestamp: new Date(Date.now() - 86400000 * 4).toISOString(),
-    trade_date: new Date(Date.now() - 86400000 * 4).toISOString().slice(0, 10)
-  }
-];
+const initialPositions: Position[] = [];
+const initialTransactions: Transaction[] = [];
 
 export const localTradingEngine = {
   getPortfolio(): Portfolio {
@@ -123,8 +69,32 @@ export const localTradingEngine = {
     localStorage.setItem(TRANSACTIONS_KEY, JSON.stringify(txs));
   },
 
+  resetCleanSlate(startingCash: number = 0): { portfolio: Portfolio; positions: Position[]; transactions: Transaction[] } {
+    const cleanPortfolio: Portfolio = {
+      cash: startingCash,
+      receiving_cash: 0,
+      margin_debt: 0,
+      total_equity: startingCash,
+      total_profit_loss: 0,
+      current_simulated_date: new Date().toISOString().slice(0, 10),
+      updated_at: new Date().toISOString()
+    };
+    const cleanPositions: Position[] = [];
+    const cleanTransactions: Transaction[] = [];
+
+    this.savePortfolio(cleanPortfolio);
+    this.savePositions(cleanPositions);
+    this.saveTransactions(cleanTransactions);
+
+    return {
+      portfolio: cleanPortfolio,
+      positions: cleanPositions,
+      transactions: cleanTransactions
+    };
+  },
+
   placeOrder(payload: OrderRequestPayload): { transaction: Transaction; position: Position; portfolio: Portfolio } {
-    const { symbol, type, quantity, price } = payload;
+    const { symbol, type, quantity, price, strategy, target_price, stop_loss, trade_date, notes } = payload;
     const portfolio = this.getPortfolio();
     const positions = this.getPositions();
     const transactions = this.getTransactions();
@@ -138,7 +108,7 @@ export const localTradingEngine = {
     if (type === 'BUY') {
       const totalRequired = grossAmount + fee;
       if (portfolio.cash < totalRequired) {
-        throw new Error(`Sức mua không đủ! Cần ${totalRequired.toLocaleString()}đ nhưng tiền mặt chỉ có ${portfolio.cash.toLocaleString()}đ`);
+        throw new Error(`Sức mua không đủ! Cần ${totalRequired.toLocaleString()}đ nhưng tiền mặt chỉ có ${portfolio.cash.toLocaleString()}đ (Anh có thể bấm Nạp tiền để thiết lập vốn thật)`);
       }
 
       portfolio.cash -= totalRequired;
@@ -155,6 +125,8 @@ export const localTradingEngine = {
           market_value: grossAmount,
           unrealized_pnl: grossAmount - (grossAmount + fee),
           unrealized_pnl_pct: ((grossAmount - (grossAmount + fee)) / (grossAmount + fee)) * 100,
+          target_price,
+          stop_loss,
           updated_at: new Date().toISOString()
         };
         positions.push(existingPos);
@@ -172,6 +144,8 @@ export const localTradingEngine = {
         existingPos.market_value = newTotal * price;
         existingPos.unrealized_pnl = existingPos.market_value - newCost;
         existingPos.unrealized_pnl_pct = (existingPos.unrealized_pnl / newCost) * 100;
+        if (target_price) existingPos.target_price = target_price;
+        if (stop_loss) existingPos.stop_loss = stop_loss;
         existingPos.updated_at = new Date().toISOString();
       }
     } else {
@@ -200,6 +174,7 @@ export const localTradingEngine = {
     portfolio.total_equity = portfolio.cash + portfolio.receiving_cash + stockValuation - portfolio.margin_debt;
     portfolio.updated_at = new Date().toISOString();
 
+    const selectedDate = trade_date || new Date().toISOString().slice(0, 10);
     const transaction: Transaction = {
       id: 'tx_' + Date.now(),
       symbol,
@@ -210,8 +185,12 @@ export const localTradingEngine = {
       tax,
       total_amount: grossAmount,
       net_amount: type === 'BUY' ? grossAmount + fee : grossAmount - fee - tax,
+      strategy,
+      target_price,
+      stop_loss,
+      notes,
       timestamp: new Date().toISOString(),
-      trade_date: new Date().toISOString().slice(0, 10)
+      trade_date: selectedDate
     };
 
     const finalPositions = positions.filter((p) => p.total_quantity > 0);

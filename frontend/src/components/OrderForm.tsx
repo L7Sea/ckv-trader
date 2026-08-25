@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Tag, AlertCircle, Calculator } from 'lucide-react';
+import { ShoppingCart, Tag, AlertCircle, Calculator, Calendar, Target, ShieldAlert, Sparkles, BookOpen } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
+import { TradeStrategy } from '../types';
+import { VN50_WATCHLIST } from './MarketBoard';
 
 export const OrderForm: React.FC = () => {
   const {
@@ -19,13 +21,21 @@ export const OrderForm: React.FC = () => {
   const [quantity, setQuantity] = useState<number>(100);
   const feeRate = 0.15; // 0.15% phí giao dịch chuẩn
   const taxRate = 0.1;  // 0.1% thuế bán chứng khoán
+  const [strategy, setStrategy] = useState<TradeStrategy>('PULLBACK_MA20');
+  const [targetPrice, setTargetPrice] = useState<number>(0);
+  const [stopLoss, setStopLoss] = useState<number>(0);
+  const [tradeDate, setTradeDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState('');
 
-  // Tự động đồng bộ khi click "Bán nhanh" hoặc chọn từ bảng
+  // Tự động đồng bộ khi click từ bảng giá hoặc danh mục
   useEffect(() => {
     if (selectedSymbol) {
       setSymbol(selectedSymbol);
-      if (selectedPrice > 0) setPrice(selectedPrice);
+      if (selectedPrice > 0) {
+        setPrice(selectedPrice);
+        setTargetPrice(Math.round(selectedPrice * 1.1)); // Target mặc định +10%
+        setStopLoss(Math.round(selectedPrice * 0.93));   // Cutloss mặc định -7%
+      }
       if (selectedAction) setType(selectedAction);
     }
   }, [selectedSymbol, selectedPrice, selectedAction]);
@@ -33,15 +43,17 @@ export const OrderForm: React.FC = () => {
   const cleanSymbol = symbol.trim().toUpperCase();
   const currentPos = positions.find((p) => p.symbol === cleanSymbol);
 
-  // Tính toán số liệu theo thời gian thực
+  // Tính toán số liệu
   const tradeValue = (price || 0) * (quantity || 0);
   const fee = Math.round((tradeValue * feeRate) / 100);
   const tax = type === 'SELL' ? Math.round((tradeValue * taxRate) / 100) : 0;
-
-  // BUY: Giá trị khớp + Phí | SELL: Giá trị khớp - Phí - Thuế
   const netAmount = type === 'BUY' ? tradeValue + fee : tradeValue - fee - tax;
 
-  // Kiểm tra điều kiện hợp lệ
+  // Tính tỷ lệ Risk / Reward (R:R)
+  const potentialProfit = targetPrice > price ? targetPrice - price : 0;
+  const potentialLoss = price > stopLoss && stopLoss > 0 ? price - stopLoss : 0;
+  const rrRatio = potentialLoss > 0 ? (potentialProfit / potentialLoss).toFixed(2) : 'N/A';
+
   const cash = portfolio?.cash || 0;
   const availableShares = currentPos?.available_quantity || 0;
   const t1Shares = currentPos?.t1_quantity || 0;
@@ -73,221 +85,221 @@ export const OrderForm: React.FC = () => {
       quantity,
       fee,
       tax,
+      strategy,
+      target_price: targetPrice > 0 ? targetPrice : undefined,
+      stop_loss: stopLoss > 0 ? stopLoss : undefined,
+      trade_date: tradeDate,
       notes
     });
 
     if (success) {
-      setQuantity(100);
       setNotes('');
     }
   };
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-5 shadow-sm">
-      <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+    <div className="bg-slate-900/90 border border-slate-800/80 rounded-3xl p-5 shadow-sm space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
         <h2 className="text-base font-bold text-white flex items-center gap-2">
-          <Calculator className="h-5 w-5 text-emerald-400" />
-          <span>Sổ Đặt Lệnh (Trading Ticket)</span>
+          <BookOpen className="h-5 w-5 text-emerald-400" />
+          <span>Ghi Nhật Ký Lệnh & Đề Xuất</span>
         </h2>
-        <span className="text-[11px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded font-mono">
-          Tuân thủ T+2.5
+        <span className="text-[10px] uppercase font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full font-mono">
+          Chuẩn T+2.5
         </span>
       </div>
 
       {/* Tabs MUA / BÁN */}
-      <div className="grid grid-cols-2 gap-2 mt-4 p-1 bg-slate-950/80 rounded-xl border border-slate-800/80">
+      <div className="grid grid-cols-2 gap-2 p-1 bg-slate-950/80 rounded-2xl border border-slate-800">
         <button
           type="button"
           onClick={() => setType('BUY')}
-          className={`py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 ${
+          className={`py-2 rounded-xl text-xs font-bold transition ${
             type === 'BUY'
-              ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+              ? 'bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/20'
               : 'text-slate-400 hover:text-white'
           }`}
         >
-          <ShoppingCart className="h-4 w-4" />
-          <span>LỆNH MUA (BUY)</span>
+          GHI MUA (VÀO LỆNH)
         </button>
         <button
           type="button"
           onClick={() => setType('SELL')}
-          className={`py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 ${
+          className={`py-2 rounded-xl text-xs font-bold transition ${
             type === 'SELL'
-              ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20'
+              ? 'bg-rose-500 text-white font-black shadow-md shadow-rose-500/20'
               : 'text-slate-400 hover:text-white'
           }`}
         >
-          <Tag className="h-4 w-4" />
-          <span>LỆNH BÁN (SELL)</span>
+          GHI BÁN (CHỐT / CẮT)
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-        {/* Mã Cổ Phiếu */}
-        <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-            Mã Cổ Phiếu (Symbol)
+      <form onSubmit={handleSubmit} className="space-y-3.5">
+        {/* Ngày Giao Dịch */}
+        <div className="space-y-1">
+          <label className="text-xs text-slate-400 flex items-center gap-1 font-semibold">
+            <Calendar className="h-3.5 w-3.5 text-indigo-400" />
+            <span>Ngày giao dịch (Khớp lệnh):</span>
           </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={symbol}
-              onChange={(e) => setSymbol(e.target.value.toUpperCase())}
-              placeholder="VD: HPG, SSI, FPT, MWG..."
-              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-4 py-2.5 text-base font-bold font-mono text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition"
-              required
-            />
-            {currentPos && (
-              <span className="absolute right-3 top-2.5 text-xs text-slate-400 font-mono">
-                Giá vốn: {formatNumber(currentPos.avg_price)}đ
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Khung thông tin T+2.5 của Mã đang chọn */}
-        {cleanSymbol && currentPos && (
-          <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl space-y-1.5 text-xs font-mono">
-            <div className="flex justify-between">
-              <span className="text-slate-400">Khả dụng (Bán được ngay):</span>
-              <span className="font-bold text-emerald-400">{formatNumber(availableShares)} CP</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">Hàng chờ về T+1:</span>
-              <span className="text-amber-400">{formatNumber(t1Shares)} CP</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">Hàng chờ về T+2 (Mua hôm nay):</span>
-              <span className="text-sky-400">{formatNumber(t2Shares)} CP</span>
-            </div>
-          </div>
-        )}
-
-        {/* Giá khớp & Khối lượng */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Giá Khớp (VNĐ)
-            </label>
-            <input
-              type="number"
-              value={price || ''}
-              onChange={(e) => setPrice(Number(e.target.value))}
-              placeholder="VD: 25000"
-              step="50"
-              min="0"
-              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm font-bold font-mono text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Khối Lượng (CP)
-            </label>
-            <input
-              type="number"
-              value={quantity || ''}
-              onChange={(e) => setQuantity(Number(e.target.value))}
-              placeholder="VD: 1000"
-              step="100"
-              min="1"
-              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm font-bold font-mono text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition"
-              required
-            />
-          </div>
-        </div>
-
-        {/* Nút chọn khối lượng nhanh */}
-        <div className="flex gap-1.5">
-          {[100, 500, 1000, 2000, 5000].map((qty) => (
-            <button
-              key={qty}
-              type="button"
-              onClick={() => setQuantity(qty)}
-              className="flex-1 py-1 text-[11px] font-mono font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
-            >
-              +{qty >= 1000 ? `${qty / 1000}k` : qty}
-            </button>
-          ))}
-          {type === 'SELL' && availableShares > 0 && (
-            <button
-              type="button"
-              onClick={() => setQuantity(availableShares)}
-              className="px-2 py-1 text-[11px] font-mono font-bold rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30 transition"
-            >
-              Max All
-            </button>
-          )}
-        </div>
-
-        {/* Phí & Thuế */}
-        <div className="p-3.5 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2 text-xs">
-          <div className="flex justify-between items-center text-slate-400">
-            <span>Giá trị giao dịch:</span>
-            <span className="font-mono text-slate-200 font-semibold">{formatNumber(tradeValue)} đ</span>
-          </div>
-          <div className="flex justify-between items-center text-slate-400">
-            <span>Phí GD ({feeRate}%):</span>
-            <span className="font-mono text-slate-300">{formatNumber(fee)} đ</span>
-          </div>
-          {type === 'SELL' && (
-            <div className="flex justify-between items-center text-slate-400">
-              <span>Thuế TNCN ({taxRate}%):</span>
-              <span className="font-mono text-slate-300">{formatNumber(tax)} đ</span>
-            </div>
-          )}
-          <div className="pt-2 border-t border-slate-800 flex justify-between items-center font-bold">
-            <span className="text-white">
-              {type === 'BUY' ? 'Tổng tiền cần thanh toán:' : 'Thực nhận (Về T+2.5):'}
-            </span>
-            <span className={`font-mono text-base ${type === 'BUY' ? 'text-emerald-400' : 'text-amber-400'}`}>
-              {formatNumber(netAmount)} đ
-            </span>
-          </div>
-        </div>
-
-        {/* Cảnh báo Sức mua / Cổ phiếu khả dụng */}
-        {type === 'BUY' && cash < netAmount && (
-          <div className="flex items-center gap-2 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs">
-            <AlertCircle className="h-4 w-4 shrink-0" />
-            <span>Không đủ sức mua! Còn thiếu {formatNumber(netAmount - cash)}đ.</span>
-          </div>
-        )}
-
-        {type === 'SELL' && availableShares < quantity && (
-          <div className="flex items-center gap-2 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs">
-            <AlertCircle className="h-4 w-4 shrink-0" />
-            <span>Không đủ cổ phiếu khả dụng để bán! (Có {formatNumber(availableShares)} CP sẵn sàng).</span>
-          </div>
-        )}
-
-        {/* Ghi chú */}
-        <div>
           <input
-            type="text"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Ghi chú lý do vào lệnh (tuỳ chọn)..."
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-slate-600"
+            type="date"
+            value={tradeDate}
+            onChange={(e) => setTradeDate(e.target.value)}
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500"
           />
         </div>
 
-        {/* Nút Đặt Lệnh */}
+        {/* Mã Cổ Phiếu & Giá Khớp */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label className="text-xs text-slate-400 font-semibold">Mã Cổ Phiếu:</label>
+            <input
+              type="text"
+              placeholder="VD: HPG, FPT..."
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs text-slate-400 font-semibold">Giá Đề Xuất / Khớp:</label>
+            <input
+              type="number"
+              step="50"
+              placeholder="VND"
+              value={price || ''}
+              onChange={(e) => setPrice(Number(e.target.value))}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+        </div>
+
+        {/* Khối Lượng (Lô 100) */}
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs text-slate-400">
+            <span className="font-semibold">Khối lượng (Lô 100):</span>
+            <span className="font-mono text-emerald-400">{formatNumber(quantity)} CP</span>
+          </div>
+          <input
+            type="number"
+            step="100"
+            min="100"
+            value={quantity || ''}
+            onChange={(e) => setQuantity(Number(e.target.value))}
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-emerald-500"
+          />
+          {/* Quick Quantity Shortcuts */}
+          <div className="grid grid-cols-4 gap-1 pt-1">
+            {[100, 500, 1000, 2000].map((q) => (
+              <button
+                key={q}
+                type="button"
+                onClick={() => setQuantity(q)}
+                className="py-1 rounded-lg bg-slate-950 border border-slate-800/80 text-[10px] font-mono text-slate-400 hover:text-white"
+              >
+                +{formatNumber(q)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Chiến Lược & Lý Do Vào Lệnh */}
+        <div className="space-y-1">
+          <label className="text-xs text-slate-400 font-semibold flex items-center gap-1">
+            <Target className="h-3.5 w-3.5 text-amber-400" />
+            <span>Chiến lược / Lý do giao dịch:</span>
+          </label>
+          <select
+            value={strategy}
+            onChange={(e) => setStrategy(e.target.value as TradeStrategy)}
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer"
+          >
+            <option value="PULLBACK_MA20">📈 Bắt đáy / Chạm hỗ trợ MA20</option>
+            <option value="BREAKOUT">🚀 Mua vượt đỉnh (Breakout)</option>
+            <option value="ACCUMULATION">🧱 Tích lũy nền giá chặt chẽ</option>
+            <option value="DIVIDEND">🎁 Săn quyền nhận cổ tức</option>
+            <option value="TAKE_PROFIT">🎯 Chốt lời đạt kỳ vọng</option>
+            <option value="STOP_LOSS">🛑 Cắt lỗ kỷ luật (-5% / -7%)</option>
+            <option value="OTHER">💡 Lý do khác</option>
+          </select>
+        </div>
+
+        {/* Giá Mục Tiêu & Cắt Lỗ (Kế hoạch quản trị rủi ro) */}
+        {type === 'BUY' && (
+          <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-bold text-slate-300">Kế Hoạch Quản Trị Rủi Ro (R:R)</span>
+              <span className="font-mono text-emerald-400 font-bold">R:R = {rrRatio}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[11px] text-emerald-400">Target (Mục tiêu):</label>
+                <input
+                  type="number"
+                  placeholder="Giá chốt lời"
+                  value={targetPrice || ''}
+                  onChange={(e) => setTargetPrice(Number(e.target.value))}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs font-mono text-emerald-400"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] text-rose-400">Stop Loss (Cắt lỗ):</label>
+                <input
+                  type="number"
+                  placeholder="Giá cắt lỗ"
+                  value={stopLoss || ''}
+                  onChange={(e) => setStopLoss(Number(e.target.value))}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs font-mono text-rose-400"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Ghi chú nhật ký tâm lý */}
+        <div className="space-y-1">
+          <label className="text-xs text-slate-400 font-semibold">Ghi chú & Tâm lý vào lệnh:</label>
+          <textarea
+            rows={2}
+            placeholder="Ghi lại lý do, nhận định thị trường hoặc bài học..."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 resize-none"
+          />
+        </div>
+
+        {/* Tóm tắt dòng tiền */}
+        <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 font-mono text-xs">
+          <div className="flex justify-between text-slate-400">
+            <span>Giá trị giao dịch:</span>
+            <span className="text-white">{formatNumber(tradeValue)} VND</span>
+          </div>
+          <div className="flex justify-between text-slate-400">
+            <span>Thuế & Phí (0.15% - 0.25%):</span>
+            <span className="text-slate-300">{formatNumber(fee + tax)} VND</span>
+          </div>
+          <div className="flex justify-between text-white font-bold pt-1 border-t border-slate-800">
+            <span>Tổng thanh toán ({type === 'BUY' ? 'Trừ tiền' : 'Tiền về'}):</span>
+            <span className={type === 'BUY' ? 'text-emerald-400' : 'text-cyan-400'}>
+              {formatNumber(netAmount)} VND
+            </span>
+          </div>
+        </div>
+
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={isLoading || (type === 'BUY' && !isBuyValid) || (type === 'SELL' && !isSellValid)}
-          className={`w-full py-3.5 rounded-xl font-bold text-sm tracking-wide transition shadow-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed ${
+          className={`w-full py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition active:scale-95 shadow-lg ${
             type === 'BUY'
-              ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-emerald-500/20 active:scale-[0.99]'
-              : 'bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-rose-500/20 active:scale-[0.99]'
+              ? 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-emerald-500/20 disabled:opacity-40'
+              : 'bg-rose-500 hover:bg-rose-400 text-white shadow-rose-500/20 disabled:opacity-40'
           }`}
         >
-          {isLoading ? (
-            <span>Đang xử lý giao dịch...</span>
-          ) : (
-            <span>XÁC NHẬN ĐẶT LỆNH {type === 'BUY' ? 'MUA' : 'BÁN'} {cleanSymbol || ''}</span>
-          )}
+          {isLoading ? 'ĐANG GHI SỔ CÁI...' : type === 'BUY' ? 'GHI SỔ LỆNH MUA' : 'GHI SỔ LỆNH BÁN'}
         </button>
       </form>
     </div>

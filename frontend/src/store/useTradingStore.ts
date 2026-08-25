@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { api } from '../services/api';
+import { localTradingEngine } from '../services/localTradingEngine';
 import { OrderRequestPayload, Portfolio, Position, Transaction } from '../types';
 
 interface TradingState {
@@ -27,6 +28,7 @@ interface TradingState {
   updatePrice: (symbol: string, price: number) => Promise<boolean>;
   settleDay: () => Promise<boolean>;
   adjustCash: (amount: number, action: 'DEPOSIT' | 'WITHDRAW') => Promise<boolean>;
+  resetCleanSlate: (startingCash?: number) => void;
   
   setSelectedStock: (symbol: string, price: number, action?: 'BUY' | 'SELL') => void;
   openCashModal: () => void;
@@ -44,8 +46,8 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   error: null,
   successMessage: null,
 
-  selectedSymbol: '',
-  selectedPrice: 0,
+  selectedSymbol: 'HPG',
+  selectedPrice: 29000,
   selectedAction: 'BUY',
 
   isCashModalOpen: false,
@@ -63,8 +65,18 @@ export const useTradingStore = create<TradingState>((set, get) => ({
       ]);
       set({ portfolio, positions, transactions, isLoading: false });
     } catch (err: any) {
-      set({ error: err.message || 'Không thể kết nối đến máy chủ Backend', isLoading: false });
+      set({ error: err.message || 'Lỗi tải dữ liệu', isLoading: false });
     }
+  },
+
+  resetCleanSlate: (startingCash = 0) => {
+    const clean = localTradingEngine.resetCleanSlate(startingCash);
+    set({
+      portfolio: clean.portfolio,
+      positions: clean.positions,
+      transactions: clean.transactions,
+      successMessage: `Đã làm sạch sổ cái! Vốn tiền mặt khởi đầu: ${startingCash.toLocaleString()} VND.`
+    });
   },
 
   placeOrder: async (payload: OrderRequestPayload) => {
@@ -72,7 +84,6 @@ export const useTradingStore = create<TradingState>((set, get) => ({
     try {
       const result = await api.placeOrder(payload);
       set((state) => {
-        // Cập nhật vị thế trong danh sách
         const updatedPositions = [...state.positions];
         const idx = updatedPositions.findIndex((p) => p.symbol === result.position.symbol);
         if (idx >= 0) {
@@ -80,7 +91,6 @@ export const useTradingStore = create<TradingState>((set, get) => ({
         } else {
           updatedPositions.push(result.position);
         }
-        // Thêm giao dịch vào lịch sử
         const updatedTransactions = [result.transaction, ...state.transactions];
 
         return {
@@ -88,12 +98,12 @@ export const useTradingStore = create<TradingState>((set, get) => ({
           positions: updatedPositions.filter((p) => p.total_quantity > 0),
           transactions: updatedTransactions,
           isLoading: false,
-          successMessage: `Khớp lệnh thành công: ${payload.type} ${payload.quantity.toLocaleString()} ${payload.symbol.toUpperCase()} giá ${(payload.price).toLocaleString()}đ`
+          successMessage: `Đã ghi nhật ký: ${payload.type === 'BUY' ? 'MUA' : 'BÁN'} ${payload.quantity.toLocaleString()} ${payload.symbol.toUpperCase()} giá ${payload.price.toLocaleString()}đ`
         };
       });
       return true;
     } catch (err: any) {
-      set({ error: err.message || 'Lỗi đặt lệnh', isLoading: false });
+      set({ error: err.message || 'Lỗi ghi sổ lệnh', isLoading: false });
       return false;
     }
   },
@@ -104,7 +114,6 @@ export const useTradingStore = create<TradingState>((set, get) => ({
       const updatedPos = await api.updateMarketPrice(symbol, price);
       set((state) => {
         const updatedPositions = state.positions.map((p) => (p.symbol === symbol ? updatedPos : p));
-        // Tính lại tổng tài sản
         const totalStockVal = updatedPositions.reduce((sum, p) => sum + p.market_value, 0);
         const newPortfolio = state.portfolio
           ? {
@@ -148,7 +157,7 @@ export const useTradingStore = create<TradingState>((set, get) => ({
         portfolio: updatedPortfolio,
         isLoading: false,
         isCashModalOpen: false,
-        successMessage: `${action === 'DEPOSIT' ? 'Nạp' : 'Rút'} ${amount.toLocaleString()}đ thành công!`
+        successMessage: `${action === 'DEPOSIT' ? 'Nạp vốn' : 'Rút vốn'} ${amount.toLocaleString()}đ thành công!`
       });
       return true;
     } catch (err: any) {

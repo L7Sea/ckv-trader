@@ -12,7 +12,9 @@ import {
   Lock,
   ShieldCheck,
   Settings,
-  Sparkles
+  Sparkles,
+  RotateCcw,
+  BookOpen
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 import { useAuthStore } from '../store/useAuthStore';
@@ -22,7 +24,7 @@ import { AuthModal } from './AuthModal';
 import { SettingsModal } from './SettingsModal';
 
 export const Header: React.FC = () => {
-  const { fetchData, settleDay, openCashModal, isLoading } = useTradingStore();
+  const { fetchData, settleDay, openCashModal, resetCleanSlate, isLoading } = useTradingStore();
   const { user, openAuthModal, logout, switchSubAccount, lockApp } = useAuthStore();
 
   const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
@@ -40,6 +42,18 @@ export const Header: React.FC = () => {
     }
   };
 
+  const handleResetSlate = () => {
+    const input = window.prompt(
+      'NHẬP SỐ TIỀN VỐN KHỞI ĐẦU ĐỂ BẮT ĐẦU SỔ GHI CHÉP THẬT (VND):\n(Để trống hoặc nhập 0 nếu muốn bắt đầu từ 0đ để nạp tiền thủ công sau)',
+      '0'
+    );
+    if (input !== null) {
+      const cleanNum = Number(input.replace(/[^0-9]/g, '')) || 0;
+      resetCleanSlate(cleanNum);
+      setIsUserMenuOpen(false);
+    }
+  };
+
   return (
     <>
       <header className="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40 px-4 sm:px-6 py-3">
@@ -54,15 +68,15 @@ export const Header: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <h1 className="text-xl font-bold tracking-tight text-white">CKV PRO</h1>
                   <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    T+2.5 Pro
+                    Sổ Nhật Ký T+2.5
                   </span>
                   <span className="hidden sm:inline-flex text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                    🐹 Capy Active
+                    🐹 Capy Physics
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-slate-400">
                   <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                  <span>Bảo Mật 3 Lớp • Cloudflare Edge</span>
+                  <span>Chủ sở hữu: <b className="text-emerald-400">L7Sea</b> • Bảo mật Cloudflare</span>
                 </div>
               </div>
             </div>
@@ -102,40 +116,46 @@ export const Header: React.FC = () => {
             </div>
           </div>
 
-          {/* Action Center */}
-          <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end overflow-x-auto pb-1 md:pb-0">
-            {/* Switch Sub-Account on Desktop */}
-            <div className="hidden md:flex items-center gap-1 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs font-mono mr-1">
+          {/* Action Tools & Navigation Center */}
+          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
+            {/* Switch Sub-account on Desktop */}
+            <div className="hidden md:flex items-center gap-1 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs font-mono">
+              <span className="text-slate-500 px-2 font-sans font-semibold">Tài khoản:</span>
               <button
                 onClick={() => switchSubAccount('01')}
-                className={`px-2.5 py-1 rounded-lg font-bold transition ${
-                  user?.subAccount === '01' ? 'bg-emerald-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white'
+                className={`px-3 py-1.5 rounded-lg font-bold transition ${
+                  user?.subAccount === '01'
+                    ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
                 }`}
-                title="Tài khoản thường (Tiền mặt 100%)"
+                title="Tiểu khoản 01: Giao dịch Thường (Không Margin)"
               >
-                TK 01 (Thường)
+                Đuôi 01 (Thường)
               </button>
               <button
                 onClick={() => switchSubAccount('06')}
-                className={`px-2.5 py-1 rounded-lg font-bold transition ${
-                  user?.subAccount === '06' ? 'bg-indigo-500 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                className={`px-3 py-1.5 rounded-lg font-bold transition ${
+                  user?.subAccount === '06'
+                    ? 'bg-indigo-500 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-white'
                 }`}
-                title="Tài khoản Ký quỹ (Margin)"
+                title="Tiểu khoản 06: Giao dịch Ký Quỹ Margin"
               >
-                TK 06 (Margin)
+                Đuôi 06 (Margin)
               </button>
             </div>
 
-            {/* Nút Nhận Cổ Tức */}
+            {/* Nút Quyền Cổ Tức */}
             <button
               onClick={() => setIsDividendModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold transition shadow-sm active:scale-95 whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold transition shadow-sm active:scale-95 whitespace-nowrap"
+              title="Ghi nhận cổ tức tiền mặt (5% TNCN) hoặc cổ tức cổ phiếu"
             >
-              <Gift className="h-4 w-4" />
+              <Gift className="h-4 w-4 text-amber-400" />
               <span>Cổ Tức</span>
             </button>
 
-            {/* Nút Quét QR mở trên Điện thoại */}
+            {/* Nút Điện Thoại / PWA */}
             <button
               onClick={() => setIsMobileModalOpen(true)}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition shadow-sm active:scale-95 whitespace-nowrap"
@@ -162,7 +182,7 @@ export const Header: React.FC = () => {
               title="Chuyển cổ phiếu T+1 -> Khả dụng, Tiền chờ về -> Tiền mặt"
             >
               <Calendar className="h-4 w-4 text-indigo-400" />
-              <span>Chốt Ngày</span>
+              <span>Chốt Ngày T+2.5</span>
             </button>
 
             {/* Nút Tùy Biến (Settings & Capy) */}
@@ -178,7 +198,7 @@ export const Header: React.FC = () => {
             <button
               onClick={lockApp}
               className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 transition active:scale-95"
-              title="Khóa ứng dụng ngay lập tức bằng mã PIN"
+              title="Khóa ứng dụng ngay lập tức bằng mã PIN 542463"
             >
               <Lock className="h-4 w-4" />
             </button>
@@ -190,19 +210,28 @@ export const Header: React.FC = () => {
                 className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 text-xs font-semibold hover:border-slate-700 transition"
               >
                 <div className="h-6 w-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
-                  {user?.name ? user.name[0].toUpperCase() : 'U'}
+                  {user?.name ? user.name[0].toUpperCase() : 'L'}
                 </div>
-                <span className="max-w-[80px] truncate hidden sm:inline">{user?.name || 'Tài Khoản'}</span>
+                <span className="max-w-[80px] truncate hidden sm:inline">{user?.name || 'L7Sea'}</span>
                 <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
               </button>
 
               {/* Dropdown Menu */}
               {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in">
+                <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in">
                   <div className="p-2 border-b border-slate-800/80 mb-1">
-                    <p className="text-xs font-bold text-white truncate">{user?.name}</p>
-                    <p className="text-[11px] font-mono text-emerald-400">{user?.accountNumber}</p>
+                    <p className="text-xs font-bold text-white truncate">{user?.name || 'L7Sea'}</p>
+                    <p className="text-[11px] font-mono text-emerald-400">STK: {user?.accountNumber || '001C888999'}</p>
                   </div>
+                  
+                  <button
+                    onClick={handleResetSlate}
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 rounded-xl transition font-semibold"
+                  >
+                    <RotateCcw className="h-4 w-4 text-rose-400" />
+                    <span>Làm sạch & Thiết lập vốn thật</span>
+                  </button>
+
                   <button
                     onClick={() => {
                       setIsUserMenuOpen(false);
@@ -241,20 +270,19 @@ export const Header: React.FC = () => {
                     className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition"
                   >
                     <RefreshCw className="h-4 w-4 text-slate-400" />
-                    <span>Làm mới dữ liệu</span>
+                    <span>Đồng bộ dữ liệu</span>
                   </button>
-                  <div className="pt-1 mt-1 border-t border-slate-800/80">
-                    <button
-                      onClick={() => {
-                        setIsUserMenuOpen(false);
-                        logout();
-                      }}
-                      className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 rounded-xl transition"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      <span>Đăng xuất</span>
-                    </button>
-                  </div>
+                  <div className="border-t border-slate-800/80 my-1"></div>
+                  <button
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
+                      logout();
+                    }}
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 rounded-xl transition"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Đăng xuất</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -265,8 +293,8 @@ export const Header: React.FC = () => {
       {/* Modals */}
       <MobileAccessModal isOpen={isMobileModalOpen} onClose={() => setIsMobileModalOpen(false)} />
       <DividendModal isOpen={isDividendModalOpen} onClose={() => setIsDividendModalOpen(false)} />
-      <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
       <AuthModal />
+      <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
     </>
   );
 };
