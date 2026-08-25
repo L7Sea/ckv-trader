@@ -289,15 +289,15 @@ export default function Capy() {
 
     // Nếu đã ở trong Chế độ Gunny -> Kéo ná tính lực và góc ngắm
     if (isGunnyMode) {
-      if (dist > 10) {
+      if (dist > 8) {
         const launchAngleDeg = (Math.atan2(-pullY, -pullX) * 180) / Math.PI;
-        const powerPct = Math.min(100, Math.round((dist / 150) * 100));
+        const powerPct = Math.min(100, Math.max(5, Math.round((dist / 160) * 100)));
 
         setAimInfo({
           active: true,
           angleDeg: launchAngleDeg,
           powerPct,
-          lineLength: Math.min(180, dist * 1.3),
+          lineLength: Math.min(220, 20 + dist * 1.25),
         });
 
         if (thanEl.current) {
@@ -331,14 +331,15 @@ export default function Capy() {
 
     setAimInfo({ active: false, angleDeg: 0, powerPct: 0, lineLength: 0 });
 
-    if (isGunnyMode && dist >= 20) {
-      // 🚀 BẮN PHÁO GUNNY SIÊU MẠNH GẤP 10 LẦN (Vận tốc cực đại, nảy 4-6 lần quanh 4 cạnh)
+    if (isGunnyMode && dist >= 10) {
+      // 🚀 PHÂN BỔ % LỰC BẮN CHUẨN XÁC ĐỘNG HỌC (5% -> bay nhẹ, 20% -> nảy 1 lần, 50% -> nảy 2-3 lần, 100% -> nã pháo nảy 5-6 lần)
       const launchAngle = Math.atan2(-pullY, -pullX);
-      const power = Math.min(280, Math.max(90, dist * 2.2));
+      const pNorm = Math.min(1.0, Math.max(0.05, dist / 160));
+      const power = 10 + 310 * Math.pow(pNorm, 1.15);
 
       s.vx = Math.cos(launchAngle) * power;
       s.vy = Math.sin(launchAngle) * power;
-      s.vXoay = (s.vx >= 0 ? 1 : -1) * (45 + Math.random() * 30);
+      s.vXoay = (s.vx >= 0 ? 1 : -1) * (8 + 56 * pNorm);
       s.soLanNay = 0;
 
       setTrangThai('bay');
@@ -346,7 +347,14 @@ export default function Capy() {
 
       const flyEmotion = bocBieuCam(['so', 'gian']);
       setBieuCam(flyEmotion);
-      noiCauTuyChinh('Aaaaa! Bắn éc éc! Đập tường vỡ đầu rồi sếp ôi!', 3.8, flyEmotion);
+      const pctDisplay = Math.round(pNorm * 100);
+      if (pctDisplay >= 80) {
+        noiCauTuyChinh(`Aaaaa! Bắn ${pctDisplay}% lực max! Đập tường vỡ đầu rồi sếp ôi!`, 3.8, flyEmotion);
+      } else if (pctDisplay >= 40) {
+        noiCauTuyChinh(`Bắn ${pctDisplay}% lực! Bay tít mù khơi luôn sếp ôi!`, 3.2, flyEmotion);
+      } else {
+        noiCauTuyChinh(`Bắn nhẹ ${pctDisplay}% lực nè sếp!`, 2.5, bocBieuCam(['toMo', 'vui']));
+      }
     } else {
       // Kéo thả bình thường hoặc chạm nhẹ
       s.vx = 0; s.vy = 0;
