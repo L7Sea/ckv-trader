@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Lock, Shield, KeyRound, ArrowRight, Delete, Eye, EyeOff } from 'lucide-react';
+import { Lock, Shield, KeyRound, Delete } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 
 export const PinLockScreen: React.FC = () => {
   const { isLocked, unlockApp, user } = useAuthStore();
   const [pin, setPin] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const [showPin, setShowPin] = useState(false);
 
   if (!isLocked) return null;
 
@@ -37,15 +36,6 @@ export const PinLockScreen: React.FC = () => {
     setErrorMsg('');
   };
 
-  const handleManualUnlock = (e: React.FormEvent) => {
-    e.preventDefault();
-    const success = unlockApp(pin);
-    if (!success) {
-      setErrorMsg('Mã PIN không chính xác! (Mặc định: 123456)');
-      setPin('');
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-sm text-center space-y-6 animate-in zoom-in-95">
@@ -59,7 +49,7 @@ export const PinLockScreen: React.FC = () => {
           <p className="text-xs text-slate-400 mt-1">
             Ứng dụng đang được khóa bảo vệ. Nhập mã PIN để mở khóa.
           </p>
-          <p className="text-[11px] font-mono text-emerald-400 mt-0.5">Tài khoản: {user?.name || 'Nhà Đầu Tư'}</p>
+          <p className="text-[11px] font-mono text-emerald-400 mt-0.5">Tài khoản: {user?.name || 'L7Sea'}</p>
         </div>
 
         {/* PIN Mask Dots */}
@@ -118,7 +108,7 @@ export const PinLockScreen: React.FC = () => {
           </button>
         </div>
 
-        <p className="text-[11px] text-slate-600 font-mono">Mã PIN mặc định: 123456 (Đổi trong mục Hồ sơ)</p>
+        <p className="text-[11px] text-slate-600 font-mono">Bảo mật mã hóa cấp độ thiết bị</p>
       </div>
     </div>
   );

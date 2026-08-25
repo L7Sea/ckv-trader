@@ -27,12 +27,18 @@ interface AuthState {
 }
 
 const STORAGE_KEY = 'ckv_user_profile';
+const DEFAULT_PIN = '542463';
 
 const getInitialUser = (): UserProfile => {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
-      return JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      // Cập nhật mã PIN thành 542463 nếu chưa có hoặc là mã cũ
+      if (parsed) {
+        parsed.pin = DEFAULT_PIN;
+        return parsed;
+      }
     } catch {
       // ignore
     }
@@ -43,7 +49,7 @@ const getInitialUser = (): UserProfile => {
     email: 'investor@ckv.vn',
     accountNumber: '001C888999',
     subAccount: '01',
-    pin: '123456',
+    pin: DEFAULT_PIN,
     isLoggedIn: true
   };
 };
@@ -61,7 +67,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       email: email || 'investor@ckv.vn',
       accountNumber: '001C' + Math.floor(100000 + Math.random() * 900000),
       subAccount: '01',
-      pin: pin || '123456',
+      pin: pin || DEFAULT_PIN,
       isLoggedIn: true
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
@@ -75,7 +81,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       email: '',
       accountNumber: 'GUEST',
       subAccount: '01',
-      pin: '',
+      pin: DEFAULT_PIN,
       isLoggedIn: false
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(guestUser));
@@ -94,7 +100,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   lockApp: () => set({ isLocked: true }),
 
   unlockApp: (inputPin: string) => {
-    const currentPin = get().user?.pin || '123456';
+    const currentPin = get().user?.pin || DEFAULT_PIN;
     if (inputPin === currentPin) {
       set({ isLocked: false });
       return true;
