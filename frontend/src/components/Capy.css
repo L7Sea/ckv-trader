@@ -268,6 +268,55 @@
 @keyframes cpPhuXoay { to { rotate: 360deg; } }
 @keyframes cpPhuRoi  { 0% { opacity: 0; translate: 0 -3px; } 30% { opacity: 1; } 100% { opacity: 0; translate: 0 12px; } }
 
+/* ═══ VÒNG SẠC NĂNG LƯỢNG 3S ĐỂ BẬT GUNNY ═══ */
+.cp__charge-indicator {
+  position: absolute;
+  top: -36px;
+  left: 50%;
+  translate: -50% 0;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1.5px solid #F59E0B;
+  color: #FBBF24;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
+  animation: cpChargePulse 0.4s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 2147483002;
+}
+@keyframes cpChargePulse {
+  from { scale: 0.95; box-shadow: 0 0 8px rgba(245, 158, 11, 0.4); }
+  to   { scale: 1.05; box-shadow: 0 0 20px rgba(245, 158, 11, 0.9); }
+}
+
+.cp--charging .cp__than {
+  filter: drop-shadow(0 0 18px rgba(245, 158, 11, 0.8)) !important;
+  animation: cpChargeShake 0.08s ease-in-out infinite alternate;
+}
+@keyframes cpChargeShake {
+  0%   { translate: -2px 1px; rotate: -3deg; }
+  100% { translate: 2px -1px; rotate: 3deg; }
+}
+
+/* ═══ MÃ CỔ PHIẾU / MÃ ĐÁ HIỆN TO RÕ TRONG BONG BÓNG ═══ */
+.cp__stock-highlight {
+  display: inline-block;
+  font-size: 17px;
+  font-weight: 900;
+  font-family: monospace;
+  color: #10B981;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1.5px solid rgba(16, 185, 129, 0.4);
+  padding: 1px 8px;
+  border-radius: 6px;
+  margin: 0 3px;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cp--boi .cp__than,
   .cp--ngu .cp__than,

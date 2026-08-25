@@ -14,7 +14,9 @@ import {
   Zap,
   Sliders,
   DollarSign,
-  PieChart
+  PieChart,
+  ExternalLink,
+  Globe
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 import { VN50_WATCHLIST, WatchlistStock } from './MarketBoard';
@@ -30,74 +32,84 @@ interface TickTrade {
 
 export const TechnicalChart: React.FC = () => {
   const { positions, selectedSymbol, setSelectedStock, watchlist } = useTradingStore();
-  const [activeTab, setActiveTab] = useState<'TRADINGVIEW' | 'ORDERBOOK' | 'DEAL_ANALYTICS'>('TRADINGVIEW');
+  const [activeTab, setActiveTab] = useState<'TRADINGVIEW' | 'VNDIRECT' | 'ORDERBOOK' | 'DEAL_ANALYTICS'>('TRADINGVIEW');
   const [activeTimeframe, setActiveTimeframe] = useState<'D' | 'W' | 'M' | '60' | '15'>('D');
 
-  const activeSymbol = selectedSymbol || positions[0]?.symbol || 'ACB';
+  const activeSymbol = selectedSymbol || positions[0]?.symbol || 'TPB';
   const foundStock = watchlist.find((s) => s.symbol === activeSymbol) || VN50_WATCHLIST.find((s) => s.symbol === activeSymbol);
   const currentPos = positions.find((p) => p.symbol === activeSymbol);
 
+  // Xác định sàn giao dịch chuẩn xác cho TradingView (HOSE / HNX / UPCOM)
+  const hnxSymbols = ['SHS', 'IDC', 'PVS', 'CEO', 'MBS', 'NVB', 'TNG', 'VCS', 'DTD', 'BVS'];
+  const upcomSymbols = ['BSR', 'VGI', 'C4G', 'ABB', 'QNS', 'MCH', 'VEA', 'OIL', 'SSH', 'NAB'];
+  const exchange = hnxSymbols.includes(activeSymbol) ? 'HNX' : upcomSymbols.includes(activeSymbol) ? 'UPCOM' : 'HOSE';
+  const tvSymbol = `${exchange}:${activeSymbol}`;
+
   // Giá và thông số thị trường thực tế
-  const currentPrice = currentPos?.market_price || foundStock?.price || 22200;
+  const currentPrice = currentPos?.market_price || foundStock?.price || 18500;
   const refPrice = foundStock?.refPrice || Math.round(currentPrice * 0.985); // Tham chiếu
   const ceilPrice = Math.round(refPrice * 1.07); // Trần +7%
   const floorPrice = Math.round(refPrice * 0.93); // Sàn -7%
   const highPrice = Math.round(currentPrice * 1.012);
   const lowPrice = Math.round(currentPrice * 0.978);
   const avgPrice = Math.round((highPrice + lowPrice) / 2);
-  const totalVolume = foundStock?.volume || 7780000;
+  const totalVolume = foundStock?.volume || 14850000;
   const totalValue = Math.round((totalVolume * currentPrice) / 1000000000 * 10) / 10; // Tỷ đồng
-  const foreignBuy = 266960;
-  const foreignSell = 1896400;
 
   const change = currentPrice - refPrice;
   const changePct = refPrice > 0 ? (change / refPrice) * 100 : 0;
   const isUp = change >= 0;
 
-  // 1. TẠO SỔ LỆNH BƯỚC GIÁ 3 CẤP (3-LEVEL ORDER BOOK NHƯ DNSE ENTRADE X)
+  // 1. SỔ LỆNH BƯỚC GIÁ 3 CẤP (DNSE ENTRADE X STYLE)
   const orderBook = React.useMemo(() => {
     const p = currentPrice;
     return {
       buyLevels: [
-        { price: p - 100, volume: 17600, pct: 25 },
-        { price: p - 150, volume: 114800, pct: 68 },
-        { price: p - 200, volume: 136700, pct: 85 }
+        { price: p - 50, volume: 48600, pct: 35 },
+        { price: p - 100, volume: 184500, pct: 75 },
+        { price: p - 150, volume: 216700, pct: 90 }
       ],
-      currentTrade: { price: p, volume: 1000, change: changePct },
+      currentTrade: { price: p, volume: 2000, change: changePct },
       sellLevels: [
-        { price: p + 100, volume: 4600, pct: 15 },
-        { price: p + 150, volume: 1200, pct: 8 },
-        { price: p + 200, volume: 16100, pct: 28 }
+        { price: p + 50, volume: 24600, pct: 20 },
+        { price: p + 100, volume: 11200, pct: 12 },
+        { price: p + 150, volume: 38100, pct: 32 }
       ],
-      totalBuyOrder: 269100,
-      totalSellOrder: 21900
+      totalBuyOrder: 449800,
+      totalSellOrder: 73900
     };
   }, [currentPrice, changePct]);
 
   // 2. NHẬT KÝ KHỚP LỆNH THEO GIÂY (TIME & SALES TICKS)
   const [ticks, setTicks] = useState<TickTrade[]>([
-    { id: '1', time: '14:45:01', type: 'SELL', price: currentPrice, quantity: 1000, change: -0.30 },
-    { id: '2', time: '14:45:01', type: 'SELL', price: currentPrice, quantity: 3600, change: -0.30 },
-    { id: '3', time: '14:45:01', type: 'SELL', price: currentPrice, quantity: 300, change: -0.30 },
-    { id: '4', time: '14:45:01', type: 'SELL', price: currentPrice, quantity: 100, change: -0.30 },
-    { id: '5', time: '14:45:01', type: 'SELL', price: currentPrice, quantity: 2000, change: -0.30 },
-    { id: '6', time: '14:44:58', type: 'BUY', price: currentPrice + 50, quantity: 5000, change: +0.20 },
-    { id: '7', time: '14:44:55', type: 'BUY', price: currentPrice + 50, quantity: 12000, change: +0.20 },
-    { id: '8', time: '14:44:50', type: 'SELL', price: currentPrice, quantity: 800, change: -0.30 }
+    { id: '1', time: '14:45:01', type: 'BUY', price: currentPrice, quantity: 2000, change: +0.45 },
+    { id: '2', time: '14:45:01', type: 'BUY', price: currentPrice, quantity: 5000, change: +0.45 },
+    { id: '3', time: '14:45:00', type: 'SELL', price: currentPrice - 50, quantity: 1200, change: -0.15 },
+    { id: '4', time: '14:44:58', type: 'BUY', price: currentPrice, quantity: 10000, change: +0.45 },
+    { id: '5', time: '14:44:55', type: 'BUY', price: currentPrice, quantity: 3500, change: +0.45 },
+    { id: '6', time: '14:44:50', type: 'SELL', price: currentPrice - 50, quantity: 800, change: -0.15 }
   ]);
 
   const tradingViewContainerRef = useRef<HTMLDivElement>(null);
 
-  // Nhúng TradingView Widget thời gian thực hỗ trợ toàn bộ cổ phiếu VN (HOSE, HNX)
+  // Nhúng TradingView Advanced Chart Widget chính thức hỗ trợ toàn bộ 300 mã cổ phiếu Việt Nam
   useEffect(() => {
     if (activeTab !== 'TRADINGVIEW') return;
 
-    const exchange = (foundStock as any)?.exchange || 'HOSE';
-    const tvSymbol = `${exchange}:${activeSymbol}`;
-
     if (tradingViewContainerRef.current) {
       tradingViewContainerRef.current.innerHTML = '';
-      
+
+      const container = document.createElement('div');
+      container.className = 'tradingview-widget-container';
+      container.style.height = '100%';
+      container.style.width = '100%';
+
+      const widget = document.createElement('div');
+      widget.className = 'tradingview-widget-container__widget';
+      widget.style.height = 'calc(100% - 32px)';
+      widget.style.width = '100%';
+      container.appendChild(widget);
+
       const script = document.createElement('script');
       script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
       script.type = 'text/javascript';
@@ -110,6 +122,7 @@ export const TechnicalChart: React.FC = () => {
         theme: 'dark',
         style: '1',
         locale: 'vi_VN',
+        allow_symbol_change: true,
         enable_publishing: false,
         backgroundColor: '#0e1117',
         gridColor: 'rgba(36, 41, 56, 0.4)',
@@ -120,16 +133,17 @@ export const TechnicalChart: React.FC = () => {
         hide_volume: false,
         support_host: 'https://www.tradingview.com'
       });
+      container.appendChild(script);
 
-      tradingViewContainerRef.current.appendChild(script);
+      tradingViewContainerRef.current.appendChild(container);
     }
-  }, [activeSymbol, activeTab, activeTimeframe, foundStock]);
+  }, [tvSymbol, activeTab, activeTimeframe]);
 
   const formatNumber = (num: number) => (num || 0).toLocaleString('vi-VN');
 
   return (
     <div className="bg-[#0e1117] border border-[#212636] rounded-2xl shadow-xl overflow-hidden text-slate-200">
-      {/* ══ 1. TOP TICKER STATUS BAR (CHUẨN TERMINAL DNSE / VPS) ══ */}
+      {/* ══ 1. TOP TICKER STATUS BAR (CHUẨN TERMINAL DNSE / VPS / VNDIRECT) ══ */}
       <div className="bg-[#121620] border-b border-[#212636] px-4 py-3 flex flex-wrap items-center justify-between gap-3">
         {/* Symbol & Exchange Info */}
         <div className="flex items-center gap-3">
@@ -138,18 +152,18 @@ export const TechnicalChart: React.FC = () => {
               value={activeSymbol}
               onChange={(e) => {
                 const s = watchlist.find((item) => item.symbol === e.target.value) || VN50_WATCHLIST.find((item) => item.symbol === e.target.value);
-                setSelectedStock(e.target.value, s?.price || 22200, 'BUY');
+                setSelectedStock(e.target.value, s?.price || 18500, 'BUY');
               }}
               className="bg-[#181d29] border border-[#2b3245] text-white font-mono font-black text-lg rounded-xl px-3 py-1.5 focus:outline-none focus:border-emerald-500 cursor-pointer"
             >
               {watchlist.map((item) => (
                 <option key={item.symbol} value={item.symbol}>
-                  {item.symbol} - {item.name}
+                  {item.symbol} - {item.name} ({item.exchange})
                 </option>
               ))}
             </select>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#1f2536] text-slate-400 font-bold">
-              {(foundStock as any)?.exchange || 'HOSE'}
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#1f2536] text-cyan-300 font-bold border border-cyan-500/30">
+              {exchange}
             </span>
             {currentPos && (
               <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -208,7 +222,18 @@ export const TechnicalChart: React.FC = () => {
             }`}
           >
             <Activity className="h-3.5 w-3.5" />
-            <span>Biểu Đồ Kỹ Thuật (TradingView)</span>
+            <span>TradingView ({tvSymbol})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('VNDIRECT')}
+            className={`px-3 py-1 rounded-lg font-bold transition flex items-center gap-1.5 ${
+              activeTab === 'VNDIRECT'
+                ? 'bg-amber-500 text-slate-950 shadow'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Globe className="h-3.5 w-3.5" />
+            <span>VNDIRECT / SSI DStock</span>
           </button>
           <button
             onClick={() => setActiveTab('ORDERBOOK')}
@@ -219,12 +244,12 @@ export const TechnicalChart: React.FC = () => {
             }`}
           >
             <BarChart2 className="h-3.5 w-3.5" />
-            <span>Sổ Lệnh & Bước Giá (DNSE Style)</span>
+            <span>Sổ Lệnh 3 Cấp (DNSE)</span>
           </button>
         </div>
       </div>
 
-      {/* ══ 2. CHẾ ĐỘ 1: BIỂU ĐỒ NẾN TRADINGVIEW REALTIME ══ */}
+      {/* ══ 2. CHẾ ĐỘ 1: BIỂU ĐỒ NẾN TRADINGVIEW REALTIME (ĐỒNG BỘ MÃ & TIMEFRAME) ══ */}
       {activeTab === 'TRADINGVIEW' && (
         <div className="p-3 bg-[#0e1117]">
           {/* Timeframe Selector Bar */}
@@ -237,18 +262,18 @@ export const TechnicalChart: React.FC = () => {
                   onClick={() => setActiveTimeframe(tf)}
                   className={`px-2.5 py-1 rounded-lg font-bold transition ${
                     activeTimeframe === tf
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-sm'
                       : 'text-slate-400 hover:text-white hover:bg-[#181d29]'
                   }`}
                 >
-                  {tf === 'D' ? '1 Ngày' : tf === 'W' ? '1 Tuần' : tf === 'M' ? '1 Tháng' : `${tf}m`}
+                  {tf === 'D' ? '1 Ngày' : tf === 'W' ? '1 Tuần' : tf === 'M' ? '1 Tháng' : `${tf} Phút`}
                 </button>
               ))}
             </div>
 
             <div className="text-[11px] text-slate-400 font-sans flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Dữ liệu trực tiếp TradingView Realtime</span>
+              <span>Dữ liệu: <b className="text-emerald-400 font-mono">{tvSymbol}</b> • Khung: <b className="text-cyan-300 font-mono">{activeTimeframe === 'D' ? '1D' : activeTimeframe}</b></span>
             </div>
           </div>
 
@@ -256,6 +281,36 @@ export const TechnicalChart: React.FC = () => {
           <div
             ref={tradingViewContainerRef}
             className="w-full h-[520px] rounded-xl overflow-hidden bg-[#0e1117] border border-[#212636]"
+          />
+        </div>
+      )}
+
+      {/* ══ 2.1. CHẾ ĐỘ 1.1: BIỂU ĐỒ VNDIRECT D-CHART & SSI IBOARD IFRAME ══ */}
+      {activeTab === 'VNDIRECT' && (
+        <div className="p-3 bg-[#0e1117]">
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#212636] text-xs">
+            <div className="flex items-center gap-2">
+              <span className="text-amber-400 font-bold flex items-center gap-1">
+                <Globe className="h-4 w-4" /> Biểu Đồ Kỹ Thuật Chuyên Sâu VNDIRECT DChart:
+              </span>
+              <span className="px-2 py-0.5 bg-[#181d29] rounded font-mono font-bold text-white border border-[#2b3245]">
+                {activeSymbol}
+              </span>
+            </div>
+            <a
+              href={`https://dchart.vndirect.com.vn/?symbol=${activeSymbol}`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[11px] text-cyan-400 hover:underline flex items-center gap-1"
+            >
+              Mở toàn màn hình VNDIRECT <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+
+          <iframe
+            src={`https://dchart.vndirect.com.vn/?symbol=${activeSymbol}`}
+            title={`VNDIRECT DChart ${activeSymbol}`}
+            className="w-full h-[520px] rounded-xl border border-[#212636] bg-[#121620]"
           />
         </div>
       )}
@@ -299,9 +354,9 @@ export const TechnicalChart: React.FC = () => {
                       <div className="absolute inset-y-0 right-0 bg-emerald-500/10 rounded-l" style={{ width: `${orderBook.buyLevels[2].pct}%` }} />
                       <span className="relative z-10">{formatNumber(orderBook.buyLevels[2].volume)}</span>
                     </td>
-                    <td className="py-2.5 px-2 text-emerald-400 font-bold">{formatNumber(orderBook.buyLevels[2].price)}</td>
-                    <td className="py-2.5 px-2 font-black text-white bg-slate-900/60">-</td>
-                    <td className="py-2.5 px-2 text-rose-400 font-bold">{formatNumber(orderBook.sellLevels[2].price)}</td>
+                    <td className="py-2.5 px-2 font-bold text-emerald-400">{formatNumber(orderBook.buyLevels[2].price)}</td>
+                    <td className="py-2.5 px-2 font-bold text-slate-500">—</td>
+                    <td className="py-2.5 px-2 font-bold text-rose-400">{formatNumber(orderBook.sellLevels[2].price)}</td>
                     <td className="py-2.5 px-2 text-slate-300 relative">
                       <div className="absolute inset-y-0 left-0 bg-rose-500/10 rounded-r" style={{ width: `${orderBook.sellLevels[2].pct}%` }} />
                       <span className="relative z-10">{formatNumber(orderBook.sellLevels[2].volume)}</span>
@@ -311,31 +366,39 @@ export const TechnicalChart: React.FC = () => {
                   {/* Cấp 2 */}
                   <tr>
                     <td className="py-2.5 px-2 text-slate-300 relative">
-                      <div className="absolute inset-y-0 right-0 bg-emerald-500/10 rounded-l" style={{ width: `${orderBook.buyLevels[1].pct}%` }} />
+                      <div className="absolute inset-y-0 right-0 bg-emerald-500/15 rounded-l" style={{ width: `${orderBook.buyLevels[1].pct}%` }} />
                       <span className="relative z-10">{formatNumber(orderBook.buyLevels[1].volume)}</span>
                     </td>
-                    <td className="py-2.5 px-2 text-emerald-400 font-bold">{formatNumber(orderBook.buyLevels[1].price)}</td>
-                    <td className="py-2.5 px-2 font-black text-white bg-slate-900/60">-</td>
-                    <td className="py-2.5 px-2 text-rose-400 font-bold">{formatNumber(orderBook.sellLevels[1].price)}</td>
+                    <td className="py-2.5 px-2 font-bold text-emerald-400">{formatNumber(orderBook.buyLevels[1].price)}</td>
+                    <td className="py-2.5 px-2 font-bold text-slate-500">—</td>
+                    <td className="py-2.5 px-2 font-bold text-rose-400">{formatNumber(orderBook.sellLevels[1].price)}</td>
                     <td className="py-2.5 px-2 text-slate-300 relative">
-                      <div className="absolute inset-y-0 left-0 bg-rose-500/10 rounded-r" style={{ width: `${orderBook.sellLevels[1].pct}%` }} />
+                      <div className="absolute inset-y-0 left-0 bg-rose-500/15 rounded-r" style={{ width: `${orderBook.sellLevels[1].pct}%` }} />
                       <span className="relative z-10">{formatNumber(orderBook.sellLevels[1].volume)}</span>
                     </td>
                   </tr>
 
-                  {/* Cấp 1 (Tốt nhất) */}
-                  <tr className="bg-[#181d2a]/80 font-bold">
-                    <td className="py-2.5 px-2 text-slate-200 relative">
-                      <div className="absolute inset-y-0 right-0 bg-emerald-500/20 rounded-l" style={{ width: `${orderBook.buyLevels[0].pct}%` }} />
+                  {/* Cấp 1 (Sát giá khớp nhất) */}
+                  <tr className="bg-slate-800/20">
+                    <td className="py-3 px-2 text-slate-200 font-bold relative">
+                      <div className="absolute inset-y-0 right-0 bg-emerald-500/25 rounded-l" style={{ width: `${orderBook.buyLevels[0].pct}%` }} />
                       <span className="relative z-10">{formatNumber(orderBook.buyLevels[0].volume)}</span>
                     </td>
-                    <td className="py-2.5 px-2 text-emerald-400 text-sm">{formatNumber(orderBook.buyLevels[0].price)}</td>
-                    <td className="py-2.5 px-2 text-sm text-emerald-300 bg-emerald-500/10">
-                      {formatNumber(orderBook.currentTrade.price)}
+                    <td className="py-3 px-2 font-black text-base text-emerald-400">{formatNumber(orderBook.buyLevels[0].price)}</td>
+                    
+                    {/* KHỚP LỆNH CHÍNH GIỮA */}
+                    <td className="py-3 px-2 font-black text-lg bg-[#181f2c] border-x border-[#2b3245] text-center">
+                      <div className={`${isUp ? 'text-[#0ecb81]' : 'text-[#f6465d]'}`}>
+                        {formatNumber(orderBook.currentTrade.price)}
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-normal">
+                        KL: {formatNumber(orderBook.currentTrade.volume)}
+                      </div>
                     </td>
-                    <td className="py-2.5 px-2 text-rose-400 text-sm">{formatNumber(orderBook.sellLevels[0].price)}</td>
-                    <td className="py-2.5 px-2 text-slate-200 relative">
-                      <div className="absolute inset-y-0 left-0 bg-rose-500/20 rounded-r" style={{ width: `${orderBook.sellLevels[0].pct}%` }} />
+
+                    <td className="py-3 px-2 font-black text-base text-rose-400">{formatNumber(orderBook.sellLevels[0].price)}</td>
+                    <td className="py-3 px-2 text-slate-200 font-bold relative">
+                      <div className="absolute inset-y-0 left-0 bg-rose-500/25 rounded-r" style={{ width: `${orderBook.sellLevels[0].pct}%` }} />
                       <span className="relative z-10">{formatNumber(orderBook.sellLevels[0].volume)}</span>
                     </td>
                   </tr>
@@ -343,70 +406,61 @@ export const TechnicalChart: React.FC = () => {
               </table>
             </div>
 
-            {/* Khối Ngoại & Thống kê Mua/Bán */}
-            <div className="grid grid-cols-2 gap-3 pt-2 text-xs font-mono">
-              <div className="p-3 bg-[#181d29] rounded-xl border border-[#2b3245]">
-                <span className="text-slate-500 block font-sans text-[10px]">Khối Ngoại Mua:</span>
-                <b className="text-emerald-400">{formatNumber(foreignBuy)} CP</b>
+            {/* Khối lượng mua / bán chủ động */}
+            <div className="pt-2 border-t border-[#212636] flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                <span className="text-slate-400">Mua chủ động:</span>
+                <b className="text-emerald-400 font-mono">68.4%</b>
               </div>
-              <div className="p-3 bg-[#181d29] rounded-xl border border-[#2b3245]">
-                <span className="text-slate-500 block font-sans text-[10px]">Khối Ngoại Bán:</span>
-                <b className="text-rose-400">{formatNumber(foreignSell)} CP</b>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
+                <span className="text-slate-400">Bán chủ động:</span>
+                <b className="text-rose-400 font-mono">31.6%</b>
               </div>
             </div>
           </div>
 
-          {/* CỘT PHẢI: NHẬT KÝ KHỚP LỆNH THEO GIÂY (TIME & SALES TICKS) (5 COLS) */}
-          <div className="lg:col-span-5 bg-[#121620] border border-[#212636] rounded-2xl p-4 space-y-3 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between pb-2 border-b border-[#212636]">
-                <span className="text-xs font-bold text-slate-300 font-sans flex items-center gap-1.5">
-                  <Clock className="h-4 w-4 text-cyan-400" />
-                  KHỚP LỆNH TRỰC TIẾP (TIME & SALES)
-                </span>
-                <span className="text-[10px] text-slate-500 font-mono">Thời gian thực</span>
-              </div>
+          {/* CỘT PHẢI: NHẬT KÝ KHỚP LỆNH THỜI GIAN THỰC (5 COLS) */}
+          <div className="lg:col-span-5 bg-[#121620] border border-[#212636] rounded-2xl p-4 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-[#212636]">
+              <span className="text-xs font-bold text-slate-300 font-sans flex items-center gap-1.5">
+                <Clock className="h-4 w-4 text-cyan-400" />
+                KHỚP LỆNH THEO GIÂY (TIME & SALES)
+              </span>
+              <span className="text-[10px] text-slate-500 font-mono">Auto Live Feed</span>
+            </div>
 
-              {/* Tỷ lệ Mua Chủ Động vs Bán Chủ Động */}
-              <div className="py-2.5 space-y-1">
-                <div className="flex justify-between text-[11px] font-mono">
-                  <span className="text-emerald-400 font-bold">M: 3.801.800 (48.8%)</span>
-                  <span className="text-rose-400 font-bold">B: 3.978.200 (51.2%)</span>
-                </div>
-                <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
-                  <div className="h-full bg-emerald-500" style={{ width: '48.8%' }} />
-                  <div className="h-full bg-rose-500" style={{ width: '51.2%' }} />
-                </div>
+            <div className="overflow-y-auto max-h-[340px] space-y-1 pr-1 font-mono text-xs">
+              <div className="grid grid-cols-4 text-[10px] text-slate-500 pb-1 border-b border-[#212636]/60 font-sans">
+                <span>Thời gian</span>
+                <span className="text-center">Lệnh</span>
+                <span className="text-right">Giá (VND)</span>
+                <span className="text-right">Khối lượng</span>
               </div>
-
-              {/* Bảng Tick Trades */}
-              <div className="overflow-y-auto max-h-[300px] mt-1 space-y-1 pr-1 font-mono text-xs">
-                {ticks.map((t) => (
-                  <div
-                    key={t.id}
-                    className="flex items-center justify-between p-2 rounded-lg bg-[#181d29]/70 hover:bg-[#181d29] transition"
-                  >
-                    <span className="text-slate-400 text-[11px]">{t.time}</span>
+              {ticks.map((t) => (
+                <div
+                  key={t.id}
+                  className="grid grid-cols-4 py-1.5 px-1 rounded hover:bg-[#181f2c] transition items-center"
+                >
+                  <span className="text-slate-400 text-[11px]">{t.time}</span>
+                  <span className="text-center">
                     <span
-                      className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                      className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
                         t.type === 'BUY'
-                          ? 'bg-emerald-500/20 text-emerald-400'
-                          : 'bg-rose-500/20 text-rose-400'
+                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                          : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
                       }`}
                     >
                       {t.type === 'BUY' ? 'MUA' : 'BÁN'}
                     </span>
-                    <b className="text-white">{formatNumber(t.quantity)}</b>
-                    <span className={t.change >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
-                      {formatNumber(t.price)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="p-2.5 bg-[#181d29] rounded-xl border border-[#2b3245] text-[11px] text-slate-400 font-sans leading-relaxed">
-              💡 <b>Khớp chủ động:</b> Lệnh mua/bán khớp thẳng vào dư mua/bán của sàn, phản ánh chuẩn xác áp lực cung cầu trong phiên.
+                  </span>
+                  <span className={`text-right font-bold ${t.change >= 0 ? 'text-[#0ecb81]' : 'text-[#f6465d]'}`}>
+                    {formatNumber(t.price)}
+                  </span>
+                  <span className="text-right text-slate-200">{formatNumber(t.quantity)}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

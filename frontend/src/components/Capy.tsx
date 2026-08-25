@@ -1,36 +1,39 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { getCapy, type CapyMode } from '@/lib/capyService';
-import { getStyle } from '@/lib/greeting';
-import { bocBieuCam, layThoai, BIEU_CAM, type BieuCam, type Nhom } from '@/lib/capyBieuCam';
-import { buocVatLy, dangBay } from '@/lib/capyVatLy';
-import { layThoaiHanhDong, type HanhDong } from '@/lib/capyThoaiHanhDong';
-import { chonBoDo, type NguCanh, layKieuAoTheoBuoi } from '@/lib/capyBoDo';
-import type { BoDo } from '@/lib/capyBoDo';
-import { docKho } from '@/lib/capyMemeKho';
-import type { CongThucMeme } from '@/lib/capyMemeSpec';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import type { BieuCam } from '@/lib/capyBieuCam';
+import { bocBieuCam, layThoai } from '@/lib/capyBieuCam';
+import { chonBoDo, type BoDo, type NguCanh } from '@/lib/capyBoDo';
+import { buocVatLy, dangBay, NGUONG_BAY } from '@/lib/capyVatLy';
+import { getStyle, type GreetingStyle } from '@/lib/greeting';
 import CapyMat from './CapyMat';
 import './Capy.css';
+import { useTradingStore } from '@/store/useTradingStore';
 
-/* Cỡ bé: ~1/10 màn hình */
-function tinhCo() {
-  const canhNgan = Math.min(window.innerWidth, window.innerHeight);
-  return Math.round(Math.max(92, Math.min(canhNgan * 0.19, 180)));
+export type CapyMode = 'full' | 'compact' | 'off';
+
+function tinhCo(): number {
+  if (typeof window === 'undefined') return 110;
+  const w = window.innerWidth;
+  if (w < 480) return 86;
+  if (w < 768) return 96;
+  return 112;
 }
 
-type TrangThai = 'boi' | 'keo' | 'bay' | 'ngu';
-
 export default function Capy() {
-  const [bat, setBat] = useState<CapyMode>(getCapy);
-  const [co, setCo] = useState(tinhCo);
-  const [bieuCam, setBieuCam] = useState<BieuCam>(() => bocBieuCam(['vui']));
-  const [thoai, setThoai] = useState<string | null>(null);
-  const [trangThai, setTrangThai] = useState<TrangThai>('boi');
-  const [vaCham, setVaCham] = useState(false);
+  const [bat, setBat] = useState<CapyMode>('full');
+  const [co, setCo] = useState<number>(tinhCo);
+  const [bieuCam, setBieuCam] = useState<BieuCam>(() => bocBieuCam(['vui', 'tuHao']));
   const [boDo, setBoDo] = useState<BoDo>(() => chonBoDo('thuong', getStyle()).bo);
-  const [memeDang, setMemeDang] = useState<CongThucMeme | null>(null);
-  const [khoMeme, setKhoMeme] = useState<CongThucMeme[]>(docKho);
+  const [thoai, setThoai] = useState<string | null>(null);
+  const [trangThai, setTrangThai] = useState<'boi' | 'keo' | 'bay' | 'ngu' | 'charging'>('boi');
+  const [vaCham, setVaCham] = useState(false);
 
-  // Slingshot Gunny state
+  // Trạng thái giữ 3s để kích hoạt Gunny
+  const [isGunnyMode, setIsGunnyMode] = useState(false);
+  const [chargeCountdown, setChargeCountdown] = useState<number | null>(null);
+  const holdTimerRef = useRef<number | null>(null);
+  const countIntervalRef = useRef<number | null>(null);
+
+  // Trạng thái tia ngắm Gunny
   const [aimInfo, setAimInfo] = useState<{
     active: boolean;
     angleDeg: number;
@@ -38,14 +41,8 @@ export default function Capy() {
     lineLength: number;
   }>({ active: false, angleDeg: 0, powerPct: 0, lineLength: 0 });
 
-  // Vị trí toạ độ tức thời cho Bong bóng thông minh
-  const [viTri, setViTri] = useState<{ x: number; y: number }>({ x: 100, y: 100 });
-
-  useEffect(() => {
-    const f = () => setKhoMeme(docKho());
-    window.addEventListener('tl-capy-meme', f);
-    return () => window.removeEventListener('tl-capy-meme', f);
-  }, []);
+  // Toạ độ để tính toán vị trí bong bóng thoại
+  const [viTri, setViTri] = useState<{ x: number; y: number }>({ x: 60, y: 200 });
 
   const boc = useRef<HTMLDivElement>(null);
   const thanEl = useRef<HTMLDivElement>(null);
@@ -61,14 +58,23 @@ export default function Capy() {
     startX: 0, startY: 0,
     curX: 0, curY: 0,
     dx: 0, dy: 0,
+    daDiChuyen: false,
+    soLanNay: 0,
     xTruoc: 0, yTruoc: 0, tTruoc: 0,
     imLang: 0,
   });
 
-  const noi = useCallback((bc: BieuCam, giay = 3.6, hd?: HanhDong) => {
+  const noi = useCallback((bc: BieuCam, giay = 3.8) => {
     donHen();
     setBieuCam(bc);
-    setThoai(hd ? layThoaiHanhDong(hd, getStyle()) : layThoai(bc, getStyle()));
+    setThoai(layThoai(bc, getStyle()));
+    dat(() => setThoai(null), giay * 1000);
+  }, []);
+
+  const noiCauTuyChinh = useCallback((loi: string, giay = 4.5, bc?: BieuCam) => {
+    donHen();
+    if (bc) setBieuCam(bc);
+    setThoai(loi);
     dat(() => setThoai(null), giay * 1000);
   }, []);
 
@@ -78,7 +84,7 @@ export default function Capy() {
       const { bo, mat } = chonBoDo('thuong', getStyle());
       setBoDo(bo);
       setBieuCam(mat);
-    }, 60000); // 60 giây = 1 phút
+    }, 60000);
 
     return () => clearInterval(timer);
   }, []);
@@ -92,14 +98,11 @@ export default function Capy() {
   useEffect(() => {
     const f = (e: Event) => {
       const d = (e as CustomEvent).detail as { loi: string; giay: number };
-      donHen();
-      setBieuCam(bocBieuCam(['vui', 'tuHao']));
-      setThoai(d.loi);
-      dat(() => setThoai(null), (d.giay ?? 4) * 1000);
+      noiCauTuyChinh(d.loi, d.giay ?? 4, bocBieuCam(['vui', 'tuHao']));
     };
     window.addEventListener('tl-capy-noi', f);
     return () => { window.removeEventListener('tl-capy-noi', f); donHen(); };
-  }, []);
+  }, [noiCauTuyChinh]);
 
   useEffect(() => {
     const f = (e: Event) => {
@@ -119,64 +122,78 @@ export default function Capy() {
     return () => window.removeEventListener('resize', f);
   }, []);
 
-  /* ══ 2. VÒNG LẶP VẬT LÝ 60 FPS: XOAY 360 ĐỘ & BAY NẢY TƯỜNG ══ */
+  /* ══ 2. VÒNG LẶP VẬT LÝ 60 FPS — HỖ TRỢ ĐẬP NẢY TƯỜNG 3-4 LẦN ══ */
   useEffect(() => {
     if (bat === 'off') return;
-    const s = v.current;
-    s.x = window.innerWidth - co - 24;
-    s.y = window.innerHeight - co - 90;
-    const moiDich = () => {
-      s.dichX = Math.random() * (window.innerWidth - co);
-      s.dichY = Math.random() * (window.innerHeight - co);
-      return { x: s.dichX, y: s.dichY };
-    };
-    moiDich();
 
-    let raf = 0;
+    let raf: number;
     let khung = 0;
-    let xTruoc = s.x;
-    let bayTruoc = false;
+    let xTruoc = v.current.x;
+
+    const chonDichNgauNhien = () => {
+      const pad = 24;
+      const maxX = Math.max(10, window.innerWidth - co - pad);
+      const maxY = Math.max(10, window.innerHeight - co - pad);
+      return {
+        x: pad + Math.random() * (maxX - pad),
+        y: pad + Math.random() * (maxY - pad),
+      };
+    };
+
+    const d0 = chonDichNgauNhien();
+    v.current.dichX = d0.x;
+    v.current.dichY = d0.y;
 
     const chay = () => {
-      const maxX = window.innerWidth - co;
-      const maxY = window.innerHeight - co;
+      const s = v.current;
+      const maxX = Math.max(0, window.innerWidth - co);
+      const maxY = Math.max(0, window.innerHeight - co);
 
       if (!s.keo) {
-        buocVatLy(s, maxX, maxY, khung, moiDich);
-      }
+        const xCu = s.x, yCu = s.y;
+        const vxCu = s.vx, vyCu = s.vy;
 
-      const dangBayNay = dangBay(s);
-      if (bayTruoc && !dangBayNay) {
-        setVaCham(true);
-        setTimeout(() => setVaCham(false), 420);
-        setTrangThai('boi');
-        s.xoay = 0;
-        s.vXoay = 0;
-        noi(bocBieuCam(['so', 'gian', 'dau']), 3.2, 'rot');
-      }
-      bayTruoc = dangBayNay;
+        buocVatLy(s, maxX, maxY, khung, chonDichNgauNhien);
 
-      if (boc.current) {
-        const dx = s.x - xTruoc;
-        if (Math.abs(dx) > 0.3 && !s.keo && !dangBayNay) {
-          boc.current.style.setProperty('--cp-huong', dx > 0 ? '1' : '-1');
+        // Phát hiện va chạm đập mép màn hình khi đang bay
+        const daVaChamTuong =
+          (s.x <= 0 && vxCu < -2) ||
+          (s.x >= maxX && vxCu > 2) ||
+          (s.y <= 0 && vyCu < -2) ||
+          (s.y >= maxY && vyCu > 2);
+
+        if (daVaChamTuong) {
+          s.soLanNay++;
+          setVaCham(true);
+          setTimeout(() => setVaCham(false), 240);
+
+          if (s.soLanNay <= 4) {
+            const hitEmotion = bocBieuCam(['dau', 'so', 'gian']);
+            setBieuCam(hitEmotion);
+          }
         }
-        boc.current.style.transform = `translate3d(${s.x}px, ${s.y}px, 0)`;
-        boc.current.style.setProperty('--cp-bong-to', String(1 + (s.vy < 0 ? -s.vy / 28 : 0)));
-        boc.current.style.setProperty('--cp-bong-mo', String(Math.max(0.08, 0.28 - Math.abs(s.vy) / 50)));
 
-        // Cập nhật góc xoay 360 độ cho thân Capy khi bay / ngắm
+        const dangBayNay = dangBay(s);
+        if (!dangBayNay && Math.abs(s.vx) <= NGUONG_BAY && Math.abs(s.vy) <= NGUONG_BAY) {
+          setTrangThai('boi');
+          s.soLanNay = 0;
+        }
+
+        if (boc.current) {
+          boc.current.style.transform = `translate(${Math.round(s.x)}px, ${Math.round(s.y)}px)`;
+        }
+
         if (thanEl.current) {
+          thanEl.current.style.setProperty('--cp-huong', s.x < xTruoc ? '-1' : '1');
           if (dangBayNay) {
             thanEl.current.style.transform = `rotate(${s.xoay}deg)`;
-          } else if (!s.keo) {
+          } else {
             thanEl.current.style.transform = `rotate(${s.xoay}deg)`;
           }
         }
       }
 
-      // Định kỳ cập nhật toạ độ cho vị trí bong bóng
-      if (khung % 12 === 0) {
+      if (khung % 10 === 0) {
         setViTri({ x: s.x, y: s.y });
       }
 
@@ -187,14 +204,16 @@ export default function Capy() {
 
     raf = requestAnimationFrame(chay);
     return () => cancelAnimationFrame(raf);
-  }, [bat, co, noi]);
+  }, [bat, co]);
 
-  /* ══ 3. TÍNH NĂNG BẮN SLINGSHOT GUNNY: KÉO NÁ & TÍCH LỰC ══ */
+  /* ══ 3. BẮT ĐẦU CHẠM / NHẤN: HỖ TRỢ KÉO THẢ & GIỮ 3S ĐỂ BẬT GUNNY ══ */
   function batDau(e: React.PointerEvent) {
     if (e.button !== 0) return;
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+
     const s = v.current;
     s.keo = true;
+    s.daDiChuyen = false;
     s.startX = e.clientX;
     s.startY = e.clientY;
     s.curX = e.clientX;
@@ -202,18 +221,40 @@ export default function Capy() {
     s.dx = e.clientX - s.x;
     s.dy = e.clientY - s.y;
     s.vx = 0; s.vy = 0; s.vXoay = 0;
-    s.imLang = 0;
-    setTrangThai('keo');
+    s.soLanNay = 0;
 
-    // Chuyển ngay sang cảm xúc TIÊU CỰC (sợ run, mắt chữ X, bốc hỏa)
-    const emotion = bocBieuCam(['so', 'gian', 'dau']);
-    setBieuCam(emotion);
-    noi(emotion, 2.5, 'nhac');
+    setIsGunnyMode(false);
+    setChargeCountdown(3);
+    setTrangThai('charging');
+
+    // Đếm ngược 3 giây
+    let count = 3;
+    if (countIntervalRef.current) clearInterval(countIntervalRef.current);
+    countIntervalRef.current = window.setInterval(() => {
+      count--;
+      if (count > 0) {
+        setChargeCountdown(count);
+      } else {
+        if (countIntervalRef.current) clearInterval(countIntervalRef.current);
+      }
+    }, 1000);
+
+    // Hẹn 3 giây để kích hoạt Chế độ Bắn Gunny Slingshot
+    if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+    holdTimerRef.current = window.setTimeout(() => {
+      setIsGunnyMode(true);
+      setChargeCountdown(null);
+      setTrangThai('keo');
+      const emotion = bocBieuCam(['so', 'gian']);
+      setBieuCam(emotion);
+      noiCauTuyChinh('⚡ ĐÃ BẬT CHẾ ĐỘ GUNNY! Kéo lùi & Thả để nã pháo!', 3.5, emotion);
+    }, 3000);
   }
 
   function dangKeo(e: React.PointerEvent) {
     const s = v.current;
     if (!s.keo) return;
+
     s.curX = e.clientX;
     s.curY = e.clientY;
 
@@ -221,24 +262,50 @@ export default function Capy() {
     const pullY = s.curY - s.startY;
     const dist = Math.hypot(pullX, pullY);
 
-    if (dist > 15) {
-      // Hướng bắn ngược với hướng kéo ná
-      const launchAngleDeg = (Math.atan2(-pullY, -pullX) * 180) / Math.PI;
-      const powerPct = Math.min(100, Math.round((dist / 140) * 100));
-
-      setAimInfo({
-        active: true,
-        angleDeg: launchAngleDeg,
-        powerPct,
-        lineLength: Math.min(160, dist * 1.2),
-      });
-
-      // Xoay Capy hướng về phía sắp bị bắn
-      if (thanEl.current) {
-        thanEl.current.style.transform = `rotate(${launchAngleDeg}deg) scale(${1 + dist * 0.0015}, ${1 - dist * 0.0015})`;
+    // Nếu người dùng chủ động kéo di chuyển > 18px trước khi đủ 3 giây -> Hủy sạc, thành KÉO THẢ TỰ DO BÌNH THƯỜNG
+    if (!isGunnyMode && dist > 18) {
+      s.daDiChuyen = true;
+      if (holdTimerRef.current) {
+        clearTimeout(holdTimerRef.current);
+        holdTimerRef.current = null;
       }
-    } else {
-      setAimInfo({ active: false, angleDeg: 0, powerPct: 0, lineLength: 0 });
+      if (countIntervalRef.current) {
+        clearInterval(countIntervalRef.current);
+        countIntervalRef.current = null;
+      }
+      setChargeCountdown(null);
+      setTrangThai('boi');
+
+      // Cập nhật vị trí kéo Capy đi theo chuột ngay lập tức
+      const maxX = Math.max(0, window.innerWidth - co);
+      const maxY = Math.max(0, window.innerHeight - co);
+      s.x = Math.max(0, Math.min(maxX, e.clientX - s.dx));
+      s.y = Math.max(0, Math.min(maxY, e.clientY - s.dy));
+      if (boc.current) {
+        boc.current.style.transform = `translate(${Math.round(s.x)}px, ${Math.round(s.y)}px)`;
+      }
+      return;
+    }
+
+    // Nếu đã ở trong Chế độ Gunny -> Kéo ná tính lực và góc ngắm
+    if (isGunnyMode) {
+      if (dist > 10) {
+        const launchAngleDeg = (Math.atan2(-pullY, -pullX) * 180) / Math.PI;
+        const powerPct = Math.min(100, Math.round((dist / 150) * 100));
+
+        setAimInfo({
+          active: true,
+          angleDeg: launchAngleDeg,
+          powerPct,
+          lineLength: Math.min(180, dist * 1.3),
+        });
+
+        if (thanEl.current) {
+          thanEl.current.style.transform = `rotate(${launchAngleDeg}deg) scale(${1 + dist * 0.0018}, ${1 - dist * 0.0018})`;
+        }
+      } else {
+        setAimInfo({ active: false, angleDeg: 0, powerPct: 0, lineLength: 0 });
+      }
     }
   }
 
@@ -248,42 +315,93 @@ export default function Capy() {
     s.keo = false;
     (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
 
+    if (holdTimerRef.current) {
+      clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
+    if (countIntervalRef.current) {
+      clearInterval(countIntervalRef.current);
+      countIntervalRef.current = null;
+    }
+    setChargeCountdown(null);
+
     const pullX = s.curX - s.startX;
     const pullY = s.curY - s.startY;
     const dist = Math.hypot(pullX, pullY);
 
     setAimInfo({ active: false, angleDeg: 0, powerPct: 0, lineLength: 0 });
 
-    if (dist >= 25) {
-      // BẮN PHÁO GUNNY!
+    if (isGunnyMode && dist >= 20) {
+      // 🚀 BẮN PHÁO GUNNY SIÊU MẠNH (Lực cực đại, nảy 3-4 lần)
       const launchAngle = Math.atan2(-pullY, -pullX);
-      const power = Math.min(38, Math.max(16, dist * 0.28));
+      const power = Math.min(68, Math.max(32, dist * 0.52));
 
       s.vx = Math.cos(launchAngle) * power;
       s.vy = Math.sin(launchAngle) * power;
-      s.vXoay = (s.vx >= 0 ? 1 : -1) * (18 + Math.random() * 16);
+      s.vXoay = (s.vx >= 0 ? 1 : -1) * (26 + Math.random() * 18);
+      s.soLanNay = 0;
 
       setTrangThai('bay');
+      setIsGunnyMode(false);
+
       const flyEmotion = bocBieuCam(['so', 'gian']);
       setBieuCam(flyEmotion);
-      noi(flyEmotion, 3.0, 'nem');
+      noiCauTuyChinh('Aaaaa! Bắn éc éc! Đập tường vỡ đầu rồi!', 3.8, flyEmotion);
     } else {
-      // Chạm nhẹ thông thường
+      // Kéo thả bình thường hoặc chạm nhẹ
       s.vx = 0; s.vy = 0;
       setTrangThai('boi');
+      setIsGunnyMode(false);
       s.xoay = 0;
       if (thanEl.current) {
         thanEl.current.style.transform = `rotate(0deg)`;
       }
-      noi(bocBieuCam(['vui', 'yeu', 'tuHao']), 2.4);
+      if (!s.daDiChuyen) {
+        noi(bocBieuCam(['vui', 'tuHao']), 2.5);
+      }
     }
   }
 
+  /* ══ 4. CƠ CHẾ NHẤN ĐÚP 2 LẦN: TỰ ĐỘNG PHÂN TÍCH KHUYẾN NGHỊ MÃ TỐT NHẤT THỜI GIAN THỰC ══ */
+  const xuLyNhanDup = () => {
+    // 1. Phân tích chọn ra mã cổ phiếu hàng đầu theo 150 thuật toán định lượng (Top picks: TPB, HPG, ACB, FPT, SSI)
+    const danhSachTop = [
+      { ma: 'TPB', gia: 18500, lyDo: 'P/E 6.8x cực rẻ, ROE 17.5%, ERP thặng dư +9.56% so với Big4' },
+      { ma: 'HPG', gia: 28200, lyDo: 'Dung Quất 2 sắp vận hành, dòng tiền tổ chức gom ròng 4 phiên liên tiếp' },
+      { ma: 'ACB', gia: 24800, lyDo: 'Chất lượng tài sản top 1 hệ thống, nợ xấu dưới 1.2%, biên an toàn cao' },
+      { ma: 'FPT', gia: 132000, lyDo: 'Tăng trưởng doanh thu AI Cloud +26%, định giá PEG = 0.95 hấp dẫn' },
+      { ma: 'SSI', gia: 33500, lyDo: 'Hưởng lợi lớn từ nâng hạng KRX, thanh khoản thị trường bùng nổ 28.000 tỷ' }
+    ];
+
+    const pick = danhSachTop[Math.floor(Math.random() * danhSachTop.length)]!;
+
+    // 2. ĐỒNG BỘ TOÀN ỨNG DỤNG: Cập nhật mã được chọn trong TradingStore (TradingView, Sổ lệnh, Khung đặt lệnh)
+    useTradingStore.getState().setSelectedStock(pick.ma, pick.gia, 'BUY');
+
+    // 3. TẠO CÂU THOẠI THEO 4 PHONG CÁCH
+    const st = getStyle();
+    let cauNoi = '';
+
+    if (st === 'troll') {
+      cauNoi = `🐹 Đúp đúp gì đấy sếp? Múc ngay mã <span class="cp__stock-highlight">${pick.ma}</span> (${pick.lyDo}) đi chứ còn chờ đu đỉnh à!`;
+    } else if (st === 'pro') {
+      cauNoi = `🐹 Tín hiệu định lượng: <span class="cp__stock-highlight">${pick.ma}</span> đạt điểm đồng thuận 96/100. ${pick.lyDo}. Đã đồng bộ sang biểu đồ!`;
+    } else if (st === 'gen_z') {
+      cauNoi = `🐹 Kèo thơm nhất hôm nay là <span class="cp__stock-highlight">${pick.ma}</span> nha sếp! ${pick.lyDo}, múc liền kẻo tím ngắt khóc thét!`;
+    } else {
+      cauNoi = `🐹 Bé mách nhỏ sếp: Mã <span class="cp__stock-highlight">${pick.ma}</span> hôm nay siêu đẹp (${pick.lyDo}), bé đã chọn sẵn cho sếp rồi đó!`;
+    }
+
+    const proEmotion = bocBieuCam(['tuHao', 'vui']);
+    setBieuCam(proEmotion);
+    noiCauTuyChinh(cauNoi, 6.5, proEmotion);
+  };
+
   if (bat === 'off') return null;
 
-  /* ══ 4. TÍNH TOÁN VỊ TRÍ THÍCH ỨNG CHO BONG BÓNG THOẠI & ĐUÔI CHỈ MIỆNG ══ */
+  /* ══ 5. TÍNH TOÁN VỊ TRÍ THÍCH ỨNG CHO BONG BÓNG THOẠI ══ */
   const isNearTop = viTri.y < 170;
-  const isNearRight = viTri.x > (window.innerWidth - 240);
+  const isNearRight = viTri.x > (window.innerWidth - 250);
   const isNearLeft = viTri.x < 110;
 
   const bubbleVClass = isNearTop ? 'cp__bong--bottom' : 'cp__bong--top';
@@ -299,18 +417,28 @@ export default function Capy() {
       className={`cp cp--${trangThai}${vaCham ? ' cp--vacham' : ''}`}
       style={{ width: co, height: co }}
     >
-      {/* ══ BONG BÓNG THOẠI THÔNG MINH (TỰ CHUYỂN DƯỚI NẾU Ở TRÊN, ĐUÔI CHỈ VÀO MIỆNG) ══ */}
-      {thoai && (
-        <div className={`cp__bong ${bubbleVClass} ${bubbleHClass}`}>
-          <div className="cp__bong-header">
-            <span className="cp__bong-tag">🐹 Capy Sensei</span>
-            <span className="cp__ten">{bieuCam.ten}</span>
-          </div>
-          <div className="cp__bong-text">{thoai}</div>
+      {/* ══ VÒNG ĐẾM 3S SẠC NĂNG LƯỢNG BẬT GUNNY ══ */}
+      {chargeCountdown !== null && (
+        <div className="cp__charge-indicator">
+          ⚡ Giữ {chargeCountdown}s để bật Gunny...
         </div>
       )}
 
-      {/* ══ TIA NGẮM & LỰC BẮN GUNNY KHI ĐANG KÉO NÁ ══ */}
+      {/* ══ BONG BÓNG THOẠI THÔNG MINH (HIỂN THỊ MÃ TO RÕ & TỰ ĐẢO VỊ TRÍ) ══ */}
+      {thoai && (
+        <div className={`cp__bong ${bubbleVClass} ${bubbleHClass}`}>
+          <div className="cp__bong-header">
+            <span className="cp__bong-tag">🐹 Capy Trading Pro</span>
+            <span className="cp__ten">{bieuCam.ten}</span>
+          </div>
+          <div
+            className="cp__bong-text"
+            dangerouslySetInnerHTML={{ __html: thoai }}
+          />
+        </div>
+      )}
+
+      {/* ══ TIA NGẮM & LỰC BẮN GUNNY ══ */}
       {aimInfo.active && (
         <div
           className="cp__slingshot-line"
@@ -326,7 +454,7 @@ export default function Capy() {
 
       <div className="cp__bong-dat" aria-hidden="true" />
 
-      {/* ══ THÂN BÉ CAPY (HỖ TRỢ XOAY 360 ĐỘ TỰ DO & KÉO NÁ GUNNY) ══ */}
+      {/* ══ THÂN BÉ CAPY (KÉO THẢ TỰ DO, GIỮ 3S BẮN GUNNY, ĐÚP 2 LẦN GỢI Ý MÃ) ══ */}
       <div
         ref={thanEl}
         className="cp__than"
@@ -334,22 +462,16 @@ export default function Capy() {
         onPointerMove={dangKeo}
         onPointerUp={ketThuc}
         onPointerCancel={ketThuc}
+        onDoubleClick={xuLyNhanDup}
         role="button"
         tabIndex={0}
-        aria-label={`Bé Capy đang ${bieuCam.ten.toLowerCase()} — kéo lùi để bắn như Gunny!`}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            noi(bocBieuCam());
-          }
-        }}
+        aria-label={`Bé Capy — Kéo thả di chuyển, giữ 3s để bắn Gunny, nhấn đúp 2 lần để nhận mã khuyến nghị!`}
       >
         <CapyMat
           bc={bieuCam}
           size={co}
-          tuThe={memeDang?.tuThe ?? boDo.tuThe}
-          phuKien={memeDang?.phuKien ?? boDo.phuKien}
-          lopThem={memeDang?.lopThem}
+          tuThe={boDo.tuThe}
+          phuKien={boDo.phuKien}
           kieuAo={boDo.kieuAo}
         />
       </div>

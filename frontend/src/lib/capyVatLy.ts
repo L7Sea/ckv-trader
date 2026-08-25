@@ -10,8 +10,8 @@
    Hàm thuần, không đụng DOM, không đụng React → chạy thẳng bằng Node.
    ═══════════════════════════════════════════════════════════════ */
 
-export const MA_SAT = 0.94;      // hãm dần sau khi ném
-export const NAY_LAI = 0.62;     // mất bao nhiêu lực khi đập mép màn hình
+export const MA_SAT = 0.972;     // hãm từ từ để đập tường 3-4 lần
+export const NAY_LAI = 0.82;     // hệ số nảy mạnh khi đập mép màn hình
 export const TOC_BOI = 0.55;     // tốc độ bơi lững thững (px/khung)
 export const NGUONG_BAY = 0.35;  // dưới mức này coi như đã dừng, chuyển sang bơi
 
