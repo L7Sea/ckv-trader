@@ -9,6 +9,7 @@ import { MarketBoard } from './components/MarketBoard';
 import { PortfolioCharts } from './components/PortfolioCharts';
 import { AnalyticsReport } from './components/AnalyticsReport';
 import { PositionDecisionEngine } from './components/PositionDecisionEngine';
+import { FiftyAlgorithmsReport } from './components/FiftyAlgorithmsReport';
 import { CashModal } from './components/CashModal';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
 import { PinLockScreen } from './components/PinLockScreen';
@@ -25,10 +26,11 @@ import {
   X,
   Layers,
   Award,
-  Scale
+  Scale,
+  Cpu
 } from 'lucide-react';
 
-type TabType = 'TRADE' | 'MARKET' | 'DECISION' | 'CHARTS' | 'ANALYTICS';
+type TabType = 'TRADE' | 'DECISION' | 'ALGORITHMS' | 'MARKET' | 'CHARTS' | 'ANALYTICS';
 
 export const AppContent: React.FC = () => {
   const { fetchData, error, successMessage, clearMessages } = useTradingStore();
@@ -97,7 +99,19 @@ export const AppContent: React.FC = () => {
               }`}
             >
               <Scale className="h-4 w-4" />
-              <span>THUẬT TOÁN HÒA VỐN TPB</span>
+              <span>HÒA VỐN TPB</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('ALGORITHMS')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+                activeTab === 'ALGORITHMS'
+                  ? 'bg-indigo-500 text-slate-950 font-bold shadow-md shadow-indigo-500/20'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Cpu className="h-4 w-4" />
+              <span>52 THUẬT TOÁN DỰ ĐOÁN</span>
             </button>
 
             <button
@@ -163,7 +177,14 @@ export const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 3: BẢNG GIÁ THEO DÕI (VNI) */}
+        {/* TAB 3: HỆ THỐNG 52 THUẬT TOÁN DỰ ĐOÁN */}
+        {activeTab === 'ALGORITHMS' && (
+          <div className="space-y-6">
+            <FiftyAlgorithmsReport />
+          </div>
+        )}
+
+        {/* TAB 4: BẢNG GIÁ THEO DÕI (VNI) */}
         {activeTab === 'MARKET' && (
           <div className="space-y-6">
             <MarketBoard />
@@ -171,7 +192,7 @@ export const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 4: PHÂN BỔ TÀI SẢN & BIỂU ĐỒ NAV */}
+        {/* TAB 5: PHÂN BỔ TÀI SẢN & BIỂU ĐỒ NAV */}
         {activeTab === 'CHARTS' && (
           <div className="space-y-6">
             <PortfolioCharts />
@@ -179,7 +200,7 @@ export const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 5: HIỆU SUẤT & XUẤT BÁO CÁO EXCEL */}
+        {/* TAB 6: HIỆU SUẤT & XUẤT BÁO CÁO EXCEL */}
         {activeTab === 'ANALYTICS' && (
           <div className="space-y-6">
             <AnalyticsReport />
