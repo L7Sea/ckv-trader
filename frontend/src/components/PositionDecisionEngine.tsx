@@ -42,6 +42,7 @@ export const PositionDecisionEngine: React.FC = () => {
   const newBuyCost = extraQty * extraPrice;
   const totalSharesAfter = currentShares + extraQty;
   const newAvgPrice = Math.round((currentCostTotal + newBuyCost) / totalSharesAfter);
+  const costReduction = avgCostPrice - newAvgPrice;
   const neededGainToBreakevenCurrent = (((avgCostPrice - marketPrice) / marketPrice) * 100).toFixed(2);
   const neededGainToBreakevenNew = (((newAvgPrice - extraPrice) / extraPrice) * 100).toFixed(2);
 
@@ -52,7 +53,7 @@ export const PositionDecisionEngine: React.FC = () => {
   const formatNumber = (num: number) => Math.round(num || 0).toLocaleString('vi-VN');
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800/80 rounded-3xl p-4 sm:p-6 shadow-sm space-y-6 backdrop-blur-md">
+    <div className="bg-slate-900/90 border border-slate-800/80 rounded-3xl p-4 sm:p-6 shadow-sm space-y-5 backdrop-blur-md">
       {/* ══ HEADER: CHỌN MÃ & TỔNG QUAN HÒA VỐN ══ */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
         <div className="flex items-center gap-3">
@@ -134,7 +135,40 @@ export const PositionDecisionEngine: React.FC = () => {
         </div>
       </div>
 
-      {/* ══ 3 KỊCH BẢN CHIẾN LƯỢC (CÂN BẰNG CHIỀU CAO & NỘI DUNG) ══ */}
+      {/* ══ THANH ĐIỀU CHỈNH THAM SỐ MÔ PHỎNG DCA (TÁCH BIỆT TRÊN ĐẦU ĐỂ 3 THẺ ĐỀU NHAU) ══ */}
+      <div className="p-3 bg-slate-950/90 rounded-2xl border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2 text-emerald-400 font-bold font-sans">
+          <Calculator className="h-4 w-4" />
+          <span>Tùy chỉnh tham số mô phỏng mua gom (DCA):</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 font-mono">
+          <div className="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+            <span className="text-slate-400 font-sans text-[11px]">Mua thêm:</span>
+            <input
+              type="number"
+              value={extraQty}
+              onChange={(e) => setExtraQty(Math.max(100, Number(e.target.value)))}
+              className="w-20 bg-slate-950 border border-slate-700 rounded-lg px-2 py-0.5 text-emerald-400 font-bold text-center text-xs"
+            />
+            <span className="text-slate-400 text-[11px]">CP</span>
+          </div>
+          <div className="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+            <span className="text-slate-400 font-sans text-[11px]">Giá gom:</span>
+            <input
+              type="number"
+              value={extraPrice}
+              onChange={(e) => setExtraPrice(Number(e.target.value))}
+              className="w-24 bg-slate-950 border border-slate-700 rounded-lg px-2 py-0.5 text-emerald-400 font-bold text-center text-xs"
+            />
+            <span className="text-slate-400 text-[11px]">đ</span>
+          </div>
+          <div className="hidden lg:flex items-center gap-1 text-slate-400 text-[11px] font-sans">
+            <span>(Vốn thêm: <b className="text-white font-mono">{formatNumber(extraQty * extraPrice)}đ</b>)</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ══ 3 KỊCH BẢN CHIẾN LƯỢC (CÂN BẰNG CHIỀU CAO & NỘI DUNG 100%) ══ */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
         {/* KỊCH BẢN 1: GIỮ NGUYÊN (HOLD) */}
         <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col justify-between space-y-4">
@@ -148,30 +182,29 @@ export const PositionDecisionEngine: React.FC = () => {
 
             <h3 className="text-sm font-bold text-white">Chờ Hồi Phục Về Giá Vốn</h3>
 
-            <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800/80 space-y-2 text-xs font-mono">
-              <div className="flex justify-between">
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800/80 space-y-2.5 text-xs font-mono">
+              <div className="flex justify-between items-center">
                 <span className="text-slate-400 font-sans">Cần tăng để hòa vốn:</span>
-                <b className="text-emerald-400">+{neededGainToBreakevenCurrent}%</b>
+                <b className="text-emerald-400 text-sm">+{neededGainToBreakevenCurrent}%</b>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-slate-400 font-sans">Thời gian dự kiến:</span>
                 <b className="text-slate-200">{estDaysCurrent} - {estDaysCurrent + 4} phiên</b>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-slate-400 font-sans">Kháng cự MA20:</span>
                 <b className="text-cyan-300">{formatNumber(Math.round(marketPrice * 1.05))} đ</b>
               </div>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-400 leading-relaxed font-sans">
+          <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-400 leading-relaxed font-sans min-h-[44px] flex items-center">
             💡 <b>Đánh giá:</b> Phù hợp khi VN-Index giữ vững hỗ trợ và bạn không muốn nạp thêm tiền.
           </div>
         </div>
 
         {/* KỊCH BẢN 2: MUA BÌNH QUÂN (DCA) */}
-        <div className="p-4 rounded-2xl bg-slate-950 border border-emerald-500/30 flex flex-col justify-between space-y-4 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="p-4 rounded-2xl bg-slate-950 border border-emerald-500/40 flex flex-col justify-between space-y-4 relative overflow-hidden shadow-lg shadow-emerald-500/5">
           <div className="space-y-3 relative z-10">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20">
@@ -182,45 +215,23 @@ export const PositionDecisionEngine: React.FC = () => {
 
             <h3 className="text-sm font-bold text-white">Kéo Giá Vốn Xuống Thấp</h3>
 
-            {/* Form chỉnh thông số DCA */}
-            <div className="grid grid-cols-2 gap-2 p-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono">
-              <div>
-                <label className="text-[10px] text-slate-400 block font-sans">Mua thêm (CP):</label>
-                <input
-                  type="number"
-                  value={extraQty}
-                  onChange={(e) => setExtraQty(Math.max(100, Number(e.target.value)))}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-emerald-400 font-bold mt-0.5 text-center"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] text-slate-400 block font-sans">Giá mua (đ):</label>
-                <input
-                  type="number"
-                  value={extraPrice}
-                  onChange={(e) => setExtraPrice(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-emerald-400 font-bold mt-0.5 text-center"
-                />
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800/80 space-y-2 text-xs font-mono">
-              <div className="flex justify-between">
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800/80 space-y-2.5 text-xs font-mono">
+              <div className="flex justify-between items-center">
                 <span className="text-slate-400 font-sans">Giá vốn mới sau DCA:</span>
-                <b className="text-emerald-400">{formatNumber(newAvgPrice)} đ</b>
+                <b className="text-emerald-400 text-sm">{formatNumber(newAvgPrice)} đ</b>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400 font-sans">Chỉ cần tăng:</span>
-                <b className="text-emerald-400">+{neededGainToBreakevenNew}% (Về bờ)</b>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-400 font-sans">Chỉ cần tăng để về bờ:</span>
+                <b className="text-emerald-300 font-bold">+{neededGainToBreakevenNew}% (Giảm {costReduction > 0 ? `-${formatNumber(costReduction)}đ` : '0đ'})</b>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-slate-400 font-sans">Thời gian hòa vốn:</span>
                 <b className="text-emerald-300">{estDaysNew} - {estDaysNew + 2} phiên</b>
               </div>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300 leading-relaxed font-sans relative z-10">
+          <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300 leading-relaxed font-sans min-h-[44px] flex items-center relative z-10">
             ⭐ <b>Khuyến nghị AI:</b> Giảm một nửa thời gian về bờ khi mua gom ở vùng giá hỗ trợ.
           </div>
         </div>
@@ -237,24 +248,24 @@ export const PositionDecisionEngine: React.FC = () => {
 
             <h3 className="text-sm font-bold text-white">Bảo Toàn Vốn & Hạ Nợ Margin</h3>
 
-            <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800/80 space-y-2 text-xs font-mono">
-              <div className="flex justify-between">
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800/80 space-y-2.5 text-xs font-mono">
+              <div className="flex justify-between items-center">
                 <span className="text-slate-400 font-sans">Ngưỡng cắt lỗ kỷ luật:</span>
-                <b className="text-rose-400">{formatNumber(Math.round(marketPrice * 0.94))} đ</b>
+                <b className="text-rose-400 text-sm">{formatNumber(Math.round(marketPrice * 0.94))} đ</b>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-slate-400 font-sans">Mức lỗ tối đa:</span>
                 <b className="text-rose-400">-{formatNumber(Math.abs(unrealizedPnL) + currentShares * marketPrice * 0.06)} đ</b>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-slate-400 font-sans">Mục tiêu xử lý:</span>
-                <b className="text-slate-200 font-sans">Tất toán Margin</b>
+                <b className="text-slate-200 font-sans">Tất toán nợ Margin</b>
               </div>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-400 leading-relaxed font-sans">
-            🛡️ <b>Kỷ luật:</b> Giải phóng nợ vay DNSE để tránh chịu lãi vay ngày khi cổ phiếu gãy MA200.
+          <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-400 leading-relaxed font-sans min-h-[44px] flex items-center">
+            🛡️ <b>Kỷ luật:</b> Giải phóng nợ vay DNSE để tránh chịu lãi vay ngày khi gãy hỗ trợ.
           </div>
         </div>
       </div>
