@@ -1,45 +1,45 @@
 import { loadUserSettings, saveUserSetting } from './settingsService';
 import { kiemCongThuc, timTrung, vanTay, type CongThucMeme } from './capyMemeSpec';
+import { DS_100_MEMES } from './capy100Memes';
 
 /* ═══════════════════════════════════════════════════════════════
-   KHO CÔNG THỨC MEME.
-
-   Lưu localStorage để hiện ngay lúc mở app (không chờ mạng), đồng thời
-   đẩy lên tài khoản để đổi máy vẫn còn — đúng nếp themeService/capyService.
+   KHO 100+ CÔNG THỨC MEME CAPYBARA.
+   Lưu localStorage và khởi tạo sẵn 105 dáng sticker đặc sắc.
    ═══════════════════════════════════════════════════════════════ */
 
-const KHOA = 'tl_capy_meme';
-const TRAN = 200;   // tối đa bao nhiêu công thức, tránh phình localStorage
+const KHOA = 'ckv_capy_meme_100';
+const TRAN = 300;
 
 export function docKho(): CongThucMeme[] {
   try {
     const s = localStorage.getItem(KHOA);
-    if (!s) return [];
+    if (!s) {
+      localStorage.setItem(KHOA, JSON.stringify(DS_100_MEMES));
+      return DS_100_MEMES;
+    }
     const v = JSON.parse(s);
-    return Array.isArray(v) ? v : [];
-  } catch { return []; }
+    if (Array.isArray(v) && v.length > 0) return v;
+    localStorage.setItem(KHOA, JSON.stringify(DS_100_MEMES));
+    return DS_100_MEMES;
+  } catch {
+    return DS_100_MEMES;
+  }
 }
 
 function ghiKho(ds: CongThucMeme[]): void {
-  try { localStorage.setItem(KHOA, JSON.stringify(ds)); } catch { /* hết quota */ }
+  try { localStorage.setItem(KHOA, JSON.stringify(ds)); } catch {}
   window.dispatchEvent(new CustomEvent('tl-capy-meme', { detail: ds.length }));
   saveUserSetting('capy_meme', ds);
 }
 
 export interface KetQuaThem {
   ok: boolean;
-  /** Lý do không thêm được */
   loi?: string[];
   canhBao?: string[];
-  /** Nếu trùng thì đây là công thức đã có */
   trungVoi?: CongThucMeme;
   spec?: CongThucMeme;
 }
 
-/**
- * Thêm 1 công thức. Từ chối nếu sai định dạng HOẶC trùng hình với
- * công thức đã có — báo rõ trùng với cái nào để anh khỏi đoán.
- */
 export function themCongThuc(raw: unknown): KetQuaThem {
   const kiem = kiemCongThuc(raw);
   if (!kiem.ok || !kiem.spec) return { ok: false, loi: kiem.loi, canhBao: kiem.canhBao };
@@ -56,7 +56,6 @@ export function themCongThuc(raw: unknown): KetQuaThem {
   return { ok: true, spec: kiem.spec, canhBao: kiem.canhBao };
 }
 
-/** Thêm nhiều công thức một lượt (dán cả mảng JSON) */
 export function themNhieu(ds: unknown[]): { them: number; trung: number; hong: number; chiTiet: string[] } {
   let them = 0, trung = 0, hong = 0;
   const chiTiet: string[] = [];
@@ -75,15 +74,13 @@ export function xoaCongThuc(ten: string): void {
 }
 
 export function xoaHet(): void {
-  ghiKho([]);
+  ghiKho(DS_100_MEMES);
 }
 
-/** Sau khi đăng nhập: kéo kho từ tài khoản về (đồng bộ đa máy) */
 export function syncKhoTuTaiKhoan(): void {
   loadUserSettings().then((s) => {
     const v = s.capy_meme;
     if (!Array.isArray(v) || v.length === 0) return;
-    /* Gộp: giữ cái đang có ở máy này, thêm cái từ tài khoản nếu chưa trùng */
     const kho = docKho();
     const co = new Set(kho.map(vanTay));
     const them = (v as CongThucMeme[]).filter((x) => {
@@ -91,8 +88,8 @@ export function syncKhoTuTaiKhoan(): void {
       return k.ok && k.spec && !co.has(vanTay(k.spec));
     });
     if (them.length) {
-      try { localStorage.setItem(KHOA, JSON.stringify([...kho, ...them])); } catch { /* quota */ }
+      try { localStorage.setItem(KHOA, JSON.stringify([...kho, ...them])); } catch {}
       window.dispatchEvent(new CustomEvent('tl-capy-meme', { detail: kho.length + them.length }));
     }
-  }).catch(() => { /* hỏng mạng thì dùng kho ở máy */ });
+  }).catch(() => {});
 }
