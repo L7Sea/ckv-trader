@@ -12,6 +12,7 @@ import { PositionDecisionEngine } from './components/PositionDecisionEngine';
 import { FiftyAlgorithmsReport } from './components/FiftyAlgorithmsReport';
 import { QuickRadarSearch } from './components/QuickRadarSearch';
 import { MarketIntelligenceDashboard } from './components/MarketIntelligenceDashboard';
+import { DailyAIRecommendations } from './components/DailyAIRecommendations';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
 import { PinLockScreen } from './components/PinLockScreen';
 import Capy from './components/Capy';
@@ -32,7 +33,8 @@ import {
   Zap,
   Newspaper,
   Compass,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Flame
 } from 'lucide-react';
 
 type TabType = 'TRADE' | 'DECISION' | 'ALGORITHMS' | 'MARKET' | 'INTELLIGENCE' | 'CHARTS' | 'ANALYTICS';
@@ -46,7 +48,7 @@ export const AppContent: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white pb-20 md:pb-6">
+    <div className="min-h-screen bg-[#090b10] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white pb-20 md:pb-6">
       {/* Header Bar */}
       <Header />
 
@@ -81,19 +83,19 @@ export const AppContent: React.FC = () => {
         <PortfolioOverview />
 
         {/* Navigation Tabs Bar (Desktop & Tablet Pill Bar) */}
-        <div className="hidden md:flex items-center justify-between border-b border-slate-800 pb-2 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-1.5 p-1 bg-slate-950/80 rounded-2xl border border-slate-800 text-xs font-semibold backdrop-blur-md">
+        <div className="hidden md:flex items-center justify-between border-b border-[#212636] pb-2 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1.5 p-1 bg-[#121620] rounded-2xl border border-[#212636] text-xs font-semibold backdrop-blur-md">
             <button
               data-tab="TRADE"
               onClick={() => setActiveTab('TRADE')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
                 activeTab === 'TRADE'
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
+                  ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <TrendingUp className="h-4 w-4" />
-              <span>GIAO DỊCH & VỊ THẾ</span>
+              <span>GIAO DỊCH & RADAR</span>
             </button>
 
             <button
@@ -101,7 +103,7 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('DECISION')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
                 activeTab === 'DECISION'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-300 text-slate-950 font-bold shadow-md shadow-amber-500/20'
+                  ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -114,7 +116,7 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('ALGORITHMS')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
                 activeTab === 'ALGORITHMS'
-                  ? 'bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold shadow-md shadow-indigo-500/20'
+                  ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-500/20'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -127,12 +129,12 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('MARKET')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
                 activeTab === 'MARKET'
-                  ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 font-bold shadow-md shadow-cyan-500/20'
+                  ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/20'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
-              <span>BẢNG GIÁ VN50 (VNI)</span>
+              <span>BẢNG GIÁ 300 MÃ (HOSE/HNX/UPCOM)</span>
             </button>
 
             <button
@@ -140,7 +142,7 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('INTELLIGENCE')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
                 activeTab === 'INTELLIGENCE'
-                  ? 'bg-gradient-to-r from-cyan-500 to-teal-400 text-slate-950 font-bold shadow-md shadow-cyan-500/20'
+                  ? 'bg-teal-500 text-slate-950 font-bold shadow-md shadow-teal-500/20'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -153,7 +155,7 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('CHARTS')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
                 activeTab === 'CHARTS'
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
+                  ? 'bg-purple-600 text-white font-bold shadow-md shadow-purple-500/20'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -166,7 +168,7 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('ANALYTICS')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
                 activeTab === 'ANALYTICS'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-300 text-slate-950 font-bold shadow-md shadow-amber-500/20'
+                  ? 'bg-rose-500 text-white font-bold shadow-md shadow-rose-500/20'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -176,9 +178,11 @@ export const AppContent: React.FC = () => {
           </div>
         </div>
 
-        {/* TAB 1: GIAO DỊCH & VỊ THẾ */}
+        {/* TAB 1: GIAO DỊCH & VỊ THẾ & GỢI Ý HÀNG NGÀY */}
         {activeTab === 'TRADE' && (
           <div className="space-y-6">
+            {/* Gợi Ý Hàng Ngày & Bản Đồ Nhiệt Toàn Thị Trường */}
+            <DailyAIRecommendations />
             <QuickRadarSearch />
             <PositionDecisionEngine />
             <TechnicalChart />
@@ -194,7 +198,7 @@ export const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 2: THUẬT TOÁN HÒA VỐN TPB */}
+        {/* TAB 2: THUẬT TOÁN HÒA VỐN TPB & DCA */}
         {activeTab === 'DECISION' && (
           <div className="space-y-6">
             <PositionDecisionEngine />
@@ -210,10 +214,10 @@ export const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 4: BẢNG GIÁ THEO DÕI (VNI) */}
+        {/* TAB 4: BẢNG GIÁ 300 CỔ PHIẾU ĐẦU NGÀNH (HOSE, HNX, UPCOM) */}
         {activeTab === 'MARKET' && (
           <div className="space-y-6">
-            <QuickRadarSearch />
+            <DailyAIRecommendations />
             <MarketBoard />
             <TechnicalChart />
           </div>
@@ -238,27 +242,29 @@ export const AppContent: React.FC = () => {
         {activeTab === 'ANALYTICS' && (
           <div className="space-y-6">
             <AnalyticsReport />
-            <TransactionHistory />
           </div>
         )}
       </main>
 
-      {/* ══ MOBILE BOTTOM NAVIGATION BAR (MOMO / ZALOPAY / SHOPEE STYLE) ══ */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 border-t border-slate-800 backdrop-blur-xl px-2 py-1.5 shadow-2xl">
+      {/* Floating Mascot Capy */}
+      <Capy />
+
+      {/* Mobile Bottom Navigation (Siêu ứng dụng 5 nút) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0e1117]/95 border-t border-[#212636] backdrop-blur-xl px-2 py-2 shadow-2xl">
         <div className="grid grid-cols-5 gap-1 text-center">
           <button
             onClick={() => setActiveTab('TRADE')}
-            className={`flex flex-col items-center gap-1 py-1 rounded-xl transition ${
+            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
               activeTab === 'TRADE' ? 'text-emerald-400 font-bold' : 'text-slate-400'
             }`}
           >
             <TrendingUp className="h-5 w-5" />
-            <span className="text-[10px]">Vị Thế</span>
+            <span className="text-[10px]">Giao Dịch</span>
           </button>
 
           <button
             onClick={() => setActiveTab('DECISION')}
-            className={`flex flex-col items-center gap-1 py-1 rounded-xl transition ${
+            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
               activeTab === 'DECISION' ? 'text-amber-400 font-bold' : 'text-slate-400'
             }`}
           >
@@ -268,20 +274,17 @@ export const AppContent: React.FC = () => {
 
           <button
             onClick={() => setActiveTab('ALGORITHMS')}
-            className={`flex flex-col items-center gap-1 py-1 rounded-xl transition ${
+            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
               activeTab === 'ALGORITHMS' ? 'text-indigo-400 font-bold' : 'text-slate-400'
             }`}
           >
-            <div className="relative">
-              <Cpu className="h-5 w-5" />
-              <span className="absolute -top-1 -right-2 w-2 h-2 rounded-full bg-indigo-500 animate-ping" />
-            </div>
+            <Cpu className="h-5 w-5" />
             <span className="text-[10px]">150 Algos</span>
           </button>
 
           <button
             onClick={() => setActiveTab('MARKET')}
-            className={`flex flex-col items-center gap-1 py-1 rounded-xl transition ${
+            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
               activeTab === 'MARKET' ? 'text-cyan-400 font-bold' : 'text-slate-400'
             }`}
           >
@@ -290,28 +293,22 @@ export const AppContent: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab('INTELLIGENCE')}
-            className={`flex flex-col items-center gap-1 py-1 rounded-xl transition ${
-              activeTab === 'INTELLIGENCE' ? 'text-purple-400 font-bold' : 'text-slate-400'
+            onClick={() => setActiveTab('CHARTS')}
+            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
+              activeTab === 'CHARTS' ? 'text-purple-400 font-bold' : 'text-slate-400'
             }`}
           >
-            <Newspaper className="h-5 w-5" />
-            <span className="text-[10px]">Tin Tức</span>
+            <PieChart className="h-5 w-5" />
+            <span className="text-[10px]">Tài Sản</span>
           </button>
         </div>
-      </nav>
+      </div>
 
-      {/* Modals, Security Screen & Full Physics Capy */}
+      {/* Quick Price Update Modal */}
       <PriceUpdateModal />
-      <PinLockScreen />
-      
-      {/* Linh vật Capy chạy trên tất cả, kéo thả lăn lộn tự do */}
-      <Capy />
 
-      {/* Footer Desktop */}
-      <footer className="hidden md:block border-t border-slate-800/80 py-4 px-6 text-center text-xs text-slate-500">
-        <p>CKV PRO TRADER • Nền tảng Quản trị Chứng khoán Cá nhân Chuẩn T+2.5 • Serverless Cloudflare & Firestore</p>
-      </footer>
+      {/* Screen PIN Lock Modal */}
+      <PinLockScreen />
     </div>
   );
 };
