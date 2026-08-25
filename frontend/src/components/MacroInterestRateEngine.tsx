@@ -6,6 +6,7 @@ import {
   calculateMacroStockValuation,
   type BankInterestRate,
   type EWalletFintechRate,
+  type DepositTier,
 } from '@/services/interestRateService';
 import {
   Landmark,
@@ -26,6 +27,10 @@ import {
 export default function MacroInterestRateEngine() {
   const [activeTab, setActiveTab] = useState<'BANKS' | 'FINTECH' | 'VALUATION' | 'MARGIN_OPTIMIZER'>('BANKS');
   const [bankFilter, setBankFilter] = useState<'ALL' | 'BIG4' | 'TMCP_TOP1' | 'TMCP_MID'>('ALL');
+  const [bankSubTab, setBankSubTab] = useState<'DEPOSIT' | 'LENDING' | 'SIMULATOR'>('DEPOSIT');
+  const [depositTerm, setDepositTerm] = useState<'KKH' | '1M' | '3M' | '6M' | '9M' | '12M' | '18M' | '24M' | '36M'>('12M');
+  const [depositTier, setDepositTier] = useState<DepositTier>('ONLINE');
+  const [simAmount, setSimAmount] = useState<number>(500000000); // 500 triệu VND
   const [searchKeyword, setSearchKeyword] = useState('');
   const [lastUpdated, setLastUpdated] = useState<string>(() => {
     const now = new Date();
@@ -40,6 +45,10 @@ export default function MacroInterestRateEngine() {
       setLastUpdated(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')} - ${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`);
       setIsRefreshing(false);
     }, 500);
+  };
+
+  const formatVND = (num: number) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num || 0);
   };
 
   // Sample stocks for Macro Valuation Matrix
@@ -70,17 +79,22 @@ export default function MacroInterestRateEngine() {
   const filteredBanks = useMemo(() => {
     return TOP_20_BANKS.filter((b) => {
       const matchGroup = bankFilter === 'ALL' || b.group === bankFilter;
-      const matchSearch = b.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-                          b.shortName.toLowerCase().includes(searchKeyword.toLowerCase());
+      const matchSearch =
+        b.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        b.shortName.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        b.id.toLowerCase().includes(searchKeyword.toLowerCase());
       return matchGroup && matchSearch;
     });
   }, [bankFilter, searchKeyword]);
 
   const filteredFintech = useMemo(() => {
-    return TOP_10_FINTECH.filter((f) =>
-      f.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-      f.provider.toLowerCase().includes(searchKeyword.toLowerCase())
-    );
+    return TOP_10_FINTECH.filter((f) => {
+      return (
+        f.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        f.provider.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        f.feature.toLowerCase().includes(searchKeyword.toLowerCase())
+      );
+    });
   }, [searchKeyword]);
 
   return (
@@ -211,88 +225,322 @@ export default function MacroInterestRateEngine() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════
-          TAB 1: TOP 20 NGÂN HÀNG VIỆT NAM
+          TAB 1: TOP 20 NGÂN HÀNG VIỆT NAM (TIỀN GỬI, CHO VAY, MÁY TÍNH LÃI)
           ═══════════════════════════════════════════════════════════════ */}
       {activeTab === 'BANKS' && (
-        <div className="mt-3 space-y-3">
-          {/* Sub filter */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400 font-medium">Nhóm:</span>
-            {(['ALL', 'BIG4', 'TMCP_TOP1', 'TMCP_MID'] as const).map((g) => (
+        <div className="mt-3 space-y-4">
+          {/* Sub Controls: Chuyển đổi giữa 3 chế độ xem */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#182030] p-2.5 rounded-xl border border-[#243048]">
+            <div className="flex flex-wrap items-center gap-1.5">
               <button
-                key={g}
-                onClick={() => setBankFilter(g)}
-                className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
-                  bankFilter === g
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                    : 'bg-[#182030] text-slate-400 hover:text-slate-200'
+                onClick={() => setBankSubTab('DEPOSIT')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  bankSubTab === 'DEPOSIT'
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
+                    : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                {g === 'ALL' ? 'Tất cả (20 NH)' : g === 'BIG4' ? 'Big 4 Nhà Nước' : g === 'TMCP_TOP1' ? 'TMCP Hàng Đầu' : 'TMCP Tầm Trung'}
+                📊 Tiền Gửi Theo Kỳ Hạn Tháng
               </button>
-            ))}
+              <button
+                onClick={() => setBankSubTab('LENDING')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  bankSubTab === 'LENDING'
+                    ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                🏢 Lãi Suất Cho Vay & Thế Chấp
+              </button>
+              <button
+                onClick={() => setBankSubTab('SIMULATOR')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  bankSubTab === 'SIMULATOR'
+                    ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                🧮 Máy Tính Tiền Lãi Theo Số Vốn
+              </button>
+            </div>
+
+            {/* Sub filter NHÓM */}
+            <div className="flex items-center gap-1.5">
+              {(['ALL', 'BIG4', 'TMCP_TOP1', 'TMCP_MID'] as const).map((g) => (
+                <button
+                  key={g}
+                  onClick={() => setBankFilter(g)}
+                  className={`px-2 py-1 rounded text-[11px] font-semibold transition-all ${
+                    bankFilter === g
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                      : 'bg-[#121824] text-slate-400 hover:text-slate-200 border border-[#212b40]'
+                  }`}
+                >
+                  {g === 'ALL' ? 'Tất cả' : g === 'BIG4' ? 'Big 4' : g === 'TMCP_TOP1' ? 'TMCP Top 1' : 'TMCP Mid'}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-[#212b40]">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="bg-[#182030] text-slate-300 border-b border-[#212b40] font-semibold">
-                  <th className="py-2.5 px-3">Ngân Hàng</th>
-                  <th className="py-2.5 px-2 text-center">Nhóm</th>
-                  <th className="py-2.5 px-2 text-right">1 Tháng</th>
-                  <th className="py-2.5 px-2 text-right">3 Tháng</th>
-                  <th className="py-2.5 px-2 text-right">6 Tháng</th>
-                  <th className="py-2.5 px-2 text-right text-emerald-400">12 Tháng (Chuẩn)</th>
-                  <th className="py-2.5 px-2 text-right">24 Tháng</th>
-                  <th className="py-2.5 px-2 text-right text-amber-400">Lãi Vay DN</th>
-                  <th className="py-2.5 px-2 text-right text-cyan-400">Margin CTCK</th>
-                  <th className="py-2.5 px-2 text-center">Xu Hướng</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#1e2738] font-mono">
-                {filteredBanks.map((b) => (
-                  <tr key={b.id} className="hover:bg-[#182236]/60 transition-colors">
-                    <td className="py-2 px-3 font-sans font-medium text-slate-200 flex items-center gap-2">
-                      <span className="w-6 h-6 rounded bg-[#222c40] flex items-center justify-center text-[10px] font-bold text-cyan-300">
-                        {b.id.slice(0, 3)}
-                      </span>
-                      <div>
-                        <div className="font-semibold text-slate-100">{b.name}</div>
-                        <div className="text-[10px] text-slate-400 font-mono">{b.shortName}</div>
-                      </div>
-                    </td>
-                    <td className="py-2 px-2 text-center font-sans">
-                      <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${
-                        b.group === 'BIG4'
-                          ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-                          : b.group === 'TMCP_TOP1'
-                          ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                          : 'bg-slate-500/20 text-slate-300 border border-slate-500/30'
-                      }`}>
-                        {b.group}
-                      </span>
-                    </td>
-                    <td className="py-2 px-2 text-right text-slate-300">{b.deposit1M.toFixed(1)}%</td>
-                    <td className="py-2 px-2 text-right text-slate-300">{b.deposit3M.toFixed(1)}%</td>
-                    <td className="py-2 px-2 text-right text-slate-300">{b.deposit6M.toFixed(1)}%</td>
-                    <td className="py-2 px-2 text-right font-bold text-emerald-400 bg-emerald-500/5">{b.deposit12M.toFixed(1)}%</td>
-                    <td className="py-2 px-2 text-right text-slate-300">{b.deposit24M.toFixed(1)}%</td>
-                    <td className="py-2 px-2 text-right font-semibold text-amber-400">{b.lendingRate.toFixed(1)}%</td>
-                    <td className="py-2 px-2 text-right font-semibold text-cyan-400">{b.marginRate ? `${b.marginRate.toFixed(1)}%` : '-'}</td>
-                    <td className="py-2 px-2 text-center font-sans">
-                      {b.trend === 'UP' ? (
-                        <span className="text-emerald-400 text-[11px] font-bold flex items-center justify-center gap-0.5">
-                          <ArrowUpRight size={12} /> Tăng
-                        </span>
-                      ) : (
-                        <span className="text-slate-400 text-[11px] font-bold">Ổn định</span>
-                      )}
-                    </td>
+          {/* ── SUB TAB 1: BẢNG LÃI SUẤT TIỀN GỬI TOÀN BỘ KỲ HẠN THÁNG ── */}
+          {bankSubTab === 'DEPOSIT' && (
+            <div className="overflow-x-auto rounded-xl border border-[#212b40]">
+              <table className="w-full text-left text-xs border-collapse font-mono">
+                <thead>
+                  <tr className="bg-[#182030] text-slate-300 border-b border-[#212b40] font-sans font-semibold">
+                    <th className="py-2.5 px-3">Ngân Hàng</th>
+                    <th className="py-2.5 px-2 text-center">Nhóm</th>
+                    <th className="py-2.5 px-2 text-right">KKH</th>
+                    <th className="py-2.5 px-2 text-right">1T</th>
+                    <th className="py-2.5 px-2 text-right">3T</th>
+                    <th className="py-2.5 px-2 text-right">6T</th>
+                    <th className="py-2.5 px-2 text-right">9T</th>
+                    <th className="py-2.5 px-2 text-right text-emerald-400 font-bold bg-emerald-500/10">12T (Chuẩn)</th>
+                    <th className="py-2.5 px-2 text-right">18T</th>
+                    <th className="py-2.5 px-2 text-right">24T</th>
+                    <th className="py-2.5 px-2 text-right">36T</th>
+                    <th className="py-2.5 px-2 text-right text-cyan-400">Online (+%)</th>
+                    <th className="py-2.5 px-2 text-right text-purple-400">VIP &gt;5T (+%)</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[#1e2738]">
+                  {filteredBanks.map((b) => (
+                    <tr key={b.id} className="hover:bg-[#182236]/60 transition-colors">
+                      <td className="py-2 px-3 font-sans font-medium text-slate-200 flex items-center gap-2">
+                        <span className="w-6 h-6 rounded bg-[#222c40] flex items-center justify-center text-[10px] font-bold text-cyan-300">
+                          {b.id.slice(0, 3)}
+                        </span>
+                        <div>
+                          <div className="font-semibold text-slate-100">{b.name}</div>
+                          <div className="text-[10px] text-slate-400 font-mono">{b.shortName}</div>
+                        </div>
+                      </td>
+                      <td className="py-2 px-2 text-center font-sans">
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                          b.group === 'BIG4'
+                            ? 'bg-red-500/20 text-red-300 border border-red-500/30'
+                            : b.group === 'TMCP_TOP1'
+                            ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                            : 'bg-slate-500/20 text-slate-300 border border-slate-500/30'
+                        }`}>
+                          {b.group}
+                        </span>
+                      </td>
+                      <td className="py-2 px-2 text-right text-slate-400">{b.depositKKH.toFixed(2)}%</td>
+                      <td className="py-2 px-2 text-right text-slate-300">{b.deposit1M.toFixed(1)}%</td>
+                      <td className="py-2 px-2 text-right text-slate-300">{b.deposit3M.toFixed(1)}%</td>
+                      <td className="py-2 px-2 text-right text-slate-300">{b.deposit6M.toFixed(1)}%</td>
+                      <td className="py-2 px-2 text-right text-slate-300">{b.deposit9M.toFixed(1)}%</td>
+                      <td className="py-2 px-2 text-right font-black text-emerald-400 bg-emerald-500/10 text-sm">
+                        {b.deposit12M.toFixed(1)}%
+                      </td>
+                      <td className="py-2 px-2 text-right text-slate-300">{b.deposit18M.toFixed(1)}%</td>
+                      <td className="py-2 px-2 text-right text-slate-300">{b.deposit24M.toFixed(1)}%</td>
+                      <td className="py-2 px-2 text-right text-slate-300">{b.deposit36M.toFixed(1)}%</td>
+                      <td className="py-2 px-2 text-right text-cyan-400 font-semibold">+{b.onlineBonus}%</td>
+                      <td className="py-2 px-2 text-right text-purple-400 font-semibold">+{b.tierBonusOver5B}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* ── SUB TAB 2: BẢNG LÃI SUẤT CHO VAY (SXKD, MUA NHÀ, TÍN CHẤP, MARGIN) ── */}
+          {bankSubTab === 'LENDING' && (
+            <div className="overflow-x-auto rounded-xl border border-[#212b40]">
+              <table className="w-full text-left text-xs border-collapse font-mono">
+                <thead>
+                  <tr className="bg-[#182030] text-slate-300 border-b border-[#212b40] font-sans font-semibold">
+                    <th className="py-2.5 px-3">Ngân Hàng</th>
+                    <th className="py-2.5 px-2 text-center">Nhóm</th>
+                    <th className="py-2.5 px-2 text-right text-emerald-400">Vay SXKD Ngắn Hạn</th>
+                    <th className="py-2.5 px-2 text-right text-emerald-300">Vay SXKD Trung Dài Hạn</th>
+                    <th className="py-2.5 px-2 text-right text-amber-400 font-bold">Vay Mua Nhà (Ưu Đãi Năm 1)</th>
+                    <th className="py-2.5 px-2 text-right text-amber-300">Vay Mua Nhà (Thả Nổi)</th>
+                    <th className="py-2.5 px-2 text-right text-rose-400">Vay Tín Chấp / Thấu Chi</th>
+                    <th className="py-2.5 px-2 text-right text-cyan-400 font-bold">Margin CTCK Trực Thuộc</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#1e2738]">
+                  {filteredBanks.map((b) => (
+                    <tr key={b.id} className="hover:bg-[#182236]/60 transition-colors">
+                      <td className="py-2 px-3 font-sans font-medium text-slate-200 flex items-center gap-2">
+                        <span className="w-6 h-6 rounded bg-[#222c40] flex items-center justify-center text-[10px] font-bold text-cyan-300">
+                          {b.id.slice(0, 3)}
+                        </span>
+                        <div>
+                          <div className="font-semibold text-slate-100">{b.name}</div>
+                          <div className="text-[10px] text-slate-400 font-mono">{b.shortName}</div>
+                        </div>
+                      </td>
+                      <td className="py-2 px-2 text-center font-sans">
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                          b.group === 'BIG4'
+                            ? 'bg-red-500/20 text-red-300 border border-red-500/30'
+                            : b.group === 'TMCP_TOP1'
+                            ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                            : 'bg-slate-500/20 text-slate-300 border border-slate-500/30'
+                        }`}>
+                          {b.group}
+                        </span>
+                      </td>
+                      <td className="py-2 px-2 text-right text-emerald-400 font-semibold">{b.loanBusinessShort.toFixed(1)}%</td>
+                      <td className="py-2 px-2 text-right text-emerald-300">{b.loanBusinessMid.toFixed(1)}%</td>
+                      <td className="py-2 px-2 text-right text-amber-400 font-bold bg-amber-500/10">{b.loanMortgagePromo.toFixed(1)}%</td>
+                      <td className="py-2 px-2 text-right text-amber-300">{b.loanMortgageFloat.toFixed(1)}%</td>
+                      <td className="py-2 px-2 text-right text-rose-400">{b.loanConsumerUnsecured.toFixed(1)}%</td>
+                      <td className="py-2 px-2 text-right text-cyan-400 font-black">{b.marginRate.toFixed(1)}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* ── SUB TAB 3: MÁY TÍNH TIỀN LÃI THỰC TẾ THEO SỐ TIỀN & KỲ HẠN ── */}
+          {bankSubTab === 'SIMULATOR' && (
+            <div className="space-y-4">
+              {/* Bộ điều khiển số tiền & kỳ hạn */}
+              <div className="bg-[#182030] p-4 rounded-xl border border-cyan-500/30 space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-xs text-slate-300 font-medium block mb-1">
+                      Số tiền gửi / ký gửi (VNĐ):
+                    </label>
+                    <input
+                      type="number"
+                      step="50000000"
+                      value={simAmount}
+                      onChange={(e) => setSimAmount(Number(e.target.value))}
+                      className="w-full bg-[#121824] border border-[#26334d] rounded-lg px-3 py-2 text-white font-mono font-bold text-sm focus:outline-none focus:border-cyan-500"
+                    />
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {[100000000, 500000000, 1000000000, 2000000000, 5000000000].map((amt) => (
+                        <button
+                          key={amt}
+                          onClick={() => setSimAmount(amt)}
+                          className="px-2 py-0.5 rounded bg-[#222c40] hover:bg-[#2e3b56] text-[10px] font-mono text-cyan-300 transition"
+                        >
+                          {amt >= 1000000000 ? `${amt / 1000000000} Tỷ` : `${amt / 1000000} Tr`}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-slate-300 font-medium block mb-1">
+                      Kỳ hạn gửi:
+                    </label>
+                    <select
+                      value={depositTerm}
+                      onChange={(e) => setDepositTerm(e.target.value as any)}
+                      className="w-full bg-[#121824] border border-[#26334d] rounded-lg px-3 py-2 text-white font-mono font-bold text-sm focus:outline-none focus:border-cyan-500"
+                    >
+                      <option value="KKH">Không kỳ hạn (Rút linh hoạt)</option>
+                      <option value="1M">1 Tháng</option>
+                      <option value="3M">3 Tháng</option>
+                      <option value="6M">6 Tháng</option>
+                      <option value="9M">9 Tháng</option>
+                      <option value="12M">12 Tháng (Chuẩn 1 năm)</option>
+                      <option value="18M">18 Tháng</option>
+                      <option value="24M">24 Tháng (2 năm)</option>
+                      <option value="36M">36 Tháng (3 năm)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-slate-300 font-medium block mb-1">
+                      Kênh gửi & Hạn mức khách hàng:
+                    </label>
+                    <select
+                      value={depositTier}
+                      onChange={(e) => setDepositTier(e.target.value as any)}
+                      className="w-full bg-[#121824] border border-[#26334d] rounded-lg px-3 py-2 text-white font-mono font-bold text-sm focus:outline-none focus:border-cyan-500"
+                    >
+                      <option value="ONLINE">📱 Tiết kiệm Online (+0.2% - +0.35%)</option>
+                      <option value="UNDER_1B">👤 Khách hàng chuẩn (&lt; 1 Tỷ)</option>
+                      <option value="TIER_1B_5B">⭐ Khách hàng ưu tiên (1 - 5 Tỷ)</option>
+                      <option value="OVER_5B">👑 Khách VIP / Private Banking (&gt; 5 Tỷ)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bảng tính toán tiền lãi thực tế */}
+              <div className="overflow-x-auto rounded-xl border border-[#212b40]">
+                <table className="w-full text-left text-xs border-collapse font-mono">
+                  <thead>
+                    <tr className="bg-[#182030] text-slate-300 border-b border-[#212b40] font-sans font-semibold">
+                      <th className="py-2.5 px-3">Ngân Hàng</th>
+                      <th className="py-2.5 px-2 text-right">Lãi Suất Áp Dụng</th>
+                      <th className="py-2.5 px-2 text-right text-emerald-400 font-bold">Tổng Tiền Lãi Nhận Được</th>
+                      <th className="py-2.5 px-2 text-right text-cyan-400">Tiền Lãi Mỗi Tháng</th>
+                      <th className="py-2.5 px-2 text-center">Xếp Hạng Sinh Lời</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#1e2738]">
+                    {filteredBanks
+                      .map((b) => {
+                        let baseRate = b.deposit12M;
+                        let months = 12;
+                        switch (depositTerm) {
+                          case 'KKH': baseRate = b.depositKKH; months = 1 / 30; break;
+                          case '1M': baseRate = b.deposit1M; months = 1; break;
+                          case '3M': baseRate = b.deposit3M; months = 3; break;
+                          case '6M': baseRate = b.deposit6M; months = 6; break;
+                          case '9M': baseRate = b.deposit9M; months = 9; break;
+                          case '12M': baseRate = b.deposit12M; months = 12; break;
+                          case '18M': baseRate = b.deposit18M; months = 18; break;
+                          case '24M': baseRate = b.deposit24M; months = 24; break;
+                          case '36M': baseRate = b.deposit36M; months = 36; break;
+                        }
+                        let bonus = 0;
+                        if (depositTier === 'ONLINE') bonus = b.onlineBonus;
+                        else if (depositTier === 'TIER_1B_5B') bonus = b.tierBonus1B_5B;
+                        else if (depositTier === 'OVER_5B') bonus = b.tierBonusOver5B;
+
+                        const finalRate = baseRate + bonus;
+                        const tongLai = Math.round((simAmount * (finalRate / 100) * months) / 12);
+                        const laiThang = Math.round(tongLai / Math.max(1, months));
+
+                        return { bank: b, finalRate, tongLai, laiThang };
+                      })
+                      .sort((a, b) => b.tongLai - a.tongLai)
+                      .map((item, idx) => (
+                        <tr key={item.bank.id} className="hover:bg-[#182236]/60 transition-colors">
+                          <td className="py-2.5 px-3 font-sans font-medium text-slate-200 flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full bg-slate-800 text-cyan-400 flex items-center justify-center text-[10px] font-bold">
+                              {idx + 1}
+                            </span>
+                            <span className="font-bold text-white">{item.bank.name}</span>
+                            <span className="text-[10px] text-slate-400 font-mono">({item.bank.shortName})</span>
+                          </td>
+                          <td className="py-2.5 px-2 text-right font-bold text-slate-200">
+                            {item.finalRate.toFixed(2)}%/năm
+                          </td>
+                          <td className="py-2.5 px-2 text-right font-black text-emerald-400 text-sm bg-emerald-500/5">
+                            +{formatVND(item.tongLai)}
+                          </td>
+                          <td className="py-2.5 px-2 text-right font-bold text-cyan-400">
+                            +{formatVND(item.laiThang)}/tháng
+                          </td>
+                          <td className="py-2.5 px-2 text-center font-sans">
+                            {idx < 3 ? (
+                              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[10px] border border-emerald-500/40">
+                                🏆 Top {idx + 1} Cao Nhất
+                              </span>
+                            ) : (
+                              <span className="text-slate-400 text-[10px]">Cạnh tranh</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -302,11 +550,11 @@ export default function MacroInterestRateEngine() {
       {activeTab === 'FINTECH' && (
         <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
           {filteredFintech.map((f) => (
-            <div key={f.id} className="bg-[#182030] border border-[#243048] rounded-xl p-3.5 hover:border-purple-500/40 transition-all flex flex-col justify-between">
+            <div key={f.id} className="bg-[#182030] border border-[#243048] rounded-xl p-4 hover:border-purple-500/40 transition-all flex flex-col justify-between space-y-3">
               <div>
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600/30 to-pink-500/20 border border-purple-500/30 flex items-center justify-center text-purple-300 font-bold text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600/30 to-pink-500/20 border border-purple-500/30 flex items-center justify-center text-purple-300 font-bold text-sm">
                       {f.id.slice(0, 2)}
                     </div>
                     <div>
@@ -314,7 +562,7 @@ export default function MacroInterestRateEngine() {
                       <p className="text-[11px] text-slate-400">{f.provider}</p>
                     </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
+                  <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
                     f.category === 'VI_DIEN_TU'
                       ? 'bg-pink-500/20 text-pink-300 border border-pink-500/30'
                       : f.category === 'APP_TICH_LUY'
@@ -324,20 +572,33 @@ export default function MacroInterestRateEngine() {
                     {f.category === 'VI_DIEN_TU' ? 'Ví Điện Tử' : f.category === 'APP_TICH_LUY' ? 'Tích Lũy Linh Hoạt' : 'Vay Tiêu Dùng'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 mt-2 bg-[#121824] p-2 rounded-lg border border-[#1e2738]">
+
+                <div className="grid grid-cols-2 gap-2 mt-3 p-2.5 bg-[#121824] rounded-lg border border-[#1e2738] font-mono text-xs">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block font-sans">Sinh Lời Theo Ngày:</span>
+                    <span className="text-sm font-black text-emerald-400">
+                      {f.savingRateDay > 0 ? `${f.savingRateDay.toFixed(1)}%/năm` : 'Không hỗ trợ'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block font-sans">Lãi Vay / Trả Sau (BNPL):</span>
+                    <span className="text-sm font-black text-rose-400">{f.borrowRate.toFixed(1)}%/năm</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 mt-2 text-[11px] text-slate-400 font-sans">
+                  <div>Hạn mức: <b className="text-slate-200 font-mono">{formatVND(f.limitMax)}</b></div>
+                  <div>Rút tiền: <b className="text-cyan-300">{f.withdrawalSpeed}</b></div>
+                </div>
+
+                <p className="text-xs text-slate-300 mt-2 bg-[#182236]/80 p-2 rounded-lg border border-[#212b40]">
                   💡 <span className="font-semibold">{f.feature}</span>
                 </p>
               </div>
 
-              <div className="mt-3 pt-3 border-t border-[#212b40] flex items-center justify-between text-xs font-mono">
-                <div>
-                  <span className="text-[10px] text-slate-400 block font-sans">Lãi Tích Lũy / Ngày:</span>
-                  <span className="text-sm font-bold text-emerald-400">{f.savingRate > 0 ? `${f.savingRate}%/năm` : 'Không hỗ trợ'}</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] text-slate-400 block font-sans">Lãi Vay / Trả Sau:</span>
-                  <span className="text-sm font-bold text-amber-400">{f.borrowRate}%/năm</span>
-                </div>
+              <div className="flex items-center justify-between pt-2 border-t border-[#212b40] text-xs text-slate-400">
+                <span>Đánh giá cộng đồng: ⭐ <b className="text-amber-400">{f.rating}/5.0</b></span>
+                <span className="text-purple-400 font-bold font-mono">T+0 TỨC THÌ</span>
               </div>
             </div>
           ))}
