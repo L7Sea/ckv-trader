@@ -11,6 +11,8 @@ import { AnalyticsReport } from './components/AnalyticsReport';
 import { CashModal } from './components/CashModal';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
 import { PinLockScreen } from './components/PinLockScreen';
+import { CapyMascot } from './components/CapyMascot';
+import { BackgroundProvider } from './lib/backgroundContext';
 import { useTradingStore } from './store/useTradingStore';
 import {
   TrendingUp,
@@ -26,7 +28,7 @@ import {
 
 type TabType = 'TRADE' | 'MARKET' | 'CHARTS' | 'ANALYTICS';
 
-export const App: React.FC = () => {
+export const AppContent: React.FC = () => {
   const { fetchData, error, successMessage, clearMessages } = useTradingStore();
   const [activeTab, setActiveTab] = useState<TabType>('TRADE');
 
@@ -35,7 +37,7 @@ export const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
       {/* Header Bar */}
       <Header />
 
@@ -66,12 +68,12 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* 1. Tổng quan tài sản (Portfolio Overview) - Luôn hiển thị trên cùng */}
+        {/* 1. Tổng quan tài sản (Portfolio Overview) */}
         <PortfolioOverview />
 
         {/* Navigation Tabs Bar */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-2 overflow-x-auto">
-          <div className="flex items-center gap-2 p-1 bg-slate-950/80 rounded-2xl border border-slate-800 text-xs font-semibold">
+          <div className="flex items-center gap-2 p-1 bg-slate-950/80 rounded-2xl border border-slate-800 text-xs font-semibold backdrop-blur-md">
             <button
               onClick={() => setActiveTab('TRADE')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
@@ -125,10 +127,7 @@ export const App: React.FC = () => {
         {/* TAB 1: GIAO DỊCH & VỊ THẾ */}
         {activeTab === 'TRADE' && (
           <div className="space-y-6">
-            {/* Biểu đồ kỹ thuật tương tác */}
             <TechnicalChart />
-
-            {/* Sổ đặt lệnh (Trái) + Danh mục nắm giữ (Phải) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               <div className="lg:col-span-4 sticky top-20">
                 <OrderForm />
@@ -137,8 +136,6 @@ export const App: React.FC = () => {
                 <PositionsTable />
               </div>
             </div>
-
-            {/* Sổ cái lịch sử khớp lệnh */}
             <TransactionHistory />
           </div>
         )}
@@ -168,16 +165,25 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Modals & Security Screen */}
+      {/* Modals, Security Screen & Mascot */}
       <CashModal />
       <PriceUpdateModal />
       <PinLockScreen />
+      <CapyMascot />
 
       {/* Footer */}
       <footer className="border-t border-slate-800/80 py-4 px-6 text-center text-xs text-slate-500">
         <p>CKV PRO TRADER • Nền tảng Quản trị Chứng khoán Cá nhân Chuẩn T+2.5 • Serverless Cloudflare & Firestore</p>
       </footer>
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <BackgroundProvider>
+      <AppContent />
+    </BackgroundProvider>
   );
 };
 

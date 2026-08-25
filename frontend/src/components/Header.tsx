@@ -10,13 +10,16 @@ import {
   LogOut,
   ChevronDown,
   Lock,
-  ShieldCheck
+  ShieldCheck,
+  Settings,
+  Sparkles
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { MobileAccessModal } from './MobileAccessModal';
 import { DividendModal } from './DividendModal';
 import { AuthModal } from './AuthModal';
+import { SettingsModal } from './SettingsModal';
 
 export const Header: React.FC = () => {
   const { fetchData, settleDay, openCashModal, isLoading } = useTradingStore();
@@ -24,6 +27,7 @@ export const Header: React.FC = () => {
 
   const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
   const [isDividendModalOpen, setIsDividendModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleSettle = async () => {
@@ -52,6 +56,9 @@ export const Header: React.FC = () => {
                   <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     T+2.5 Pro
                   </span>
+                  <span className="hidden sm:inline-flex text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    🐹 Capy Active
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-slate-400">
                   <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
@@ -79,8 +86,15 @@ export const Header: React.FC = () => {
                 06
               </button>
               <button
+                onClick={() => setIsSettingsModalOpen(true)}
+                className="p-1 rounded-lg bg-slate-800 text-slate-300 ml-1"
+                title="Tùy biến & Capy"
+              >
+                <Settings className="h-3.5 w-3.5" />
+              </button>
+              <button
                 onClick={lockApp}
-                className="p-1 rounded-lg bg-slate-800 text-amber-400 ml-1"
+                className="p-1 rounded-lg bg-slate-800 text-amber-400"
                 title="Khóa ứng dụng"
               >
                 <Lock className="h-3.5 w-3.5" />
@@ -89,7 +103,7 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Action Center */}
-          <div className="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end overflow-x-auto pb-1 md:pb-0">
+          <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end overflow-x-auto pb-1 md:pb-0">
             {/* Switch Sub-Account on Desktop */}
             <div className="hidden md:flex items-center gap-1 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs font-mono mr-1">
               <button
@@ -151,6 +165,15 @@ export const Header: React.FC = () => {
               <span>Chốt Ngày</span>
             </button>
 
+            {/* Nút Tùy Biến (Settings & Capy) */}
+            <button
+              onClick={() => setIsSettingsModalOpen(true)}
+              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition active:scale-95"
+              title="Tùy biến hình nền, tính cách Capy & giao diện"
+            >
+              <Settings className="h-4 w-4 text-indigo-400" />
+            </button>
+
             {/* Nút Khóa Ứng Dụng (Lock App) */}
             <button
               onClick={lockApp}
@@ -183,12 +206,22 @@ export const Header: React.FC = () => {
                   <button
                     onClick={() => {
                       setIsUserMenuOpen(false);
+                      setIsSettingsModalOpen(true);
+                    }}
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition"
+                  >
+                    <Sparkles className="h-4 w-4 text-amber-400" />
+                    <span>Linh vật Capy & Hình nền</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
                       openAuthModal();
                     }}
                     className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition"
                   >
                     <User className="h-4 w-4 text-slate-400" />
-                    <span>Hồ sơ & Mã PIN</span>
+                    <span>Hồ sơ & Đổi PIN</span>
                   </button>
                   <button
                     onClick={() => {
@@ -232,6 +265,7 @@ export const Header: React.FC = () => {
       {/* Modals */}
       <MobileAccessModal isOpen={isMobileModalOpen} onClose={() => setIsMobileModalOpen(false)} />
       <DividendModal isOpen={isDividendModalOpen} onClose={() => setIsDividendModalOpen(false)} />
+      <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
       <AuthModal />
     </>
   );
