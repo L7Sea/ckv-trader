@@ -10,7 +10,7 @@ import { PortfolioCharts } from './components/PortfolioCharts';
 import { AnalyticsReport } from './components/AnalyticsReport';
 import { PositionDecisionEngine } from './components/PositionDecisionEngine';
 import { FiftyAlgorithmsReport } from './components/FiftyAlgorithmsReport';
-import { CashModal } from './components/CashModal';
+import { QuickRadarSearch } from './components/QuickRadarSearch';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
 import { PinLockScreen } from './components/PinLockScreen';
 import Capy from './components/Capy';
@@ -27,7 +27,8 @@ import {
   Layers,
   Award,
   Scale,
-  Cpu
+  Cpu,
+  Zap
 } from 'lucide-react';
 
 type TabType = 'TRADE' | 'DECISION' | 'ALGORITHMS' | 'MARKET' | 'CHARTS' | 'ANALYTICS';
@@ -123,7 +124,7 @@ export const AppContent: React.FC = () => {
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
-              <span>BẢNG GIÁ THEO DÕI (VNI)</span>
+              <span>BẢNG GIÁ VN50 (VNI)</span>
             </button>
 
             <button
@@ -155,6 +156,8 @@ export const AppContent: React.FC = () => {
         {/* TAB 1: GIAO DỊCH & VỊ THẾ */}
         {activeTab === 'TRADE' && (
           <div className="space-y-6">
+            {/* Ô DỰ TOÁN NHANH AI TRUY VẾT 52 MÃ */}
+            <QuickRadarSearch />
             <PositionDecisionEngine />
             <TechnicalChart />
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -180,6 +183,7 @@ export const AppContent: React.FC = () => {
         {/* TAB 3: HỆ THỐNG 52 THUẬT TOÁN DỰ ĐOÁN */}
         {activeTab === 'ALGORITHMS' && (
           <div className="space-y-6">
+            <QuickRadarSearch />
             <FiftyAlgorithmsReport />
           </div>
         )}
@@ -187,6 +191,7 @@ export const AppContent: React.FC = () => {
         {/* TAB 4: BẢNG GIÁ THEO DÕI (VNI) */}
         {activeTab === 'MARKET' && (
           <div className="space-y-6">
+            <QuickRadarSearch />
             <MarketBoard />
             <TechnicalChart />
           </div>
@@ -210,7 +215,6 @@ export const AppContent: React.FC = () => {
       </main>
 
       {/* Modals, Security Screen & Full Physics Capy */}
-      <CashModal />
       <PriceUpdateModal />
       <PinLockScreen />
       

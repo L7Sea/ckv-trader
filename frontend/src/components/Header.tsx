@@ -165,15 +165,6 @@ export const Header: React.FC = () => {
               <span>Điện Thoại</span>
             </button>
 
-            {/* Nạp/Rút tiền */}
-            <button
-              onClick={openCashModal}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700/60 transition shadow-sm active:scale-95 whitespace-nowrap"
-            >
-              <Wallet className="h-4 w-4 text-emerald-400" />
-              <span>Nạp / Rút</span>
-            </button>
-
             {/* Chốt ngày T+2.5 */}
             <button
               onClick={handleSettle}
