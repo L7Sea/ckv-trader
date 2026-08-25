@@ -28,7 +28,7 @@ interface TradingState {
   updatePrice: (symbol: string, price: number) => Promise<boolean>;
   settleDay: () => Promise<boolean>;
   adjustCash: (amount: number, action: 'DEPOSIT' | 'WITHDRAW') => Promise<boolean>;
-  resetCleanSlate: (startingCash?: number) => void;
+  resetToUserExactData: () => void;
   
   setSelectedStock: (symbol: string, price: number, action?: 'BUY' | 'SELL') => void;
   openCashModal: () => void;
@@ -46,8 +46,8 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   error: null,
   successMessage: null,
 
-  selectedSymbol: 'HPG',
-  selectedPrice: 29000,
+  selectedSymbol: 'TPB',
+  selectedPrice: 14450,
   selectedAction: 'BUY',
 
   isCashModalOpen: false,
@@ -58,24 +58,33 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   fetchData: async () => {
     set({ isLoading: true, error: null });
     try {
-      const [portfolio, positions, transactions] = await Promise.all([
+      let [portfolio, positions, transactions] = await Promise.all([
         api.getPortfolio(),
         api.getPositions(),
         api.getTransactions()
       ]);
+
+      // Tự động đồng bộ chuẩn danh mục thực tế của anh Hải (L7Sea) nếu chưa có TPB
+      if (!positions || positions.length === 0 || !positions.some((p) => p.symbol === 'TPB')) {
+        const exact = localTradingEngine.resetToUserExactData();
+        portfolio = exact.portfolio;
+        positions = exact.positions;
+        transactions = exact.transactions;
+      }
+
       set({ portfolio, positions, transactions, isLoading: false });
     } catch (err: any) {
       set({ error: err.message || 'Lỗi tải dữ liệu', isLoading: false });
     }
   },
 
-  resetCleanSlate: (startingCash = 0) => {
-    const clean = localTradingEngine.resetCleanSlate(startingCash);
+  resetToUserExactData: () => {
+    const exact = localTradingEngine.resetToUserExactData();
     set({
-      portfolio: clean.portfolio,
-      positions: clean.positions,
-      transactions: clean.transactions,
-      successMessage: `Đã làm sạch sổ cái! Vốn tiền mặt khởi đầu: ${startingCash.toLocaleString()} VND.`
+      portfolio: exact.portfolio,
+      positions: exact.positions,
+      transactions: exact.transactions,
+      successMessage: 'Đã nạp chính xác danh mục thực tế: 1,000 TPB (Vốn thực có: 8.89tr, Nợ Margin: 6.89tr).'
     });
   },
 
@@ -118,15 +127,17 @@ export const useTradingStore = create<TradingState>((set, get) => ({
         const newPortfolio = state.portfolio
           ? {
               ...state.portfolio,
-              total_equity: (state.portfolio.cash || 0) + (state.portfolio.receiving_cash || 0) + totalStockVal - (state.portfolio.margin_debt || 0)
+              total_equity: state.portfolio.cash + state.portfolio.receiving_cash + totalStockVal - state.portfolio.margin_debt,
+              total_profit_loss: updatedPositions.reduce((sum, p) => sum + p.unrealized_pnl, 0),
+              updated_at: new Date().toISOString()
             }
           : null;
+
         return {
           positions: updatedPositions,
           portfolio: newPortfolio,
           isLoading: false,
-          isPriceModalOpen: false,
-          successMessage: `Đã cập nhật giá thị trường ${symbol} thành ${price.toLocaleString()}đ`
+          successMessage: `Đã cập nhật thị giá ${symbol} thành ${price.toLocaleString()}đ`
         };
       });
       return true;
@@ -140,11 +151,15 @@ export const useTradingStore = create<TradingState>((set, get) => ({
     set({ isLoading: true, error: null, successMessage: null });
     try {
       const msg = await api.settleDay();
-      await get().fetchData();
-      set({ isLoading: false, successMessage: msg });
+      const [portfolio, positions, transactions] = await Promise.all([
+        api.getPortfolio(),
+        api.getPositions(),
+        api.getTransactions()
+      ]);
+      set({ portfolio, positions, transactions, isLoading: false, successMessage: msg });
       return true;
     } catch (err: any) {
-      set({ error: err.message || 'Lỗi thanh toán ngày T+2.5', isLoading: false });
+      set({ error: err.message || 'Lỗi chốt ngày T+2.5', isLoading: false });
       return false;
     }
   },
@@ -152,16 +167,15 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   adjustCash: async (amount: number, action: 'DEPOSIT' | 'WITHDRAW') => {
     set({ isLoading: true, error: null, successMessage: null });
     try {
-      const updatedPortfolio = await api.adjustCash(amount, action);
+      const portfolio = await api.adjustCash(amount, action);
       set({
-        portfolio: updatedPortfolio,
+        portfolio,
         isLoading: false,
-        isCashModalOpen: false,
-        successMessage: `${action === 'DEPOSIT' ? 'Nạp vốn' : 'Rút vốn'} ${amount.toLocaleString()}đ thành công!`
+        successMessage: `Đã ${action === 'DEPOSIT' ? 'nạp thêm' : 'rút'} ${amount.toLocaleString()}đ tiền mặt thành công!`
       });
       return true;
     } catch (err: any) {
-      set({ error: err.message || 'Lỗi nạp/rút tiền', isLoading: false });
+      set({ error: err.message || 'Lỗi thay đổi tiền mặt', isLoading: false });
       return false;
     }
   },
@@ -172,11 +186,8 @@ export const useTradingStore = create<TradingState>((set, get) => ({
 
   openCashModal: () => set({ isCashModalOpen: true }),
   closeCashModal: () => set({ isCashModalOpen: false }),
-
-  openPriceModal: (symbol: string, currentPrice: number) => {
-    set({ isPriceModalOpen: true, priceModalSymbol: symbol, priceModalCurrentPrice: currentPrice });
-  },
+  openPriceModal: (symbol: string, currentPrice: number) =>
+    set({ isPriceModalOpen: true, priceModalSymbol: symbol, priceModalCurrentPrice: currentPrice }),
   closePriceModal: () => set({ isPriceModalOpen: false }),
-
   clearMessages: () => set({ error: null, successMessage: null })
 }));

@@ -8,6 +8,7 @@ import { TechnicalChart } from './components/TechnicalChart';
 import { MarketBoard } from './components/MarketBoard';
 import { PortfolioCharts } from './components/PortfolioCharts';
 import { AnalyticsReport } from './components/AnalyticsReport';
+import { PositionDecisionEngine } from './components/PositionDecisionEngine';
 import { CashModal } from './components/CashModal';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
 import { PinLockScreen } from './components/PinLockScreen';
@@ -23,10 +24,11 @@ import {
   AlertCircle,
   X,
   Layers,
-  Award
+  Award,
+  Scale
 } from 'lucide-react';
 
-type TabType = 'TRADE' | 'MARKET' | 'CHARTS' | 'ANALYTICS';
+type TabType = 'TRADE' | 'MARKET' | 'DECISION' | 'CHARTS' | 'ANALYTICS';
 
 export const AppContent: React.FC = () => {
   const { fetchData, error, successMessage, clearMessages } = useTradingStore();
@@ -87,6 +89,18 @@ export const AppContent: React.FC = () => {
             </button>
 
             <button
+              onClick={() => setActiveTab('DECISION')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+                activeTab === 'DECISION'
+                  ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Scale className="h-4 w-4" />
+              <span>THUẬT TOÁN HÒA VỐN TPB</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('MARKET')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
                 activeTab === 'MARKET'
@@ -95,7 +109,7 @@ export const AppContent: React.FC = () => {
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
-              <span>BẢNG GIÁ VN30</span>
+              <span>BẢNG GIÁ THEO DÕI (VNI)</span>
             </button>
 
             <button
@@ -127,6 +141,7 @@ export const AppContent: React.FC = () => {
         {/* TAB 1: GIAO DỊCH & VỊ THẾ */}
         {activeTab === 'TRADE' && (
           <div className="space-y-6">
+            <PositionDecisionEngine />
             <TechnicalChart />
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               <div className="lg:col-span-4 sticky top-20">
@@ -140,7 +155,15 @@ export const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 2: BẢNG GIÁ VN30 */}
+        {/* TAB 2: THUẬT TOÁN HÒA VỐN TPB */}
+        {activeTab === 'DECISION' && (
+          <div className="space-y-6">
+            <PositionDecisionEngine />
+            <TechnicalChart />
+          </div>
+        )}
+
+        {/* TAB 3: BẢNG GIÁ THEO DÕI (VNI) */}
         {activeTab === 'MARKET' && (
           <div className="space-y-6">
             <MarketBoard />
@@ -148,7 +171,7 @@ export const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 3: PHÂN BỔ TÀI SẢN & BIỂU ĐỒ NAV */}
+        {/* TAB 4: PHÂN BỔ TÀI SẢN & BIỂU ĐỒ NAV */}
         {activeTab === 'CHARTS' && (
           <div className="space-y-6">
             <PortfolioCharts />
@@ -156,7 +179,7 @@ export const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 4: HIỆU SUẤT & XUẤT BÁO CÁO EXCEL */}
+        {/* TAB 5: HIỆU SUẤT & XUẤT BÁO CÁO EXCEL */}
         {activeTab === 'ANALYTICS' && (
           <div className="space-y-6">
             <AnalyticsReport />
@@ -188,5 +211,3 @@ export const App: React.FC = () => {
     </BackgroundProvider>
   );
 };
-
-export default App;

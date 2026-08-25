@@ -4,24 +4,66 @@ const PORTFOLIO_KEY = 'ckv_local_portfolio';
 const POSITIONS_KEY = 'ckv_local_positions';
 const TRANSACTIONS_KEY = 'ckv_local_transactions';
 
+/* ═══ KHỞI TẠO CHÍNH XÁC DANH MỤC & NGUỒN VỐN CỦA ANH HẢI (L7Sea) THEO ẢNH 1 ═══
+   • Vốn thực có ban đầu: 8,891,893đ
+   • Vốn vay Margin (Deal): 6,898,107đ
+   • Vị thế: 1,000 TPB (Giá vốn: 15,918đ, Thị giá: 14,450đ, Lỗ: -1,465,943đ / -9.29%)
+   • Tài sản ròng (NAV): 7,551,893đ
+═══════════════════════════════════════════════════════════════════════════════════ */
+
 const initialPortfolio: Portfolio = {
-  cash: 0, // Mặc định sổ cái sạch
+  cash: 0, // Tiền mặt đã giải ngân hết vào TPB
   receiving_cash: 0,
-  margin_debt: 0,
-  total_equity: 0,
-  total_profit_loss: 0,
+  margin_debt: 6898107, // Vốn vay Deal Margin
+  total_equity: 7551893, // NAV = 14,450,000 - 6,898,107
+  total_profit_loss: -1465943, // Lỗ chưa chốt -9.29%
   current_simulated_date: new Date().toISOString().slice(0, 10),
   updated_at: new Date().toISOString()
 };
 
-const initialPositions: Position[] = [];
-const initialTransactions: Transaction[] = [];
+const initialPositions: Position[] = [
+  {
+    symbol: 'TPB',
+    total_quantity: 1000,
+    available_quantity: 1000,
+    t1_quantity: 0,
+    t2_quantity: 0,
+    avg_price: 15918, // Giá hòa vốn 15.918
+    market_price: 14450, // Thị giá 14.45 (-1.03%)
+    market_value: 14450000,
+    unrealized_pnl: -1465943,
+    unrealized_pnl_pct: -9.29,
+    target_price: 16500, // Mục tiêu kỳ vọng
+    stop_loss: 13800, // Ngưỡng cắt lỗ bảo vệ
+    updated_at: new Date().toISOString()
+  }
+];
+
+const initialTransactions: Transaction[] = [
+  {
+    id: 'tx_tpb_init',
+    type: 'BUY',
+    symbol: 'TPB',
+    price: 15918,
+    quantity: 1000,
+    fee: 23877,
+    tax: 0,
+    total_amount: 15918000,
+    net_amount: 15941877,
+    strategy: 'PULLBACK_MA20',
+    target_price: 16500,
+    stop_loss: 13800,
+    notes: 'Giải ngân 1,000 TPB (Vốn thực có 8.89tr + Vay margin Deal 6.89tr)',
+    timestamp: new Date(Date.now() - 86400000 * 5).toISOString(),
+    trade_date: new Date(Date.now() - 86400000 * 5).toISOString().slice(0, 10)
+  }
+];
 
 export const localTradingEngine = {
   getPortfolio(): Portfolio {
     const data = localStorage.getItem(PORTFOLIO_KEY);
     if (!data) {
-      localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(initialPortfolio));
+      this.savePortfolio(initialPortfolio);
       return initialPortfolio;
     }
     try {
@@ -38,7 +80,7 @@ export const localTradingEngine = {
   getPositions(): Position[] {
     const data = localStorage.getItem(POSITIONS_KEY);
     if (!data) {
-      localStorage.setItem(POSITIONS_KEY, JSON.stringify(initialPositions));
+      this.savePositions(initialPositions);
       return initialPositions;
     }
     try {
@@ -55,7 +97,7 @@ export const localTradingEngine = {
   getTransactions(): Transaction[] {
     const data = localStorage.getItem(TRANSACTIONS_KEY);
     if (!data) {
-      localStorage.setItem(TRANSACTIONS_KEY, JSON.stringify(initialTransactions));
+      this.saveTransactions(initialTransactions);
       return initialTransactions;
     }
     try {
@@ -69,27 +111,14 @@ export const localTradingEngine = {
     localStorage.setItem(TRANSACTIONS_KEY, JSON.stringify(txs));
   },
 
-  resetCleanSlate(startingCash: number = 0): { portfolio: Portfolio; positions: Position[]; transactions: Transaction[] } {
-    const cleanPortfolio: Portfolio = {
-      cash: startingCash,
-      receiving_cash: 0,
-      margin_debt: 0,
-      total_equity: startingCash,
-      total_profit_loss: 0,
-      current_simulated_date: new Date().toISOString().slice(0, 10),
-      updated_at: new Date().toISOString()
-    };
-    const cleanPositions: Position[] = [];
-    const cleanTransactions: Transaction[] = [];
-
-    this.savePortfolio(cleanPortfolio);
-    this.savePositions(cleanPositions);
-    this.saveTransactions(cleanTransactions);
-
+  resetToUserExactData(): { portfolio: Portfolio; positions: Position[]; transactions: Transaction[] } {
+    this.savePortfolio(initialPortfolio);
+    this.savePositions(initialPositions);
+    this.saveTransactions(initialTransactions);
     return {
-      portfolio: cleanPortfolio,
-      positions: cleanPositions,
-      transactions: cleanTransactions
+      portfolio: initialPortfolio,
+      positions: initialPositions,
+      transactions: initialTransactions
     };
   },
 
@@ -100,15 +129,15 @@ export const localTradingEngine = {
     const transactions = this.getTransactions();
 
     const grossAmount = quantity * price;
-    const fee = grossAmount * 0.0015; // 0.15% phí giao dịch
-    const tax = type === 'SELL' ? grossAmount * 0.001 : 0; // 0.1% thuế bán
+    const fee = grossAmount * 0.0015;
+    const tax = type === 'SELL' ? grossAmount * 0.001 : 0;
 
     let existingPos = positions.find((p) => p.symbol === symbol);
 
     if (type === 'BUY') {
       const totalRequired = grossAmount + fee;
       if (portfolio.cash < totalRequired) {
-        throw new Error(`Sức mua không đủ! Cần ${totalRequired.toLocaleString()}đ nhưng tiền mặt chỉ có ${portfolio.cash.toLocaleString()}đ (Anh có thể bấm Nạp tiền để thiết lập vốn thật)`);
+        throw new Error(`Sức mua tiền mặt không đủ (${portfolio.cash.toLocaleString()}đ)! Anh có thể bấm Nạp tiền hoặc sử dụng tính năng Mô phỏng Mua thêm.`);
       }
 
       portfolio.cash -= totalRequired;
@@ -152,11 +181,11 @@ export const localTradingEngine = {
       // BÁN
       if (!existingPos || existingPos.available_quantity < quantity) {
         const avail = existingPos ? existingPos.available_quantity : 0;
-        throw new Error(`Không đủ cổ phiếu khả dụng để bán! (Khả dụng: ${avail.toLocaleString()}, đang chờ T+1/T+2: ${existingPos ? (existingPos.t1_quantity + existingPos.t2_quantity).toLocaleString() : 0})`);
+        throw new Error(`Không đủ cổ phiếu khả dụng để bán! (Khả dụng: ${avail.toLocaleString()})`);
       }
 
       const netProceeds = grossAmount - fee - tax;
-      portfolio.receiving_cash += netProceeds; // Tiền chờ về T+2.5
+      portfolio.receiving_cash += netProceeds;
 
       existingPos.available_quantity -= quantity;
       existingPos.total_quantity -= quantity;
@@ -167,7 +196,6 @@ export const localTradingEngine = {
       existingPos.updated_at = new Date().toISOString();
     }
 
-    // Tính lại tổng tài sản
     const stockValuation = positions.reduce((sum, p) => sum + p.market_value, 0);
     const totalProfit = positions.reduce((sum, p) => sum + p.unrealized_pnl, 0);
     portfolio.total_profit_loss = totalProfit;
