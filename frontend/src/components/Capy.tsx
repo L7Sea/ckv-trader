@@ -48,8 +48,16 @@ export default function Capy() {
   const boc = useRef<HTMLDivElement>(null);
   const thanEl = useRef<HTMLDivElement>(null);
   const hen = useRef<number[]>([]);
+  const singleClickTimerRef = useRef<number | null>(null);
   const dat = (fn: () => void, ms: number) => { hen.current.push(window.setTimeout(fn, ms)); };
-  const donHen = () => { hen.current.forEach(clearTimeout); hen.current = []; };
+  const donHen = () => {
+    hen.current.forEach(clearTimeout);
+    hen.current = [];
+    if (singleClickTimerRef.current) {
+      clearTimeout(singleClickTimerRef.current);
+      singleClickTimerRef.current = null;
+    }
+  };
 
   const v = useRef({
     x: 60, y: 200, vx: 0, vy: 0,
@@ -65,14 +73,14 @@ export default function Capy() {
     imLang: 0,
   });
 
-  const noi = useCallback((bc: BieuCam, giay = 3.8) => {
+  const noi = useCallback((bc: BieuCam, giay = 5.0) => {
     donHen();
     setBieuCam(bc);
     setThoai(layThoai(bc, getStyle()));
     dat(() => setThoai(null), giay * 1000);
   }, []);
 
-  const noiCauTuyChinh = useCallback((loi: string, giay = 4.5, bc?: BieuCam) => {
+  const noiCauTuyChinh = useCallback((loi: string, giay = 5.0, bc?: BieuCam) => {
     donHen();
     if (bc) setBieuCam(bc);
     setThoai(loi);
@@ -350,7 +358,7 @@ export default function Capy() {
       setBieuCam(flyEmotion);
       const pctDisplay = Math.round(pNorm * 100);
       const cauNoiGunny = layThoaiGunnyTheoLuc(pctDisplay, getStyle());
-      noiCauTuyChinh(cauNoiGunny, 3.8, pctDisplay < 15 ? bocBieuCam(['toMo', 'vui']) : flyEmotion);
+      noiCauTuyChinh(cauNoiGunny, 5.2, pctDisplay < 15 ? bocBieuCam(['toMo', 'vui']) : flyEmotion);
     } else {
       // Kéo thả bình thường hoặc chạm nhẹ
       s.vx = 0; s.vy = 0;
@@ -361,13 +369,27 @@ export default function Capy() {
         thanEl.current.style.transform = `rotate(0deg)`;
       }
       if (!s.daDiChuyen) {
-        noi(bocBieuCam(['vui', 'tuHao']), 2.5);
+        // Debounce 260ms: Chỉ phát câu nói đơn khi người dùng KHÔNG bấm tiếp lần 2 (tránh nhảy câu khi nhấn đúp)
+        if (singleClickTimerRef.current) {
+          clearTimeout(singleClickTimerRef.current);
+          singleClickTimerRef.current = null;
+        }
+        singleClickTimerRef.current = window.setTimeout(() => {
+          singleClickTimerRef.current = null;
+          noi(bocBieuCam(['vui', 'tuHao']), 5.0);
+        }, 260);
       }
     }
   }
 
   /* ══ 4. CƠ CHẾ NHẤN ĐÚP 2 LẦN: TỰ ĐỘNG PHÂN TÍCH KHUYẾN NGHỊ MÃ TỐT NHẤT THỜI GIAN THỰC ══ */
   const xuLyNhanDup = () => {
+    // Hủy ngay timer click đơn để KHÔNG bị nhảy qua câu nói đơn trước đó
+    if (singleClickTimerRef.current) {
+      clearTimeout(singleClickTimerRef.current);
+      singleClickTimerRef.current = null;
+    }
+
     // 1. Phân tích chọn ra mã cổ phiếu hàng đầu theo 150 thuật toán định lượng (Top picks: TPB, HPG, ACB, FPT, SSI)
     const danhSachTop = [
       { ma: 'TPB', gia: 18500, lyDo: 'P/E 6.8x cực rẻ, ROE 17.5%, ERP thặng dư +9.56% so với Big4' },
@@ -398,7 +420,7 @@ export default function Capy() {
 
     const proEmotion = bocBieuCam(['tuHao', 'vui']);
     setBieuCam(proEmotion);
-    noiCauTuyChinh(cauNoi, 6.5, proEmotion);
+    noiCauTuyChinh(cauNoi, 6.0, proEmotion);
   };
 
   if (bat === 'off') return null;
