@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   BÉ CAPY — bơi tự do khắp màn hình.
-   z-index 2147483000 — TRÊN TẤT CẢ, kể cả modal, biểu đồ, màn hình khóa.
+   BÉ CAPY — CƠ CHẾ VẬT LÝ GUNNY, XOAY 360 ĐỘ & BONG BÓNG THÔNG MINH
+   z-index 2147483000 — TRÊN TẤT CẢ mọi thành phần giao diện.
    ═══════════════════════════════════════════════════════════════ */
 .cp {
   position: fixed;
@@ -16,10 +16,11 @@
   cursor: grab;
   touch-action: none;
   -webkit-tap-highlight-color: transparent;
-  filter: drop-shadow(0 8px 14px rgba(16, 24, 40, .32));
-  transition: transform var(--dur-fast, 0.15s) var(--ease, ease);
+  filter: drop-shadow(0 8px 16px rgba(16, 24, 40, .36));
+  transition: transform 0.08s ease-out;
   user-select: none;
   -webkit-user-select: none;
+  transform-origin: center center;
 }
 .cp__than:focus-visible {
   outline: 3px solid #10B981;
@@ -27,34 +28,39 @@
   border-radius: 50%;
 }
 
-/* ── Bơi: nhấp nhô như nổi trên mặt nước ── */
-.cp--boi .cp__than { animation: cpNoi 3.6s ease-in-out infinite; }
+/* ── Trạng thái bơi nhấp nhô ── */
+.cp--boi .cp__than {
+  animation: cpNoi 3.6s ease-in-out infinite;
+}
 @keyframes cpNoi {
   0%, 100% { translate: 0 0; }
   50%      { translate: 0 -7px; }
 }
 
-/* ── Đang bị nhấc: to lên, nghiêng ngả, con trỏ nắm ── */
+/* ── Trạng thái kéo ná Gunny: co giãn đàn hồi, rung bần bật vì sợ ── */
 .cp--keo .cp__than {
   cursor: grabbing;
-  scale: 1.12;
-  animation: cpGiayGiua .28s ease-in-out infinite;
-  filter: drop-shadow(0 18px 24px rgba(16, 24, 40, .42));
+  filter: drop-shadow(0 18px 26px rgba(225, 29, 72, .45));
+  animation: cpRunSo 0.1s ease-in-out infinite;
 }
-@keyframes cpGiayGiua {
-  0%, 100% { rotate: -7deg; }
-  50%      { rotate: 7deg; }
+@keyframes cpRunSo {
+  0%, 100% { translate: -1.5px 1px; }
+  50%      { translate: 1.5px -1px; }
 }
 
-/* ── Đang bay sau cú ném: hơi bẹp lại theo hướng bay ── */
-.cp--bay .cp__than { scale: 1.06 0.94; }
+/* ── Trạng thái bay: xoay tròn tự do 360 độ ── */
+.cp--bay .cp__than {
+  filter: drop-shadow(0 14px 22px rgba(16, 24, 40, .4));
+}
 
-/* ── Vừa tiếp đất: nảy đàn hồi ── */
-.cp--vacham .cp__than { animation: cpUych .38s cubic-bezier(.34, 1.56, .64, 1); }
+/* ── Vừa va chạm đập mép màn hình / tiếp đất ── */
+.cp--vacham .cp__than {
+  animation: cpUych .38s cubic-bezier(.34, 1.56, .64, 1);
+}
 @keyframes cpUych {
-  0%   { scale: 1.24 0.74; }
-  45%  { scale: 0.9 1.12; }
-  75%  { scale: 1.05 0.96; }
+  0%   { scale: 1.28 0.72; }
+  45%  { scale: 0.88 1.14; }
+  75%  { scale: 1.06 0.95; }
   100% { scale: 1 1; }
 }
 
@@ -72,53 +78,138 @@
     rgba(16, 24, 40, var(--cp-bong-mo, .26)) 0%,
     rgba(16, 24, 40, 0) 72%);
   pointer-events: none;
-  transition: scale var(--dur-fast, 0.15s) var(--ease, ease);
+  transition: scale 0.15s ease;
 }
 
-/* ── LẬT MẶT THEO HƯỚNG BƠI ── */
+/* ── LẬT MẶT THEO HƯỚNG BƠI (khi không bị xoay 360) ── */
 .cp__than > svg {
   transform: scaleX(var(--cp-huong, 1));
-  transition: transform var(--dur-normal, 0.25s) var(--ease, ease);
+  transition: transform 0.2s ease;
+  transform-origin: center center;
 }
 
-/* ── Ngủ: thở chậm, sâu ── */
-.cp--ngu .cp__than { animation: cpNguThở 4.6s ease-in-out infinite; }
+/* ── Ngủ ── */
+.cp--ngu .cp__than {
+  animation: cpNguThở 4.6s ease-in-out infinite;
+}
 @keyframes cpNguThở {
   0%, 100% { scale: 1 1; }
   50%      { scale: 1.04 0.97; }
 }
 
-/* ═══ BONG BÓNG THOẠI KIỂU ANIME / MANGA SIÊU RÕ NÉT ═══ */
+/* ═══ ĐƯỜNG NGẮM & LỰC BẮN SLINGSHOT GUNNY ═══ */
+.cp__slingshot-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 4px;
+  background: linear-gradient(90deg, #E11D48, #F59E0B, #10B981);
+  transform-origin: 0 50%;
+  border-radius: 4px;
+  box-shadow: 0 0 12px rgba(225, 29, 72, 0.8);
+  pointer-events: none;
+  z-index: 2147483001;
+}
+
+.cp__aim-arrow {
+  position: absolute;
+  right: -8px;
+  top: -6px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 14px solid #10B981;
+}
+
+.cp__power-badge {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  translate: -50% 0;
+  background: #E11D48;
+  color: #FFFFFF;
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1.5px solid #FFFFFF;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ═══ BONG BÓNG THOẠI THÔNG MINH TỰ ĐỘNG CHỈNH ĐUÔI VÀ VỊ TRÍ ═══ */
 .cp__bong {
   pointer-events: none;
   position: absolute;
-  left: 50%;
-  translate: -50% 0;
   width: max-content;
-  max-width: min(280px, 75vw);
+  max-width: min(290px, 78vw);
   background: #FFFFFF;
   color: #0F172A;
   border: 2.5px solid #1E293B;
   border-radius: 18px;
-  padding: 10px 14px 9px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 0 2px rgba(255, 255, 255, 0.9);
+  padding: 9px 13px 8px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45), 0 0 0 2px rgba(255, 255, 255, 0.9);
   animation: cpBongAnime .24s cubic-bezier(.34, 1.56, .64, 1) both;
   z-index: 2147483647;
 }
 
-/* Đuôi bong bóng truyện tranh chỉ vào đỉnh đầu Capy */
-.cp__bong::after {
+/* 1. Vị trí ở TRÊN Capy (mặc định) */
+.cp__bong--top {
+  bottom: calc(100% + 12px);
+}
+.cp__bong--top::after {
   content: '';
   position: absolute;
   bottom: -8px;
-  left: 50%;
   width: 14px;
   height: 14px;
-  margin-left: -7px;
   background: #FFFFFF;
   border-right: 2.5px solid #1E293B;
   border-bottom: 2.5px solid #1E293B;
   transform: rotate(45deg);
+}
+
+/* 2. Vị trí ở DƯỚI Capy (khi Capy ở sát mép trên) */
+.cp__bong--bottom {
+  top: calc(100% + 12px);
+}
+.cp__bong--bottom::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  width: 14px;
+  height: 14px;
+  background: #FFFFFF;
+  border-left: 2.5px solid #1E293B;
+  border-top: 2.5px solid #1E293B;
+  transform: rotate(45deg);
+}
+
+/* Canh lề ngang: Giữa, Trái, Phải */
+.cp__bong--align-center {
+  left: 50%;
+  translate: -50% 0;
+}
+.cp__bong--align-center::after {
+  left: 50%;
+  margin-left: -7px;
+}
+
+.cp__bong--align-right {
+  right: -8px;
+}
+.cp__bong--align-right::after {
+  right: 24px;
+}
+
+.cp__bong--align-left {
+  left: -8px;
+}
+.cp__bong--align-left::after {
+  left: 24px;
 }
 
 .cp__bong-header {
@@ -126,7 +217,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .cp__bong-tag {
@@ -150,17 +241,16 @@
 }
 
 .cp__bong-text {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 700;
-  line-height: 1.45;
+  line-height: 1.42;
   color: #0F172A;
-  text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.8);
   word-break: break-word;
 }
 
 @keyframes cpBongAnime {
-  from { opacity: 0; translate: -50% 12px; scale: .88; }
-  to   { opacity: 1; translate: -50% 0;    scale: 1; }
+  from { opacity: 0; scale: .85; }
+  to   { opacity: 1; scale: 1; }
 }
 
 /* ═══ Cử động của phụ kiện trên mặt ═══ */
