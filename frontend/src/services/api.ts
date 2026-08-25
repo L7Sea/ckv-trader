@@ -1,77 +1,85 @@
 import { OrderRequestPayload, Portfolio, Position, Transaction } from '../types';
+import { localTradingEngine } from './localTradingEngine';
 
-// Sử dụng relative URL '/api' để Vite Proxy tự chuyển tiếp về Backend (hỗ trợ cả máy tính, điện thoại qua Wi-Fi và Cloudflare Tunnel)
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
+// Hàm fetch an toàn kiểm tra Content-Type JSON chống lỗi HTML DOCTYPE của SPA
+async function safeFetchJson(url: string, options?: RequestInit): Promise<any | null> {
+  try {
+    const res = await fetch(url, options);
+    const contentType = res.headers.get('content-type') || '';
+    if (!res.ok || !contentType.includes('application/json')) {
+      return null;
+    }
+    const data = await res.json();
+    return data && data.success ? data.data : null;
+  } catch {
+    return null;
+  }
+}
+
 export const api = {
-  // Lấy tổng quan tài sản
+  // 1. Lấy tổng quan tài sản
   async getPortfolio(): Promise<Portfolio> {
-    const res = await fetch(`${API_BASE_URL}/api/portfolio`);
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.message || 'Không thể tải thông tin danh mục');
-    return data.data;
+    const remote = await safeFetchJson(`${API_BASE_URL}/api/portfolio`);
+    if (remote) return remote;
+    return localTradingEngine.getPortfolio();
   },
 
-  // Lấy danh sách vị thế cổ phiếu
+  // 2. Lấy danh sách vị thế cổ phiếu
   async getPositions(): Promise<Position[]> {
-    const res = await fetch(`${API_BASE_URL}/api/positions`);
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.message || 'Không thể tải danh sách vị thế cổ phiếu');
-    return data.data;
+    const remote = await safeFetchJson(`${API_BASE_URL}/api/positions`);
+    if (remote) return remote;
+    return localTradingEngine.getPositions();
   },
 
-  // Lấy lịch sử giao dịch
+  // 3. Lấy lịch sử giao dịch
   async getTransactions(): Promise<Transaction[]> {
-    const res = await fetch(`${API_BASE_URL}/api/transactions`);
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.message || 'Không thể tải lịch sử giao dịch');
-    return data.data;
+    const remote = await safeFetchJson(`${API_BASE_URL}/api/transactions`);
+    if (remote) return remote;
+    return localTradingEngine.getTransactions();
   },
 
-  // Đặt lệnh giao dịch Mua / Bán
+  // 4. Đặt lệnh giao dịch Mua / Bán
   async placeOrder(payload: OrderRequestPayload): Promise<{ transaction: Transaction; position: Position; portfolio: Portfolio }> {
-    const res = await fetch(`${API_BASE_URL}/api/order`, {
+    const remote = await safeFetchJson(`${API_BASE_URL}/api/order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.message || 'Đặt lệnh không thành công');
-    return data.data;
+    if (remote) return remote;
+    return localTradingEngine.placeOrder(payload);
   },
 
-  // Cập nhật giá thị trường thủ công
+  // 5. Cập nhật giá thị trường
   async updateMarketPrice(symbol: string, market_price: number): Promise<Position> {
-    const res = await fetch(`${API_BASE_URL}/api/positions/update-price`, {
+    const remote = await safeFetchJson(`${API_BASE_URL}/api/positions/update-price`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ symbol, market_price })
     });
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.message || 'Không thể cập nhật giá thị trường');
-    return data.data;
+    if (remote) return remote;
+    return localTradingEngine.updateMarketPrice(symbol, market_price);
   },
 
-  // Chuyển trạng thái ngày mới (T+2.5 Settlement)
+  // 6. Chuyển trạng thái ngày mới (T+2.5 Settlement)
   async settleDay(): Promise<string> {
-    const res = await fetch(`${API_BASE_URL}/api/settle-day`, {
+    const res = await safeFetchJson(`${API_BASE_URL}/api/settle-day`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
     });
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.message || 'Không thể thanh toán T+2.5');
-    return data.message;
+    if (res && res.message) return res.message;
+    return localTradingEngine.settleDay();
   },
 
-  // Nạp hoặc Rút tiền
+  // 7. Nạp hoặc Rút tiền
   async adjustCash(amount: number, action: 'DEPOSIT' | 'WITHDRAW'): Promise<Portfolio> {
-    const res = await fetch(`${API_BASE_URL}/api/portfolio/cash-adjust`, {
+    const remote = await safeFetchJson(`${API_BASE_URL}/api/portfolio/cash-adjust`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount, action })
     });
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.message || 'Giao dịch tiền không thành công');
-    return data.data;
+    if (remote) return remote;
+    return localTradingEngine.adjustCash(amount, action);
   }
 };
