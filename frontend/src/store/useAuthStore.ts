@@ -4,7 +4,7 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
-  accountNumber: string; // VD: 001C123456
+  accountNumber: string;
   subAccount: '01' | '06'; // 01: Thường, 06: Margin
   pin: string;
   isLoggedIn: boolean;
@@ -13,9 +13,15 @@ export interface UserProfile {
 interface AuthState {
   user: UserProfile | null;
   isAuthModalOpen: boolean;
+  isLocked: boolean; // Trạng thái khóa màn hình bảo mật
+  requirePinForOrders: boolean; // Bắt buộc xác thực PIN khi đặt lệnh/rút tiền
+
   login: (name: string, email: string, pin: string) => void;
   logout: () => void;
   switchSubAccount: (sub: '01' | '06') => void;
+  lockApp: () => void;
+  unlockApp: (pin: string) => boolean;
+  setRequirePinForOrders: (required: boolean) => void;
   openAuthModal: () => void;
   closeAuthModal: () => void;
 }
@@ -33,8 +39,8 @@ const getInitialUser = (): UserProfile => {
   }
   return {
     id: 'user-default',
-    name: 'Dương L.K',
-    email: 'trader@ckv.vn',
+    name: 'L7Sea',
+    email: 'investor@ckv.vn',
     accountNumber: '001C888999',
     subAccount: '01',
     pin: '123456',
@@ -42,9 +48,11 @@ const getInitialUser = (): UserProfile => {
   };
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: getInitialUser(),
   isAuthModalOpen: false,
+  isLocked: false,
+  requirePinForOrders: true,
 
   login: (name: string, email: string, pin: string) => {
     const user: UserProfile = {
@@ -57,7 +65,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       isLoggedIn: true
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-    set({ user, isAuthModalOpen: false });
+    set({ user, isAuthModalOpen: false, isLocked: false });
   },
 
   logout: () => {
@@ -71,7 +79,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       isLoggedIn: false
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(guestUser));
-    set({ user: guestUser });
+    set({ user: guestUser, isLocked: false });
   },
 
   switchSubAccount: (sub: '01' | '06') => {
@@ -82,6 +90,19 @@ export const useAuthStore = create<AuthState>((set) => ({
       return { user: updated };
     });
   },
+
+  lockApp: () => set({ isLocked: true }),
+
+  unlockApp: (inputPin: string) => {
+    const currentPin = get().user?.pin || '123456';
+    if (inputPin === currentPin) {
+      set({ isLocked: false });
+      return true;
+    }
+    return false;
+  },
+
+  setRequirePinForOrders: (required: boolean) => set({ requirePinForOrders: required }),
 
   openAuthModal: () => set({ isAuthModalOpen: true }),
   closeAuthModal: () => set({ isAuthModalOpen: false })

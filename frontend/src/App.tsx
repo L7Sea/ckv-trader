@@ -10,6 +10,7 @@ import { PortfolioCharts } from './components/PortfolioCharts';
 import { AnalyticsReport } from './components/AnalyticsReport';
 import { CashModal } from './components/CashModal';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
+import { PinLockScreen } from './components/PinLockScreen';
 import { useTradingStore } from './store/useTradingStore';
 import {
   TrendingUp,
@@ -167,9 +168,10 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Modals */}
+      {/* Modals & Security Screen */}
       <CashModal />
       <PriceUpdateModal />
+      <PinLockScreen />
 
       {/* Footer */}
       <footer className="border-t border-slate-800/80 py-4 px-6 text-center text-xs text-slate-500">

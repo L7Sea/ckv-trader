@@ -9,8 +9,8 @@ import {
   User,
   LogOut,
   ChevronDown,
-  Shield,
-  Layers
+  Lock,
+  ShieldCheck
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 import { useAuthStore } from '../store/useAuthStore';
@@ -20,7 +20,7 @@ import { AuthModal } from './AuthModal';
 
 export const Header: React.FC = () => {
   const { fetchData, settleDay, openCashModal, isLoading } = useTradingStore();
-  const { user, openAuthModal, logout, switchSubAccount } = useAuthStore();
+  const { user, openAuthModal, logout, switchSubAccount, lockApp } = useAuthStore();
 
   const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
   const [isDividendModalOpen, setIsDividendModalOpen] = useState(false);
@@ -50,10 +50,13 @@ export const Header: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <h1 className="text-xl font-bold tracking-tight text-white">CKV PRO</h1>
                   <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    T+2.5 Engine
+                    T+2.5 Pro
                   </span>
                 </div>
-                <p className="text-xs text-slate-400">Nền Tảng Quản Trị Giao Dịch Chứng Khoán Chuyên Nghiệp</p>
+                <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>Bảo Mật 3 Lớp • Cloudflare Edge</span>
+                </div>
               </div>
             </div>
 
@@ -65,7 +68,7 @@ export const Header: React.FC = () => {
                   user?.subAccount === '01' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400'
                 }`}
               >
-                01-Thường
+                01
               </button>
               <button
                 onClick={() => switchSubAccount('06')}
@@ -73,7 +76,14 @@ export const Header: React.FC = () => {
                   user?.subAccount === '06' ? 'bg-indigo-500 text-white' : 'text-slate-400'
                 }`}
               >
-                06-Margin
+                06
+              </button>
+              <button
+                onClick={lockApp}
+                className="p-1 rounded-lg bg-slate-800 text-amber-400 ml-1"
+                title="Khóa ứng dụng"
+              >
+                <Lock className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
@@ -141,6 +151,15 @@ export const Header: React.FC = () => {
               <span>Chốt Ngày</span>
             </button>
 
+            {/* Nút Khóa Ứng Dụng (Lock App) */}
+            <button
+              onClick={lockApp}
+              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 transition active:scale-95"
+              title="Khóa ứng dụng ngay lập tức bằng mã PIN"
+            >
+              <Lock className="h-4 w-4" />
+            </button>
+
             {/* Nút Tài Khoản / Profile */}
             <div className="relative">
               <button
@@ -170,6 +189,16 @@ export const Header: React.FC = () => {
                   >
                     <User className="h-4 w-4 text-slate-400" />
                     <span>Hồ sơ & Mã PIN</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
+                      lockApp();
+                    }}
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-amber-300 hover:bg-amber-500/10 rounded-xl transition"
+                  >
+                    <Lock className="h-4 w-4 text-amber-400" />
+                    <span>Khóa bảo vệ bằng PIN</span>
                   </button>
                   <button
                     onClick={() => {
