@@ -210,29 +210,29 @@ export const FiftyAlgorithmsReport: React.FC = () => {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
-            <div className="p-3 bg-slate-900/90 rounded-2xl border border-slate-800">
-              <span className="text-[11px] text-slate-400 block font-sans">Mục Tiêu 1 Tuần:</span>
-              <span className="text-base font-bold text-emerald-400">{formatNumber(prediction.targetPrice1W)} đ</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-center">
+            <div className="p-3 bg-slate-900/90 rounded-2xl border border-slate-800 flex flex-col justify-center">
+              <span className="text-[11px] text-slate-400 block font-sans">Mục Tiêu 1 Tuần</span>
+              <span className="text-base font-bold text-emerald-400 mt-0.5">{formatNumber(prediction.targetPrice1W)} đ</span>
               <span className="text-[10px] text-emerald-400 block mt-0.5">+4.50%</span>
             </div>
 
-            <div className="p-3 bg-slate-900/90 rounded-2xl border border-emerald-500/30">
-              <span className="text-[11px] text-emerald-400 block font-sans font-bold">Mục Tiêu 1 Tháng (Hòa Vốn):</span>
-              <span className="text-base font-bold text-emerald-300">{formatNumber(prediction.targetPrice1M)} đ</span>
+            <div className="p-3 bg-slate-900/90 rounded-2xl border border-emerald-500/30 flex flex-col justify-center">
+              <span className="text-[11px] text-emerald-400 block font-sans font-bold">Mục Tiêu 1 Tháng</span>
+              <span className="text-base font-bold text-emerald-300 mt-0.5">{formatNumber(prediction.targetPrice1M)} đ</span>
               <span className="text-[10px] text-emerald-400 block mt-0.5">+{prediction.expectedGainPct}% (Hòa Vốn)</span>
             </div>
 
-            <div className="p-3 bg-slate-900/90 rounded-2xl border border-rose-500/30">
-              <span className="text-[11px] text-rose-400 block font-sans font-bold">Cắt Lỗ Kỷ Luật (Stop Loss):</span>
-              <span className="text-base font-bold text-rose-400">{formatNumber(prediction.stopLossPrice)} đ</span>
+            <div className="p-3 bg-slate-900/90 rounded-2xl border border-rose-500/30 flex flex-col justify-center">
+              <span className="text-[11px] text-rose-400 block font-sans font-bold">Cắt Lỗ Kỷ Luật</span>
+              <span className="text-base font-bold text-rose-400 mt-0.5">{formatNumber(prediction.stopLossPrice)} đ</span>
               <span className="text-[10px] text-rose-400 block mt-0.5">-{prediction.expectedRiskPct}%</span>
             </div>
 
-            <div className="p-3 bg-slate-900/90 rounded-2xl border border-indigo-500/30">
-              <span className="text-[11px] text-indigo-400 block font-sans font-bold">Tỷ Lệ Lợi Nhuận / Rủi Ro:</span>
-              <span className="text-base font-bold text-indigo-300">R:R = {prediction.riskRewardRatio}</span>
-              <span className="text-[10px] text-indigo-400 block mt-0.5">Lãi tiềm năng gấp {prediction.riskRewardRatio}x</span>
+            <div className="p-3 bg-slate-900/90 rounded-2xl border border-indigo-500/30 flex flex-col justify-center">
+              <span className="text-[11px] text-indigo-400 block font-sans font-bold">Tỷ Lệ Lãi / Lỗ</span>
+              <span className="text-base font-bold text-indigo-300 mt-0.5">R:R = {prediction.riskRewardRatio}</span>
+              <span className="text-[10px] text-indigo-400 block mt-0.5">Gấp {prediction.riskRewardRatio}x rủi ro</span>
             </div>
           </div>
 
