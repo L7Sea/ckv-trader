@@ -3,5 +3,5 @@ main = "src/worker.ts"
 compatibility_date = "2024-01-01"
 
 [vars]
-SUPABASE_URL = "https://YOUR_SUPABASE_PROJECT_ID.supabase.co"
-SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY"
+SUPABASE_URL = "https://srgdawqqwogkyncqvqta.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNyZ2Rhd3Fxd29na3luY3F2cXRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2NDY3OTIsImV4cCI6MjEwMzIyMjc5Mn0._VPuo9m9dw7NEYWTbJmmRQAaw4KiNDuEH7Y5mGHfr08"
