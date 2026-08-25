@@ -131,4 +131,46 @@ test('7. Điểm đồng thuận 150 Thuật toán: Thang điểm 0 - 100 chuẩ
   assert.strictEqual(finalScore > 50, true); // Đạt đồng thuận tích cực
 });
 
-console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/7 TESTS ĐẠT CHUẨN 100%!\n`);
+// 8. Định Lượng Vĩ Mô: Equity Risk Premium (ERP = Earning Yield - Rf 12M)
+test('8. Định lượng vĩ mô: Tính chuẩn Equity Risk Premium (ERP) và Fair Value P/E', () => {
+  const stock = { pe: 6.8, eps: 2720, roe: 17.5, price: 18500 };
+  const riskFree12M = 5.15; // Benchmark lãi suất 12 tháng
+  const earningYield = (1 / stock.pe) * 100; // 14.706%
+  const erp = earningYield - riskFree12M; // 9.556%
+
+  const targetPE = 100 / (riskFree12M + 3.5); // 100 / 8.65 = 11.56x
+  const fairValue = Math.round(stock.eps * targetPE); // 31,445đ
+
+  assert.strictEqual(earningYield.toFixed(2), '14.71');
+  assert.strictEqual(erp.toFixed(2), '9.56');
+  assert.strictEqual(fairValue, 31445);
+  assert.strictEqual(erp > 3.0, true); // Xác nhận HOT BUY theo chuẩn vĩ mô
+});
+
+// 9. Tối Ưu Chi Phí Đòn Bẩy: Spread Lợi Suất vs Lãi Margin DNSE
+test('9. Tối ưu chi phí đòn bẩy: Chênh lệch sinh lời E/P vs Lãi Margin DNSE (9.99%)', () => {
+  const stockPE = 6.8;
+  const earningYield = (1 / stockPE) * 100; // 14.706%
+  const dnseMarginRate = 9.99;
+  const marginNetSpread = earningYield - dnseMarginRate; // +4.716%
+
+  assert.strictEqual(marginNetSpread.toFixed(2), '4.72');
+  assert.strictEqual(marginNetSpread > 0, true); // Đòn bẩy sinh lời dương
+});
+
+// 10. Tối Ưu Tiền Mặt Nhàn Rỗi: Túi Thần Tài MoMo / Tikop (4.8% - 6.2%)
+test('10. Tiền mặt chờ giải ngân: Tối ưu lợi suất linh hoạt không kỳ hạn', () => {
+  const idleCash = 50000000; // 50 triệu tiền mặt chờ mua
+  const bankCasaRate = 0.001; // Lãi không kỳ hạn ngân hàng 0.1%/năm
+  const momoYield = 0.048;   // Túi Thần Tài 4.8%/năm
+
+  const bankYieldPerYear = idleCash * bankCasaRate; // 50,000đ
+  const momoYieldPerYear = idleCash * momoYield;   // 2,400,000đ
+  const extraIncome = momoYieldPerYear - bankYieldPerYear; // 2,350,000đ
+
+  assert.strictEqual(bankYieldPerYear, 50000);
+  assert.strictEqual(momoYieldPerYear, 2400000);
+  assert.strictEqual(extraIncome, 2350000);
+});
+
+console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/10 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);

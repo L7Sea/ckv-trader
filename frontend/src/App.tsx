@@ -13,6 +13,7 @@ import { FiftyAlgorithmsReport } from './components/FiftyAlgorithmsReport';
 import { QuickRadarSearch } from './components/QuickRadarSearch';
 import { MarketIntelligenceDashboard } from './components/MarketIntelligenceDashboard';
 import { DailyAIRecommendations } from './components/DailyAIRecommendations';
+import MacroInterestRateEngine from './components/MacroInterestRateEngine';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
 import { PinLockScreen } from './components/PinLockScreen';
 import Capy from './components/Capy';
@@ -34,10 +35,11 @@ import {
   Newspaper,
   Compass,
   FileSpreadsheet,
-  Flame
+  Flame,
+  Landmark
 } from 'lucide-react';
 
-type TabType = 'TRADE' | 'DECISION' | 'ALGORITHMS' | 'MARKET' | 'INTELLIGENCE' | 'CHARTS' | 'ANALYTICS';
+type TabType = 'TRADE' | 'DECISION' | 'ALGORITHMS' | 'MARKET' | 'MACRO' | 'INTELLIGENCE' | 'CHARTS' | 'ANALYTICS';
 
 export const AppContent: React.FC = () => {
   const { fetchData, error, successMessage, clearMessages } = useTradingStore();
@@ -134,7 +136,20 @@ export const AppContent: React.FC = () => {
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
-              <span>BẢNG GIÁ 300 MÃ (HOSE/HNX/UPCOM)</span>
+              <span>BẢNG GIÁ 300 MÃ</span>
+            </button>
+
+            <button
+              data-tab="MACRO"
+              onClick={() => setActiveTab('MACRO')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+                activeTab === 'MACRO'
+                  ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/30'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Landmark className="h-4 w-4 text-emerald-400" />
+              <span>LÃI SUẤT & VĨ MÔ</span>
             </button>
 
             <button
@@ -223,9 +238,17 @@ export const AppContent: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 5: TIN TỨC & BÁO CÁO TÀI CHÍNH BCTC DOANH NGHIỆP */}
+        {/* TAB 5: HỆ THỐNG LÃI SUẤT VĨ MÔ & ĐỊNH GIÁ ERP CHI PHÍ VỐN */}
+        {activeTab === 'MACRO' && (
+          <div className="space-y-6">
+            <MacroInterestRateEngine />
+          </div>
+        )}
+
+        {/* TAB 6: TIN TỨC & BÁO CÁO TÀI CHÍNH BCTC DOANH NGHIỆP */}
         {activeTab === 'INTELLIGENCE' && (
           <div className="space-y-6">
+            <MacroInterestRateEngine />
             <MarketIntelligenceDashboard />
           </div>
         )}
