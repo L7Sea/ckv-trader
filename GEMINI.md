@@ -1,4 +1,4 @@
-# CKV PRO TRADER — QUY TẮC DỰ ÁN & CHỈ DẪN AGENT (CLAUDE.md)
+# CKV PRO TRADER — QUY TẮC DỰ ÁN & CHỈ DẪN GOOGLE ANTIGRAVITY (GEMINI.md)
 *Single Source of Truth: tài liệu/CONTEXT.md*
 
 ## 1. 🎯 Bối Cảnh & Kiến Trúc Dự Án
@@ -15,7 +15,7 @@ node scripts/test-sql-schema.cjs         # 8/8 bài test toàn vẹn mô hình d
 npm --prefix frontend run build          # Biên dịch sạch sẽ 100%, 0 lỗi TypeScript
 ```
 
-## 3. 🛡️ Ranh Giới Quyền Hạn (Agent Guardrails)
+## 3. 🛡️ Ranh Giới Quyền Hạn (Antigravity Agent Guardrails)
 - **ĐƯỢC TỰ LÀM**:
   - Sửa code frontend, thuật toán định lượng, biểu đồ, máy tính lãi suất.
   - Chạy test, dọn code chết, làm sạch tài liệu qua npm run clean:md.
