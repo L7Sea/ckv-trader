@@ -4,14 +4,14 @@ export interface ToastState {
   success: (msg: string) => void;
   error: (msg: string) => void;
   info: (msg: string) => void;
-  confirm: (msg: string, onYes: () => void) => void;
+  confirm: (msg: string, opts?: any) => Promise<boolean>;
 }
 
 const ToastContext = createContext<ToastState>({
   success: (msg) => console.log('Toast success:', msg),
   error: (msg) => console.error('Toast error:', msg),
   info: (msg) => console.log('Toast info:', msg),
-  confirm: (msg, onYes) => { if (window.confirm(msg)) onYes(); }
+  confirm: async (msg) => window.confirm(msg)
 });
 
 export const useToast = () => useContext(ToastContext);
@@ -28,10 +28,8 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     success: (t) => show(t, 'success'),
     error: (t) => show(t, 'error'),
     info: (t) => show(t, 'info'),
-    confirm: (message, onYes) => {
-      if (window.confirm(message)) {
-        onYes();
-      }
+    confirm: async (message) => {
+      return window.confirm(message);
     }
   };
 
