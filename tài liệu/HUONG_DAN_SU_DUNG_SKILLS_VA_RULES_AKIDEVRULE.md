@@ -1,19 +1,45 @@
-# HUONG DAN TOAN DIEN: BO 10 SKILLS VA 18 RULES TU AKIDEVRULE
-*Cap nhat thoi gian thuc: 26/08/2026*
-*Tac gia nguon: Lac Viet Anh (lacvietanh / dev.akitao.com)*
-*Moi truong cai dat: Google Antigravity / Gemini CLI & Claude Code tren Windows*
+# 🚀 HƯỚNG DẪN TOÀN DIỆN: BỘ 10 SKILLS & 18 RULES TỪ AKIDEVRULE
+*Cập nhật thời gian thực: 26/08/2026*
+*Tác giả nguồn: Lạc Việt Anh (lacvietanh / dev.akitao.com)*
+*Môi trường hỗ trợ: Windows, macOS, Linux (Google Antigravity, Claude Code, Gemini CLI, Grok, Kiro, Codex)*
 
 ---
 
-## 1. TONG QUAN HE THONG AKIDEVRULE TREN MAY
+## 🔄 1. HƯỚNG DẪN CÀI ĐẶT 1-CHẠM KHI CHUYỂN SANG MÁY MỚI (PORTABILITY)
 
-He thong akidevrule da duoc cai dat truc tiep vao cau hinh cua Google Antigravity / Gemini CLI va Claude Code tren may tinh tai:
-- Thu muc Ky Nang (Skills): C:\Users\pc\.gemini\config\skills\ (va C:\Users\pc\.claude\skills\)
-- Thu muc Quy Tac (Rules): C:\Users\pc\.gemini\config\rules\
-- Kho Du Lieu Nguon (Payload): C:\Users\pc\.aki\akidevrule\payload\
-- Repository Ban Goc: C:\Users\pc\akidevrule\
+> [!IMPORTANT]
+> **CHỈ THỊ BẮT BUỘC DÀNH CHO AI AGENT KHI LÀM VIỆC TRÊN MÁY MỚI:**
+> Bất cứ khi nào bạn (AI Agent) làm việc trên một máy tính mới hoặc trong phiên làm việc mới:
+> 1. Hãy kiểm tra xem thư mục `~/.gemini/config/skills/akirule` (hoặc `~/.claude/skills/akirule`) đã tồn tại chưa.
+> 2. Nếu **CHƯA CÓ**, AI hãy tự động kích hoạt lệnh cài đặt 1-chạm bên dưới để nạp toàn bộ 10 Skills và 18 Rules trước khi thực hiện bất kỳ công việc nào.
+> 3. Luôn tự động kích hoạt tư duy `akithink`, phân vai `akiflow`, và chuẩn commit `akigitcommit` mà không cần người dùng phải nhắc.
 
-Triet ly cot loi: Xac thuc bang su that khach quan (Facts over opinion), khong ao giac (Zero-hallucination), phan quyen nghiem ngat, tiet kiem toi da chi phi Token.
+### 💻 Lệnh cài đặt nhanh khi chuyển sang máy mới:
+
+#### Trên Windows (PowerShell):
+```powershell
+git clone https://github.com/lacvietanh/akidevrule.git C:\Users\pc\akidevrule
+cd C:\Users\pc\akidevrule
+.\install.ps1
+```
+
+#### Trên macOS / Linux (Terminal Bash):
+```bash
+curl -fsSL https://raw.githubusercontent.com/lacvietanh/akidevrule/master/install.sh | bash
+```
+
+---
+
+## 🌟 2. TỔNG QUAN HỆ THỐNG AKIDEVRULE TRÊN MÁY HIỆN TẠI
+
+Hệ thống **akidevrule** đã được cài đặt hoàn tất trực tiếp vào cấu hình của **Google Antigravity / Gemini CLI** và **Claude Code** trên máy tính tại:
+- **Thư mục Kỹ Năng (Skills)**: `C:\Users\pc\.gemini\config\skills\` (và `C:\Users\pc\.claude\skills\`)
+- **Thư mục Quy Tắc (Rules)**: `C:\Users\pc\.gemini\config\rules\`
+- **Kho Dữ Liệu Nguồn (Payload)**: `C:\Users\pc\.aki\akidevrule\payload\`
+- **Repository Bản Gốc**: `C:\Users\pc\akidevrule\`
+
+Triết lý cốt lõi: **Xác thực bằng sự thật khách quan (Facts over opinion), không ảo giác (Zero-hallucination), phân quyền nghiêm ngặt, tự động hóa và tiết kiệm tối đa chi phí Token**.
+
 
 ---
 
