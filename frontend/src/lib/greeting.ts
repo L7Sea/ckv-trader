@@ -88,6 +88,8 @@ export function getGreetingStyle(): GreetingStyle {
   return 'vui';
 }
 
+export const getStyle = getGreetingStyle;
+
 export function setGreetingStyle(style: GreetingStyle): void {
   try {
     localStorage.setItem(LS_STYLE_KEY, style);

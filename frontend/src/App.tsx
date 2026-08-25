@@ -11,7 +11,7 @@ import { AnalyticsReport } from './components/AnalyticsReport';
 import { CashModal } from './components/CashModal';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
 import { PinLockScreen } from './components/PinLockScreen';
-import { CapyMascot } from './components/CapyMascot';
+import Capy from './components/Capy';
 import { BackgroundProvider } from './lib/backgroundContext';
 import { useTradingStore } from './store/useTradingStore';
 import {
@@ -165,11 +165,13 @@ export const AppContent: React.FC = () => {
         )}
       </main>
 
-      {/* Modals, Security Screen & Mascot */}
+      {/* Modals, Security Screen & Full Physics Capy */}
       <CashModal />
       <PriceUpdateModal />
       <PinLockScreen />
-      <CapyMascot />
+      
+      {/* Linh vật Capy chạy trên tất cả, kéo thả lăn lộn tự do */}
+      <Capy />
 
       {/* Footer */}
       <footer className="border-t border-slate-800/80 py-4 px-6 text-center text-xs text-slate-500">
