@@ -211,3 +211,5 @@ export const App: React.FC = () => {
     </BackgroundProvider>
   );
 };
+
+export default App;

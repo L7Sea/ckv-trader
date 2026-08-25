@@ -63,8 +63,9 @@ export const USER_WATCHLIST: WatchlistStock[] = [
   { symbol: 'VNM', name: 'Vinamilk', price: 62600, refPrice: 63200, ceilPrice: 67600, floorPrice: 58800, volume: 3343900, change: -600, changePct: -0.95 },
   { symbol: 'VPB', name: 'VPBank', price: 26400, refPrice: 26350, ceilPrice: 28150, floorPrice: 24550, volume: 16309200, change: 50, changePct: 0.19 },
   { symbol: 'VPL', name: 'VPL', price: 76500, refPrice: 76900, ceilPrice: 82200, floorPrice: 71600, volume: 751800, change: -400, changePct: -0.52 },
-  { symbol: 'VRE', name: 'Vincom Retail', price: 25200, refPrice: 25300, ceilPrice: 27050, floorPrice: 23550, volume: 6940900, change: -100, changePct: -0.40 }
 ];
+
+export const VN50_WATCHLIST = USER_WATCHLIST;
 
 export const MarketBoard: React.FC = () => {
   const { setSelectedStock } = useTradingStore();

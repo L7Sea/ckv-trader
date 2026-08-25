@@ -28,6 +28,7 @@ interface TradingState {
   updatePrice: (symbol: string, price: number) => Promise<boolean>;
   settleDay: () => Promise<boolean>;
   adjustCash: (amount: number, action: 'DEPOSIT' | 'WITHDRAW') => Promise<boolean>;
+  resetCleanSlate: (startingCash?: number) => void;
   resetToUserExactData: () => void;
   
   setSelectedStock: (symbol: string, price: number, action?: 'BUY' | 'SELL') => void;
@@ -64,7 +65,7 @@ export const useTradingStore = create<TradingState>((set, get) => ({
         api.getTransactions()
       ]);
 
-      // Tự động đồng bộ chuẩn danh mục thực tế của anh Hải (L7Sea) nếu chưa có TPB
+      // Tự động nạp chuẩn danh mục thực tế nếu chưa có TPB
       if (!positions || positions.length === 0 || !positions.some((p) => p.symbol === 'TPB')) {
         const exact = localTradingEngine.resetToUserExactData();
         portfolio = exact.portfolio;
@@ -76,6 +77,16 @@ export const useTradingStore = create<TradingState>((set, get) => ({
     } catch (err: any) {
       set({ error: err.message || 'Lỗi tải dữ liệu', isLoading: false });
     }
+  },
+
+  resetCleanSlate: (startingCash = 0) => {
+    const clean = localTradingEngine.resetToUserExactData();
+    set({
+      portfolio: clean.portfolio,
+      positions: clean.positions,
+      transactions: clean.transactions,
+      successMessage: 'Đã đồng bộ lại dữ liệu thực tế: 1,000 TPB, nợ margin 6.89tr, NAV 7.55tr.'
+    });
   },
 
   resetToUserExactData: () => {

@@ -13,7 +13,7 @@ import {
 } from 'recharts';
 import { Activity, TrendingUp, BarChart2, Layers, Search } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
-import { VN50_WATCHLIST } from './MarketBoard';
+import { VN50_WATCHLIST, WatchlistStock } from './MarketBoard';
 
 interface ChartPoint {
   date: string;
@@ -85,7 +85,7 @@ export const TechnicalChart: React.FC = () => {
   const [showRSI, setShowRSI] = useState(true);
 
   const activeSymbol = selectedSymbol || positions[0]?.symbol || 'HPG';
-  const foundStock = VN50_WATCHLIST.find((s) => s.symbol === activeSymbol);
+  const foundStock = VN50_WATCHLIST.find((s: WatchlistStock) => s.symbol === activeSymbol);
   const currentPos = positions.find((p) => p.symbol === activeSymbol);
   const basePrice = currentPos?.market_price || foundStock?.price || 29000;
 
@@ -114,12 +114,12 @@ export const TechnicalChart: React.FC = () => {
               <select
                 value={activeSymbol}
                 onChange={(e) => {
-                  const s = VN50_WATCHLIST.find((item) => item.symbol === e.target.value);
+                  const s = VN50_WATCHLIST.find((item: WatchlistStock) => item.symbol === e.target.value);
                   setSelectedStock(e.target.value, s?.price || 30000, 'BUY');
                 }}
                 className="bg-slate-950 border border-slate-800 text-white font-bold font-mono text-lg rounded-xl px-2.5 py-1 focus:outline-none focus:border-emerald-500 cursor-pointer"
               >
-                {VN50_WATCHLIST.map((item) => (
+                {VN50_WATCHLIST.map((item: WatchlistStock) => (
                   <option key={item.symbol} value={item.symbol}>
                     {item.symbol} - {item.name}
                   </option>
