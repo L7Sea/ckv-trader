@@ -48,7 +48,7 @@ export const AppContent: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#090b10] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white pb-20 md:pb-6">
+    <div className="min-h-screen bg-transparent text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white pb-20 md:pb-6">
       {/* Header Bar */}
       <Header />
 
