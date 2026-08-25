@@ -319,25 +319,25 @@ export const QuickRadarSearch: React.FC = () => {
           </div>
         </div>
 
-        {/* 3 Quick Parameters */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
-          <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800">
-            <span className="text-[10px] text-slate-400 block font-sans">Vùng Gom Khuyến Nghị:</span>
-            <b className="text-emerald-400 text-sm mt-0.5 block">
+        {/* 3 Quick Parameters (Cân đối 3 cột đồng đều) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs text-center">
+          <div className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 flex flex-col justify-center">
+            <span className="text-[11px] text-slate-400 font-sans">Vùng Gom Khuyến Nghị</span>
+            <b className="text-emerald-400 text-sm mt-1 block">
               {formatNumber(currentStock.price)} - {formatNumber(Math.round(currentStock.price * 1.015))} đ
             </b>
           </div>
 
-          <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800">
-            <span className="text-[10px] text-emerald-400 block font-sans font-semibold">Mục Tiêu 1 Tháng (Hòa Vốn):</span>
-            <b className="text-emerald-300 text-sm mt-0.5 block">
+          <div className="p-3.5 bg-slate-950 rounded-2xl border border-emerald-500/30 flex flex-col justify-center">
+            <span className="text-[11px] text-emerald-400 font-sans font-semibold">Mục Tiêu 1 Tháng (Hòa Vốn)</span>
+            <b className="text-emerald-300 text-sm mt-1 block">
               {formatNumber(prediction.targetPrice1M)} đ (+{prediction.expectedGainPct}%)
             </b>
           </div>
 
-          <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800">
-            <span className="text-[10px] text-rose-400 block font-sans font-semibold">Ngưỡng Cắt Lỗ Kỷ Luật:</span>
-            <b className="text-rose-400 text-sm mt-0.5 block">
+          <div className="p-3.5 bg-slate-950 rounded-2xl border border-rose-500/30 flex flex-col justify-center">
+            <span className="text-[11px] text-rose-400 font-sans font-semibold">Ngưỡng Cắt Lỗ Kỷ Luật</span>
+            <b className="text-rose-400 text-sm mt-1 block">
               {formatNumber(prediction.stopLossPrice)} đ (-{prediction.expectedRiskPct}%)
             </b>
           </div>
