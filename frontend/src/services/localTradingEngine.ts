@@ -4,7 +4,7 @@ const PORTFOLIO_KEY = 'ckv_local_portfolio';
 const POSITIONS_KEY = 'ckv_local_positions';
 const TRANSACTIONS_KEY = 'ckv_local_transactions';
 
-/* ═══ KHỞI TẠO CHÍNH XÁC DANH MỤC & NGUỒN VỐN CỦA ANH HẢI (L7Sea) THEO ẢNH 1 ═══
+/* ═══ KHỞI TẠO CHÍNH XÁC DANH MỤC & NGUỒN VỐN CỦA ANH HẢI (VIP Trader) THEO ẢNH 1 ═══
    • Vốn thực có ban đầu: 8,891,893đ
    • Vốn vay Margin (Deal): 6,898,107đ
    • Vị thế: 1,000 TPB (Giá vốn: 15,918đ, Thị giá: 14,450đ, Lỗ: -1,465,943đ / -9.29%)

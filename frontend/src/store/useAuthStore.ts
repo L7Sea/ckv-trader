@@ -26,14 +26,14 @@ interface AuthState {
   closeAuthModal: () => void;
 }
 
-const STORAGE_KEY = 'ckv_user_profile';
+const STORAGE_KEY = 'quant_user_profile_v2';
 const DEFAULT_PIN = '542463';
 
 const getInitialUser = (): UserProfile => {
   const defaultProfile: UserProfile = {
-    id: 'user-L7Sea',
-    name: 'L7Sea',
-    email: 'L7Sea@ckv.pro',
+    id: 'user-vip',
+    name: 'VIP Trader',
+    email: 'trader@quant.pro',
     accountNumber: '001C888999',
     subAccount: '06', // Margin Deal
     pin: DEFAULT_PIN,
@@ -45,9 +45,6 @@ const getInitialUser = (): UserProfile => {
     try {
       const parsed = JSON.parse(saved);
       if (parsed) {
-        parsed.name = 'L7Sea'; // Tuyệt đối luôn là L7Sea
-        parsed.pin = DEFAULT_PIN;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
         return parsed;
       }
     } catch {}
@@ -65,9 +62,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   login: (name: string, email: string, pin: string) => {
     const user: UserProfile = {
-      id: 'user-L7Sea',
-      name: 'L7Sea',
-      email: email || 'L7Sea@ckv.pro',
+      id: 'user-vip',
+      name: name || 'VIP Trader',
+      email: email || 'trader@quant.pro',
       accountNumber: '001C888999',
       subAccount: '06',
       pin: pin || DEFAULT_PIN,

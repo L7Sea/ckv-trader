@@ -71,7 +71,7 @@ export const Header: React.FC = () => {
               </div>
               <div className="flex items-center gap-1.5 text-xs text-slate-400">
                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                <span>Tài khoản: <b className="text-emerald-400">L7Sea</b></span>
+                <span>Tài khoản: <b className="text-emerald-400">{user?.name || 'VIP Trader'}</b></span>
               </div>
             </div>
           </div>
@@ -161,9 +161,9 @@ export const Header: React.FC = () => {
                 className="flex items-center gap-2 pl-2 pr-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-semibold hover:border-slate-700 transition"
               >
                 <div className="h-6 w-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
-                  {user?.name ? user.name[0].toUpperCase() : 'L'}
+                  {user?.name ? user.name[0].toUpperCase() : 'V'}
                 </div>
-                <span className="max-w-[70px] truncate hidden md:inline">{user?.name || 'L7Sea'}</span>
+                <span className="max-w-[70px] truncate hidden md:inline">{user?.name || 'VIP Trader'}</span>
                 <ChevronDown className="h-3 w-3 text-slate-500" />
               </button>
 
@@ -171,7 +171,7 @@ export const Header: React.FC = () => {
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in">
                   <div className="p-2 border-b border-slate-800/80 mb-1">
-                    <p className="text-xs font-bold text-white truncate">{user?.name || 'L7Sea'}</p>
+                    <p className="text-xs font-bold text-white truncate">{user?.name || 'VIP Trader'}</p>
                     <p className="text-[11px] font-mono text-emerald-400">STK: {user?.accountNumber || '001C888999'}</p>
                   </div>
                   

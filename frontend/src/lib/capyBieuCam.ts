@@ -112,15 +112,15 @@ export const BIEU_CAM: BieuCam[] = [
 /* ══ BẢNG LỜI THOẠI CHỨNG KHOÁN THEO PHONG CÁCH & CẢM XÚC ══ */
 const THOAI: Record<GreetingStyle, Record<Nhom, string[]>> = {
   vui: {
-    vui:      ['Tím lịm tìm sim cả danh mục rồi anh L7Sea ơi!', 'Hôm nay nến xanh mướt mát, gồng lãi tự tin nhé!', 'Capy chúc sếp một ngày thắng lớn!'],
-    yeu:      ['Thương danh mục của anh nhất trần đời!', 'Cổ tức về tài khoản thơm phức luôn!', 'Anh L7Sea chuẩn bị chốt lời nào!'],
+    vui:      ['Tím lịm tìm sim cả danh mục rồi anh VIP Trader ơi!', 'Hôm nay nến xanh mướt mát, gồng lãi tự tin nhé!', 'Capy chúc sếp một ngày thắng lớn!'],
+    yeu:      ['Thương danh mục của anh nhất trần đời!', 'Cổ tức về tài khoản thơm phức luôn!', 'Anh VIP Trader chuẩn bị chốt lời nào!'],
     buonNgu:  ['Buồn ngủ chút thôi, tới giờ ATO là Capy thức liền', 'Ngủ trưa lấy sức chiều gồng lãi anh ơi', 'Khò khò... mơ thấy VN-Index vượt 1800 điểm'],
-    gian:     ['Ai vừa đè giá cổ phiếu của anh L7Sea vậy? Quạo nha!', 'Lái đánh kiểu này là không thương Capy rồi!', 'Tức á, đừng hòng ép bán đáy!'],
+    gian:     ['Ai vừa đè giá cổ phiếu của anh VIP Trader vậy? Quạo nha!', 'Lái đánh kiểu này là không thương Capy rồi!', 'Tức á, đừng hòng ép bán đáy!'],
     so:       ['Rung lắc ghê quá, nhưng anh em mình có kỷ luật thép!', 'Suýt rớt hàng, may mà giữ vững tay lái!', 'Bình tĩnh, hỗ trợ cứng 14.0 vẫn nguyên vẹn!'],
     nguong:   ['Được anh khen phân tích chuẩn mà em ngại ghê', 'Capy tài ba nhưng vẫn khiêm tốn học hỏi nha', 'Hihi, lộc lá đầy nhà rồi sếp ơi!'],
     chan:     ['Bảng điện sideways đứng im chán như con gián', 'Lái ngủ quên hay sao mà chưa thấy kéo trần ta', 'Đợi khớp lệnh mà sốt cả ruột'],
     tuHao:    ['150 thuật toán của em phân tích chuẩn bài chưa sếp?', 'Bắt đáy ngay chân sóng, quá tự hào!', 'Hệ thống CKV PRO số 1 thị trường!'],
-    toMo:     ['Khối ngoại hôm nay đang âm thầm gom mã nào ta?', 'Anh L7Sea chuẩn bị giải ngân siêu cổ nào bật mí em với?', 'Hóng phiên ATC chiều nay quá!'],
+    toMo:     ['Khối ngoại hôm nay đang âm thầm gom mã nào ta?', 'Anh VIP Trader chuẩn bị giải ngân siêu cổ nào bật mí em với?', 'Hóng phiên ATC chiều nay quá!'],
     dau:      ['Cắt lỗ đau như cắt từng khúc ruột, nhưng bảo vệ vốn là trên hết!', 'Thị trường quay xe chóng cả mặt', 'Uống ngụm nước ấm rồi làm lại nào anh!'],
     lamViec:  ['Đang soi chart danh mục VN50 thần tốc!', 'Ghi chép nhật ký lệnh cẩn thận để rèn giũa kỷ luật', 'Phân tích kỹ lưỡng trước khi bấm nút!'],
     doi:      ['Đói bụng rồi, cho Capy xin miếng dưa hấu giải nhiệt nào!', 'Ăn trưa no nê chiều nay mới có sức đè lái chứ!', 'Uống ly trà sữa trân châu mừng cổ tức về!'],
@@ -141,11 +141,11 @@ const THOAI: Record<GreetingStyle, Record<Nhom, string[]>> = {
   },
   pro: {
     vui:      ['Hiệu suất danh mục đang tăng trưởng đúng theo kế hoạch.', 'Vị thế cổ phiếu vận động tích cực trên đường MA20.', 'Đạt tỷ lệ Lợi nhuận / Rủi ro R:R tối ưu.'],
-    yeu:      ['Hân hạnh đồng hành cùng anh L7Sea trên con đường đầu tư chuyên nghiệp.', 'Hệ thống luôn sẵn sàng hỗ trợ dữ liệu 24/7.'],
+    yeu:      ['Hân hạnh đồng hành cùng anh VIP Trader trên con đường đầu tư chuyên nghiệp.', 'Hệ thống luôn sẵn sàng hỗ trợ dữ liệu 24/7.'],
     buonNgu:  ['Đã đến giờ nghỉ ngơi theo nguyên tắc quản trị sức khỏe.', 'Thư giãn trí não để duy trì sự tỉnh táo cao độ.'],
     gian:     ['Thao tác không tuân thủ kế hoạch giao dịch ban đầu.', 'Cần kiềm chế cảm xúc FOMO và tuân thủ kỷ luật.'],
     so:       ['Độ biến động thị trường gia tăng. Kiểm tra lại tỷ lệ an toàn vốn ký quỹ.'],
-    nguong:   ['Cảm ơn sự tín nhiệm của nhà đầu tư L7Sea.'],
+    nguong:   ['Cảm ơn sự tín nhiệm của nhà đầu tư VIP Trader.'],
     chan:     ['Thị trường trong pha tích lũy thanh khoản thấp. Kiên nhẫn chờ đợi điểm bứt phá.'],
     tuHao:    ['150 mô hình định lượng đã xác nhận điểm đảo chiều chính xác.', 'Bảo toàn thành công tài sản ròng trước nhịp chỉnh.'],
     toMo:     ['Đang quét dữ liệu dòng tiền khối ngoại và tự doanh.'],
@@ -154,7 +154,7 @@ const THOAI: Record<GreetingStyle, Record<Nhom, string[]>> = {
     doi:      ['Đã đến giờ ăn trưa và nghỉ ngơi theo lịch trình giao dịch.'],
   },
   gen_z: {
-    vui:      ['Slay quá anh L7Sea ơi, danh mục tím lịm flex mỏi tay!', 'Vibe hôm nay chuẩn triệu đô, lesgooo!'],
+    vui:      ['Slay quá anh VIP Trader ơi, danh mục tím lịm flex mỏi tay!', 'Vibe hôm nay chuẩn triệu đô, lesgooo!'],
     yeu:      ['Anh là chân ái của Capy 💛', 'U là trời siêu phẩm về tài khoản thương xỉu!'],
     buonNgu:  ['Pin em còn 1% rồi, đi sạc năng lượng chiều chiến tiếp!', 'Buồn ngủ dã man con ngan!'],
     gian:     ['Ủa alo lái, đè giá quài zạ? Em quạo rồi nha!'],

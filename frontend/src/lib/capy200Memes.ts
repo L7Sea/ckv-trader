@@ -77,7 +77,7 @@ export const CAPY_200_MEMES: CapyMemeItem[] = [
   { id: 'm_51', name: 'Đọc báo tài chính VnEconomy', category: 'TRADING', categoryName: 'Trader & Chứng khoán', mat: 'cham', phuKien: 'to_bao_tai_chinh', description: 'Cầm tờ báo đọc tin tức vĩ mô' },
   { id: 'm_52', name: 'Cầm thỏi vàng SJC 9999', category: 'TRADING', categoryName: 'Trader & Chứng khoán', mat: 'gach', phuKien: 'thoi_vang', description: 'Thỏi vàng nguyên chất lấp lánh' },
   { id: 'm_53', name: 'Cầm con bò xanh Bull Market', category: 'TRADING', categoryName: 'Trader & Chứng khoán', mat: 'gach', phuKien: 'bo_bull_xanh', description: 'Tượng bò tót xanh thị trường tăng trưởng' },
-  { id: 'm_54', name: 'Cầm tấm séc triệu đô', category: 'TRADING', categoryName: 'Trader & Chứng khoán', mat: 'gach', phuKien: 'tam_sec', description: 'Phiếu thu lợi nhuận tài khoản L7Sea' },
+  { id: 'm_54', name: 'Cầm tấm séc triệu đô', category: 'TRADING', categoryName: 'Trader & Chứng khoán', mat: 'gach', phuKien: 'tam_sec', description: 'Phiếu thu lợi nhuận tài khoản VIP Trader' },
   { id: 'm_55', name: 'Cầm cúp vàng vô địch đầu tư', category: 'TRADING', categoryName: 'Trader & Chứng khoán', mat: 'gach', phuKien: 'cup_vang', description: 'Chiếc cúp vinh danh trader xuất sắc' },
   { id: 'm_56', name: 'Cầm điện thoại check số dư NAV', category: 'TRADING', categoryName: 'Trader & Chứng khoán', mat: 'cham', phuKien: 'dt_check_nav', description: 'Điện thoại màn hình CKV PRO xanh mướt' },
   { id: 'm_57', name: 'Cầm chìa khóa két sắt bảo mật', category: 'TRADING', categoryName: 'Trader & Chứng khoán', mat: 'cham', phuKien: 'chia_khoa_ket', description: 'Chìa khóa vàng mã PIN 542463' },

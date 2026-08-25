@@ -35,12 +35,12 @@ export const FULL_MATRIX_4x7x6: Record<GreetingStyle, Record<ThuTrongTuan, Recor
   // ═══════════════ 1. PHONG CÁCH VUI VẺ (VUI) ═══════════════
   vui: {
     t2: {
-      rang: ['Thứ 2 rạng sáng rồi, anh L7Sea chuẩn bị mở bát tuần mới rực rỡ nhé!', 'Bình minh đầu tuần tinh khôi, chúc danh mục tuần này tím lịm!'],
+      rang: ['Thứ 2 rạng sáng rồi, anh VIP Trader chuẩn bị mở bát tuần mới rực rỡ nhé!', 'Bình minh đầu tuần tinh khôi, chúc danh mục tuần này tím lịm!'],
       sang: ['Thứ 2 mở phiên ATO: Sắc tím ngập tràn cả rổ VN50 nào sếp ơi!', 'Chào Thứ 2 đầu tuần! Cà phê sáng thơm nồng đón sóng tăng!'],
       trua: ['Khép phiên sáng Thứ 2, ăn trưa no nê lấy sức chiều bùng nổ!', 'Trưa Thứ 2 nghỉ ngơi thảnh thơi cùng Capy ngâm bồn nhé anh.'],
       chieu: ['14:00 Chiều Thứ 2: Khung giờ vàng đón nhịp kéo ATC tăng vọt!', 'Khép phiên Thứ 2 rực rỡ, khởi đầu một tuần đầy thuận lợi!'],
       toi: ['Tối Thứ 2: Thong thả mở sổ CKV tổng kết lại diễn biến ngày mở bát.', 'Uống ngụm trà nóng buổi tối, rà soát lại danh mục chiến lược.'],
-      dem: ['Đêm Thứ 2 thanh tĩnh, chúc anh L7Sea ngủ ngon mơ thấy siêu cổ!', 'Khò khò... mai Thứ 3 danh mục lại tiếp tục tăng tốc.']
+      dem: ['Đêm Thứ 2 thanh tĩnh, chúc anh VIP Trader ngủ ngon mơ thấy siêu cổ!', 'Khò khò... mai Thứ 3 danh mục lại tiếp tục tăng tốc.']
     },
     t3: {
       rang: ['Rạng sáng Thứ 3, không khí trong lành, tinh thần minh mẫn!', 'Sớm Thứ 3: Đón nhịp tăng tốc của các mã dẫn dắt.'],
@@ -54,9 +54,9 @@ export const FULL_MATRIX_4x7x6: Record<GreetingStyle, Record<ThuTrongTuan, Recor
       rang: ['Rạng sáng Thứ 4 giữa tuần, tâm thế vững vàng đón sóng mới!', 'Bình minh Thứ 4 tươi đẹp, chuẩn bị sẵn kế hoạch chốt lời T+2.5.'],
       sang: ['Chào Thứ 4 giữa tuần! Hàng T+2.5 về, chủ động vị thế nhé anh.', 'Sáng Thứ 4 chúc các mã chiến lược của anh bứt phá đỉnh cũ!'],
       trua: ['Trưa Thứ 4 nghỉ ngơi thoải mái, buổi sáng dòng tiền hấp thụ rất tốt.', 'Cơm trưa ấm cúng, tinh thần thoải mái gặt hái thành công.'],
-      chieu: ['14:00 Chiều Thứ 4: Giờ cao điểm giao dịch T+2.5 bùng nổ!', 'Chúc mừng anh L7Sea đã hiện thực hóa lợi nhuận phiên giữa tuần!'],
+      chieu: ['14:00 Chiều Thứ 4: Giờ cao điểm giao dịch T+2.5 bùng nổ!', 'Chúc mừng anh VIP Trader đã hiện thực hóa lợi nhuận phiên giữa tuần!'],
       toi: ['Tối Thứ 4: Ghi chép cẩn thận các giao dịch thành công vào sổ CKV.', 'Xem lại biểu đồ kỹ thuật và hiệu suất NAV sau phiên giữa tuần.'],
-      dem: ['Đêm Thứ 4 yên bình, chúc anh ngủ ngon chuẩn bị phiên Thứ 5.', 'Capy chúc anh L7Sea giấc ngủ sâu và nhiều năng lượng.']
+      dem: ['Đêm Thứ 4 yên bình, chúc anh ngủ ngon chuẩn bị phiên Thứ 5.', 'Capy chúc anh VIP Trader giấc ngủ sâu và nhiều năng lượng.']
     },
     t5: {
       rang: ['Rạng sáng Thứ 5: Giữ tâm lý vững vàng trước phiên biến động.', 'Bình minh Thứ 5, chuẩn bị kế hoạch quản trị rủi ro chặt chẽ.'],
@@ -64,13 +64,13 @@ export const FULL_MATRIX_4x7x6: Record<GreetingStyle, Record<ThuTrongTuan, Recor
       trua: ['Trưa Thứ 5: Tạm gác biến động, ăn trưa thư giãn nào anh!', 'Uống ly trà thanh mát, giữ tinh thần sảng khoái cho phiên chiều.'],
       chieu: ['14:15 Chiều Thứ 5: Thị trường cân bằng, kéo điểm tăng trở lại.', 'ATC Thứ 5 đầy cảm xúc, vị thế của anh vẫn giữ vững phong độ!'],
       toi: ['Tối Thứ 5: Thư thả soi lại 150 thuật toán & danh mục VN50 sau phiên.', 'Tổng kết tài sản, chuẩn bị cho phiên giao dịch cuối tuần Thứ 6.'],
-      dem: ['Khuya Thứ 5 rồi, chúc anh ngủ ngon để mai chốt sổ tuần rực rỡ!', 'Capy chúc anh L7Sea giấc ngủ êm đềm và an lành.']
+      dem: ['Khuya Thứ 5 rồi, chúc anh ngủ ngon để mai chốt sổ tuần rực rỡ!', 'Capy chúc anh VIP Trader giấc ngủ êm đềm và an lành.']
     },
     t6: {
       rang: ['Rạng sáng Thứ 6: Phiên giao dịch cuối cùng của tuần đã đến!', 'Đón chào ngày chốt sổ tuần với tâm thế tự tin nhất.'],
       sang: ['Chào Thứ 6 cuối tuần! Chúc toàn bộ danh mục của anh bùng nổ sắc tím!', 'Cà phê sáng Thứ 6 thật ngon, hoàn tất các mục tiêu tuần.'],
       trua: ['Trưa Thứ 6 rồi! Ăn mừng nhẹ chuẩn bị đón 2 ngày nghỉ cuối tuần!', 'Capy cầm miếng dưa hấu chúc anh bữa trưa tuyệt vời!'],
-      chieu: ['14:30 Chiều Thứ 6: Kéo nến tuần đóng cửa cao nhất tuần rực rỡ!', 'Chúc mừng anh L7Sea đã kết thúc tuần với NAV tăng trưởng vững chắc!'],
+      chieu: ['14:30 Chiều Thứ 6: Kéo nến tuần đóng cửa cao nhất tuần rực rỡ!', 'Chúc mừng anh VIP Trader đã kết thúc tuần với NAV tăng trưởng vững chắc!'],
       toi: ['Tối Thứ 6: Cuối tuần rồi, gác lại bảng điện và tận hưởng niềm vui!', 'Làm bữa tối thịnh soạn ăn mừng thành quả đầu tư cả tuần.'],
       dem: ['Đêm Thứ 6: Ngủ nướng không cần báo thức luôn sếp ơi!', 'Capy chúc anh một đêm cuối tuần thật êm đềm và hạnh phúc.']
     },
@@ -80,7 +80,7 @@ export const FULL_MATRIX_4x7x6: Record<GreetingStyle, Record<ThuTrongTuan, Recor
       trua: ['Trưa Thứ 7 ăn uống thả ga, nạp lại 100% năng lượng sau tuần cày cuốc.', 'Capy ngâm bồn Onsen đắp khăn vuông chúc anh bữa trưa sum vầy!'],
       chieu: ['Chiều Thứ 7 dạo phố, tập thể thao hoặc đi chơi giải tỏa căng thẳng.', 'Capy cưỡi rùa đi dạo chúc sếp buổi chiều ngập tràn niềm vui.'],
       toi: ['Tối Thứ 7 ấm cúng bên gia đình, xem một bộ phim hay.', 'Capy thổi kèn Saxophone góp vui cho buổi tối Thứ 7 của anh!'],
-      dem: ['Đêm Thứ 7 ngủ thật ngon, mai là Chủ Nhật tha hồ nghỉ ngơi.', 'Chúc anh L7Sea giấc ngủ êm đềm, ngập tràn giấc mơ đẹp.']
+      dem: ['Đêm Thứ 7 ngủ thật ngon, mai là Chủ Nhật tha hồ nghỉ ngơi.', 'Chúc anh VIP Trader giấc ngủ êm đềm, ngập tràn giấc mơ đẹp.']
     },
     cn: {
       rang: ['Rạng sáng Chủ Nhật: Tiếng chim hót ríu rít chào ngày mới an lành.', 'Chào buổi sớm cuối tuần cùng bé Capy siêu chill!'],
@@ -88,7 +88,7 @@ export const FULL_MATRIX_4x7x6: Record<GreetingStyle, Record<ThuTrongTuan, Recor
       trua: ['Trưa Chủ Nhật thưởng thức bữa cơm ấm cúng bên gia đình.', 'Nghỉ trưa thảnh thơi, tái tạo trọn vẹn thể lực và trí lực.'],
       chieu: ['Chiều Chủ Nhật: Dành chút thời gian ngắm lại đồ thị tuần các siêu cổ.', 'Chuẩn bị kỹ lưỡng là bí quyết nắm chắc 80% phần thắng tuần mới.'],
       toi: ['Tối Chủ Nhật: Mở app CKV kiểm tra lại trạng thái tài khoản trước giờ G.', 'Mọi kế hoạch đã sẵn sàng, tự tin bước vào tuần mới đại thắng!'],
-      dem: ['Đêm Chủ Nhật: Đi ngủ sớm để mai 08:30 sẵn sàng đón ATO mở bát!', 'Chúc anh L7Sea ngủ thật ngon, mai Thứ 2 danh mục lại tím lịm!']
+      dem: ['Đêm Chủ Nhật: Đi ngủ sớm để mai 08:30 sẵn sàng đón ATO mở bát!', 'Chúc anh VIP Trader ngủ thật ngon, mai Thứ 2 danh mục lại tím lịm!']
     }
   },
 
@@ -112,7 +112,7 @@ export const FULL_MATRIX_4x7x6: Record<GreetingStyle, Record<ThuTrongTuan, Recor
     },
     t4: {
       rang: ['Sớm Thứ 4: Hàng T+2.5 sắp về, run tay hay tự tin chốt lời đây?', 'Thức sớm làm gì, 9h bảng mới mở cửa mà sếp!'],
-      sang: ['Thứ 4 hàng về tài khoản, xem anh L7Sea quyết đoán chốt hay ôm tiếp!', 'Đừng để lãi thành lỗ nha, bài học số 1 không bao giờ cũ!'],
+      sang: ['Thứ 4 hàng về tài khoản, xem anh VIP Trader quyết đoán chốt hay ôm tiếp!', 'Đừng để lãi thành lỗ nha, bài học số 1 không bao giờ cũ!'],
       trua: ['Nghỉ trưa ăn dưa hấu đi, chiều nay 14h hàng về tha hồ rung lắc!', 'Capy ngâm bồn đây, anh không ăn trưa là chiều tụt huyết áp đó!'],
       chieu: ['14:15 hàng T+2.5 xả như lũ, anh đã kịp bấm nút chốt chưa?', 'Lái đánh khét quá, giữ chặt tay lái kẻo rớt hàng nha sếp!'],
       toi: ['Tối Thứ 4 tổng kết: Nay có chốt lời trúng đỉnh hay lại ôm mộng dài hạn?', 'Soi sổ lệnh thấy kỷ luật ghê ha, Capy chấm 9 điểm!'],
@@ -147,7 +147,7 @@ export const FULL_MATRIX_4x7x6: Record<GreetingStyle, Record<ThuTrongTuan, Recor
       sang: ['Sáng Chủ Nhật uống cà phê ngắm phố, chuẩn bị tinh thần cho tuần mới.', 'Chủ Nhật thảnh thơi, lên sẵn kế hoạch Thứ 2 săn hàng hời.'],
       trua: ['Trưa Chủ Nhật sum vầy bên mâm cơm gia đình ấm áp.', 'Nạp đầy năng lượng để mai bắt đầu một tuần giao dịch mới!'],
       chieu: ['Chiều Chủ Nhật: Mở CKV PRO soi trước 150 thuật toán định lượng cho chắc cú.', 'Kế hoạch đã lên, mai Thứ 2 chỉ việc bấm nút theo kỷ luật.'],
-      toi: ['Tối Chủ Nhật: Rà soát lại tỷ lệ margin và tài sản ròng trước giờ G.', 'Mai mở bát tuần mới, chúc sếp L7Sea bách chiến bách thắng!'],
+      toi: ['Tối Chủ Nhật: Rà soát lại tỷ lệ margin và tài sản ròng trước giờ G.', 'Mai mở bát tuần mới, chúc sếp VIP Trader bách chiến bách thắng!'],
       dem: ['Đêm Chủ Nhật: Tắt đèn đi ngủ sớm, 08:30 mai gặp lại ở ATO nha!']
     }
   },
@@ -176,7 +176,7 @@ export const FULL_MATRIX_4x7x6: Record<GreetingStyle, Record<ThuTrongTuan, Recor
       trua: ['Trưa Thứ 4: Tổng kết thanh khoản phiên sáng và phân bổ dòng tiền.', 'Duy trì trạng thái cân bằng cho danh mục đầu tư.'],
       chieu: ['14:00 Thứ 4: Khối lượng giao dịch T+2.5 tăng cao, thực thi kế hoạch chốt lời.', 'Kết thúc phiên giữa tuần với kết quả tăng trưởng ổn định.'],
       toi: ['Tối Thứ 4: Đánh giá lại hiệu suất danh mục so với chỉ số chuẩn VN-Index.', 'Cập nhật sổ cái tài sản ròng và phân bổ tài sản.'],
-      dem: ['Chúc nhà đầu tư L7Sea nghỉ ngơi tốt, chuẩn bị cho phiên Thứ 5.']
+      dem: ['Chúc nhà đầu tư VIP Trader nghỉ ngơi tốt, chuẩn bị cho phiên Thứ 5.']
     },
     t5: {
       rang: ['Rạng sáng Thứ 5: Đánh giá tác động của phiên đáo hạn hợp đồng tương lai.', 'Giữ vững vị thế nắm giữ trung và dài hạn trước các nhiễu động giá.'],
@@ -226,7 +226,7 @@ export const FULL_MATRIX_4x7x6: Record<GreetingStyle, Record<ThuTrongTuan, Recor
       rang: ['Sớm Thứ 3 thức dậy thấy đời đẹp như màu tím trần!', 'Vibe sáng Thứ 3 triệu đô, sẵn sàng bứt phá!'],
       sang: ['Chào Thứ 3! Hôm nay bank kéo là bay nóc luôn á sếp!', 'Đúng điểm mua là múc liền, không nói nhiều!'],
       trua: ['Ăn trưa đi nè, chiều nay lại bung lụa tiếp lo gì!', 'Trưa Thứ 3 uống trà sữa trân châu full topping!'],
-      chieu: ['Chiều Thứ 3 quẩy banh nóc, tài khoản nở hoa tưng bừng!', 'ATC kéo nến đẹp xỉu, quá đỉnh anh L7Sea ơi!'],
+      chieu: ['Chiều Thứ 3 quẩy banh nóc, tài khoản nở hoa tưng bừng!', 'ATC kéo nến đẹp xỉu, quá đỉnh anh VIP Trader ơi!'],
       toi: ['Tối Thứ 3 check lại danh mục, đúng là hết nước chấm!', 'Thư giãn tối Thứ 3 cùng Capy siêu cute!'],
       dem: ['Ngủ thôi bestie ơi, mai săn hàng T+2.5 về tài khoản!']
     },
@@ -234,7 +234,7 @@ export const FULL_MATRIX_4x7x6: Record<GreetingStyle, Record<ThuTrongTuan, Recor
       rang: ['Sớm Thứ 4 giữa tuần, năng lượng tích cực ngập tràn!', 'Hàng T+2.5 về hôm nay, chuẩn bị flex lãi thôi!'],
       sang: ['Chào Thứ 4! Chốt lời không bao giờ sai nha bestie!', 'Sáng nay mã nào chạm target là bấm nút lụm tiền liền!'],
       trua: ['Nghỉ trưa Thứ 4, ăn no nê chiều nay đếm tiền mỏi tay!', 'Trưa chill cùng Capy, không áp lực!'],
-      chieu: ['14:00 Thứ 4: Chốt lời bỏ túi, tiền tươi thóc thật là chân ái!', 'Chúc mừng sếp L7Sea chốt lời thành công rực rỡ!'],
+      chieu: ['14:00 Thứ 4: Chốt lời bỏ túi, tiền tươi thóc thật là chân ái!', 'Chúc mừng sếp VIP Trader chốt lời thành công rực rỡ!'],
       toi: ['Tối Thứ 4 flex nhẹ thành quả cả tuần, quá đã!', 'Ghi nhật ký lệnh xịn sò trên CKV PRO!'],
       dem: ['Đêm Thứ 4 ngủ ngon lành, mai chiến tiếp!']
     },
@@ -250,7 +250,7 @@ export const FULL_MATRIX_4x7x6: Record<GreetingStyle, Record<ThuTrongTuan, Recor
       rang: ['Sớm Thứ 6: Phiên cuối tuần rồi, năng lượng bùng nổ!', 'Sẵn sàng chốt sổ tuần triệu đô!'],
       sang: ['Chào Thứ 6! Danh mục hôm nay tím lịm cho cuối tuần vui vẻ nào!', 'Cà phê sáng Thứ 6 thơm lừng!'],
       trua: ['Trưa Thứ 6: Ăn mừng tuần làm việc thành công xuất sắc!', 'Chiều nay chốt phiên là có thể đi chill rồi!'],
-      chieu: ['14:30 chốt tuần: Slayyy! Nến tuần đóng đẹp như tranh vẽ!', 'Chúc mừng anh L7Sea đã hoàn thành xuất sắc tuần này!'],
+      chieu: ['14:30 chốt tuần: Slayyy! Nến tuần đóng đẹp như tranh vẽ!', 'Chúc mừng anh VIP Trader đã hoàn thành xuất sắc tuần này!'],
       toi: ['Tối Thứ 6 đi quẩy thôi anh ơi, cuối tuần là để xả hơi!', 'Không bàn chuyện chứng khoán tối nay nữa, tận hưởng thôi!'],
       dem: ['Đêm Thứ 6 ngủ xả láng không lo báo thức!']
     },
@@ -267,7 +267,7 @@ export const FULL_MATRIX_4x7x6: Record<GreetingStyle, Record<ThuTrongTuan, Recor
       sang: ['Sáng Chủ Nhật làm tách trà matcha thơm ngon, đọc sách chill chill!', 'Nạp lại 100% năng lượng chuẩn bị tuần mới.'],
       trua: ['Trưa Chủ Nhật ăn cơm gia đình ấm áp sum vầy!', 'Nghỉ trưa thảnh thơi nạp năng lượng.'],
       chieu: ['Chiều Chủ Nhật: Soi chart 150 thuật toán chuẩn bị săn siêu cổ Thứ 2!', 'Kế hoạch đã sẵn sàng, tuần mới lại slay tiếp!'],
-      toi: ['Tối Chủ Nhật: Check lại app CKV PRO tự tin bước vào tuần mới!', 'Chúc sếp L7Sea tuần mới lại gom đầy tài lộc!'],
+      toi: ['Tối Chủ Nhật: Check lại app CKV PRO tự tin bước vào tuần mới!', 'Chúc sếp VIP Trader tuần mới lại gom đầy tài lộc!'],
       dem: ['Đêm Chủ Nhật: Đi ngủ sớm mai 08:30 sẵn sàng combat ATO nha bestie!']
     }
   }

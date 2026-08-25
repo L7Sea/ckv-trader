@@ -29,7 +29,7 @@ export interface WatchlistStock {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   30 MÃ THEO DÕI CHÍNH XÁC THEO 3 BẢNG ẢNH CỦA ANH HẢI (L7Sea)
+   30 MÃ THEO DÕI CHÍNH XÁC THEO 3 BẢNG ẢNH CỦA ANH HẢI (VIP Trader)
    Chỉ số VN-Index: 1791.41 (+2.63 | +0.15%)
    ═══════════════════════════════════════════════════════════════ */
 

@@ -6,7 +6,7 @@ import { bocBieuCam, type BieuCam, type Nhom } from './capyBieuCam';
 /* ═══════════════════════════════════════════════════════════════
    QUY ĐỊNH BỘ ĐỒ THEO BUỔI (1 BUỔI = 1 DẠNG MẶC ĐỒ DUY NHẤT).
    
-   Theo yêu cầu của anh Hải (L7Sea):
+   Theo yêu cầu của anh Hải (VIP Trader):
      - Mỗi buổi trong ngày (Sáng, Trưa, Chiều, Tối, Đêm, Rạng sáng)
        chỉ được mặc DUY NHẤT 1 kiểu áo.
      - Nếu sáng mặc áo đỏ thì phải sang phiên chiều mới đổi áo khác.

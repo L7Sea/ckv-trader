@@ -6,7 +6,7 @@
 -- 1. BẢNG TỔNG QUAN TÀI SẢN (PORTFOLIO)
 CREATE TABLE IF NOT EXISTS public.portfolios (
     id TEXT PRIMARY KEY DEFAULT 'default',
-    account_name TEXT DEFAULT 'L7Sea',
+    account_name TEXT DEFAULT 'VIP Trader',
     account_number TEXT DEFAULT '001C888999',
     sub_account TEXT DEFAULT '06',
     cash NUMERIC DEFAULT 0,
@@ -74,9 +74,9 @@ CREATE POLICY "Cho phep truy cap toan quyen positions" ON public.positions FOR A
 CREATE POLICY "Cho phep truy cap toan quyen transactions" ON public.transactions FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Cho phep truy cap toan quyen watchlist" ON public.watchlist FOR ALL USING (true) WITH CHECK (true);
 
--- 6. NẠP DỮ LIỆU THỰC TẾ BAN ĐẦU CHO ANH HẢI (L7SEA)
+-- 6. NẠP DỮ LIỆU THỰC TẾ BAN ĐẦU CHO Nhà Đầu Tư VIP
 INSERT INTO public.portfolios (id, account_name, account_number, sub_account, cash, receiving_cash, margin_debt, total_equity, total_profit_loss)
-VALUES ('default', 'L7Sea', '001C888999', '06', 0, 0, 6898107, 7551893, -1465943)
+VALUES ('default', 'VIP Trader', '001C888999', '06', 0, 0, 6898107, 7551893, -1465943)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.positions (symbol, total_quantity, available_quantity, t1_quantity, t2_quantity, avg_price, market_price, market_value, unrealized_pnl, unrealized_pnl_pct)

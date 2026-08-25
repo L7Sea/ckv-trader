@@ -6,7 +6,7 @@ import type { LopThem } from '@/lib/capyMemeSpec';
 import type { KieuAo } from '@/lib/capyBoDo';
 
 /* ═══════════════════════════════════════════════════════════════
-   BÉ CAPY CHUẨN GỐC — DỰA 100% THEO ẢNH GỐC CỦA ANH HẢI (L7Sea).
+   BÉ CAPY CHUẨN GỐC — DỰA 100% THEO ẢNH GỐC CỦA ANH HẢI (VIP Trader).
    
    ĐẶC TRƯNG NHẬN DIỆN:
      1. ĐẦU hình ổ bánh mì dẹt ngang, má phính bầu bĩnh.

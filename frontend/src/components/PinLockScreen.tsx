@@ -49,7 +49,7 @@ export const PinLockScreen: React.FC = () => {
           <p className="text-xs text-slate-400 mt-1">
             Ứng dụng đang được khóa bảo vệ. Nhập mã PIN để mở khóa.
           </p>
-          <p className="text-[11px] font-mono text-emerald-400 mt-0.5">Tài khoản: {user?.name || 'L7Sea'}</p>
+          <p className="text-[11px] font-mono text-emerald-400 mt-0.5">Tài khoản: {user?.name || 'VIP Trader'}</p>
         </div>
 
         {/* PIN Mask Dots */}

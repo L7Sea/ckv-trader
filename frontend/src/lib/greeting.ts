@@ -96,7 +96,7 @@ export function setGreetingStyle(style: GreetingStyle): void {
   } catch {}
 }
 
-export function getSmartGreeting(name = 'L7Sea'): string {
+export function getSmartGreeting(name = 'VIP Trader'): string {
   const style = getGreetingStyle();
   const buoi = getBuoiHienTai();
   const list = TIME_GREETINGS[style][buoi] || TIME_GREETINGS.vui.sang;

@@ -30,7 +30,7 @@
   - Hàng T+2 $\rightarrow$ Hàng T+1.
   - Tiền chờ về $\rightarrow$ Tiền mặt khả dụng.
 
-### 2. Quản Trị Vị Thế Thực Tế (Anh Hải - L7Sea)
+### 2. Quản Trị Vị Thế Thực Tế (Anh Hải - VIP Trader)
 - **Cổ phiếu trọng tâm:** 1,000 CP TPB (Giá vốn: 15.918đ, Thị giá: 14.450đ).
 - **Vốn tự có thực tế (NAV):** 7.551.893 đ (52.3%).
 - **Vốn vay Margin DNSE:** 6.898.107 đ (47.7%).
