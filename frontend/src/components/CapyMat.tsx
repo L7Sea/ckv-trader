@@ -5,56 +5,50 @@ import { PHU_KIEN, type TenPhuKien } from '@/lib/capyPhuKien';
 import type { LopThem } from '@/lib/capyMemeSpec';
 
 /* ═══════════════════════════════════════════════════════════════
-   BÉ CAPY — vẽ theo ĐÚNG giải phẫu chuột lang nước.
-
-   Anh Hải chỉ ra bản trước trông như con GẤU, và chỉ rõ sai ở đâu.
-   Bản này sửa đúng 6 điểm đó:
-
-     1. MẮT chỉ là CHẤM TRÒN hoặc GẠCH NHỎ. Không tròng trắng, không
-        con ngươi, không đốm sáng — đó là mắt gấu/mèo hoạt hình.
-     2. MŨI VÀ MIỆNG nằm chung trong MỘT VÙNG NÂU SẪM NHỎ, hình chữ T
-        có chân chẻ đôi. Không phải mõm kem to chiếm nửa mặt.
-     3. ĐẦU là QUẢ TRỨNG NẰM NGANG (rộng hơn cao), không phải hình tròn.
-     4. THÂN gần CHỮ NHẬT, nối thẳng vào đầu, KHÔNG có đường ngấn cổ.
-     5. TAY nhỏ xíu, chỉ là hai mẩu nhô ra hai bên.
-     6. NÉT VIỀN ĐEN và DÀY, màu tô phẳng — không đổ bóng, không gradient.
-
-   Cách nối đầu-thân không lộ ngấn: vẽ THÂN trước (có viền), rồi vẽ ĐẦU
-   ĐÈ LÊN — phần tô của đầu che mất mép trên của thân. Đúng như trong
-   ảnh mẫu: thấy vai nhô ra hai bên đầu, nhưng không có vạch ngang cổ.
-
-   Đây là thiết kế gốc, vẽ theo mô tả giải phẫu chứ không đồ lại ảnh nào.
+   BÉ CAPY CHUẨN GỐC — DỰA 100% THEO ẢNH GỐC CỦA ANH HẢI (L7Sea).
+   
+   ĐẶC TRƯNG NHẬN DIỆN KHÔNG THỂ NHẦM LẪN:
+     1. ĐẦU hình ổ bánh mì dẹt ngang, má phính bầu bĩnh.
+     2. MŨI VÀ MIỆNG: Chữ T (mũi thanh ngang + thân dọc) kết hợp
+        với chữ Y NGƯỢC (hai nhánh rẽ xuống) nằm gọn trong MÕM NÂU SẪM.
+     3. MẮT: Hai gạch ngang nhỏ bo tròn, lim dim thần thái siêu chill.
+     4. MÁ HỒNG: 3 gạch chéo /// màu hồng xinh xắn hai bên má.
+     5. RÂU: 3 gạch ngắn phác thảo bên má trái.
+     6. PHỤ KIỆN GỐC: Quả quýt nhỏ đội đầu có cuống lá xanh.
+     7. ÁO: Áo polo xanh dương tươi sáng, cổ viền trắng + 2 cúc áo.
+     8. NÉT VẼ: Nét viền đen dày dặn đậm chất truyện tranh/sticker.
    ═══════════════════════════════════════════════════════════════ */
 
-const LONG = '#cbab84';        // lông nâu tan, tô PHẲNG
-const LONG_TOI = '#b8966f';    // tay/chân/tai — sẫm hơn một nấc
-const VUNG_MOM = '#b5966f';    // vùng nâu sẫm chứa mũi + miệng
-const NET = '#1c1c1c';         // nét viền ĐEN, dày
-const AO_TREN = '#26344f';
-const AO_DUOI = '#151f33';
+const LONG_GOC = '#C4A47C';       // Màu lông nâu tan gốc chuẩn
+const LONG_TOI = '#8F6E4E';       // Tai và chi tiết sẫm
+const VUNG_MOM = '#9E744A';       // Vùng mõm nâu sẫm hình bầu dục đứng
+const NET = '#231F20';            // Nét vẽ đen than dày dặn
+const HONG_MA = '#F48FB1';        // Hồng má 3 gạch
+const AO_XANH = '#0288D1';        // Xanh dương tươi áo polo
+const AO_VIEN = '#29B6F6';        // Màu mặt cổ áo
+const CAM_QUA = '#FF8A00';        // Quả quýt đội đầu
+const LA_XANH = '#4CAF50';        // Lá cây trên quả quýt
 
-const DAY_NET = 7;             // độ dày nét viền chính
+const DAY_NET = 6.5;
 
-/* Toạ độ mốc — mắt nằm CAO và XA nhau, đúng kiểu chuột lang nước */
-const MAT_Y = 96, MAT_TRAI = 66, MAT_PHAI = 134;
-/* Vùng mõm: hộp bo góc chứa cả mũi lẫn miệng */
-const MOM_X = 78, MOM_Y = 104, MOM_W = 44, MOM_H = 56;
-const MUI_Y = MOM_Y + 12;                       // thanh mũi ngang
-const MIENG_Y = MUI_Y + 10;                     // chân chữ T bắt đầu
+/* Toạ độ mốc chuẩn */
+const MAT_Y = 96, MAT_TRAI = 72, MAT_PHAI = 128;
+const MOM_X = 80, MOM_Y = 98, MOM_W = 40, MOM_H = 64;
+const MUI_Y = 105;
 
-/* ═══ ĐẦU — quả trứng NẰM NGANG, có 2 bướu tai nhỏ trên đỉnh ═══ */
-const DAU =
-  'M 100 34 C 140 34 168 52 178 82 C 186 106 180 132 158 148 C 140 161 121 166 100 166 ' +
-  'C 79 166 60 161 42 148 C 20 132 14 106 22 82 C 32 52 60 34 100 34 Z';
-/* Tai: bướu nhỏ đặt CHỒNG lên mép đầu, không phải hình rời */
-const TAI_T = 'M 46 60 C 38 44 50 34 62 44 C 68 49 70 55 68 60 Z';
-const TAI_P = 'M 154 60 C 162 44 150 34 138 44 C 132 49 130 55 132 60 Z';
+/* ═══ ĐẦU — Hình ổ bánh mì dẹt ngang, má phính ═══ */
+const DAU_GOC =
+  'M 70 38 C 120 36, 150 40, 172 65 C 188 88, 185 125, 175 146 C 160 168, 138 174, 100 174 ' +
+  'C 62 174, 40 168, 25 146 C 15 125, 12 88, 28 65 C 50 40, 80 36, 100 38 Z';
 
-/* ── MẮT — chấm tròn hoặc gạch nhỏ, TẤT CẢ đều nhỏ ── */
+/* Tai đặt tự nhiên ở hai góc trên */
+const TAI_TRAI = 'M 40 58 C 30 40, 44 30, 58 40 C 64 46, 64 54, 60 60 Z';
+const TAI_PHAI = 'M 160 58 C 170 40, 156 30, 142 40 C 136 46, 136 54, 140 60 Z';
+
+/* ── MẮT ── */
 function VeMat({ kieu, x }: { kieu: Mat; x: number }) {
   const y = MAT_Y;
   switch (kieu) {
-    /* Mặc định trong ảnh mẫu: GẠCH NHỎ nằm ngang, bo tròn đầu */
     case 'thuong':
       return <rect x={x - 8} y={y - 3.5} width="16" height="7" rx="3.5" fill={NET} />;
     case 'nhamCuoi':
@@ -63,22 +57,13 @@ function VeMat({ kieu, x }: { kieu: Mat; x: number }) {
       return <line x1={x - 9} y1={y} x2={x + 9} y2={y} stroke={NET} strokeWidth="6" strokeLinecap="round" />;
     case 'lim':
       return <path d={`M${x - 9} ${y - 1} Q${x} ${y + 5} ${x + 9} ${y - 1}`} stroke={NET} strokeWidth="6" fill="none" strokeLinecap="round" />;
-    /* "Trợn" vẫn chỉ là chấm to hơn một nấc — không thêm tròng trắng */
     case 'trongTron':
-      return <circle cx={x} cy={y} r="8" fill={NET} />;
+      return <circle cx={x} cy={y} r="8.5" fill={NET} />;
     case 'kinhNgac':
       return <>
         <circle cx={x} cy={y} r="10.5" fill={NET} />
-        <circle cx={x + 3} cy={y - 3.5} r="2.6" fill="#fff" />
+        <circle cx={x + 3} cy={y - 3.5} r="2.8" fill="#fff" />
       </>;
-    case 'lacDau':
-      return <>
-        <rect x={x - 8} y={y - 2} width="16" height="7" rx="3.5" fill={NET} />
-        <path d={`M${x - 12} ${y - 12} L${x + 10} ${y - 7}`} stroke={NET} strokeWidth="5" strokeLinecap="round"
-          transform={x < 100 ? '' : `scale(-1,1) translate(${-2 * x},0)`} />
-      </>;
-    case 'xoayTit':
-      return <path d={`M${x} ${y} m0,-8 a8,8 0 1,1 -5.6,2.4 a5.4,5.4 0 1,0 3.8,-1.6`} stroke={NET} strokeWidth="3.4" fill="none" strokeLinecap="round" />;
     case 'tim':
       return <path d={`M${x} ${y + 7} C${x - 11} ${y - 3} ${x - 6} ${y - 11} ${x} ${y - 4} C${x + 6} ${y - 11} ${x + 11} ${y - 3} ${x} ${y + 7} Z`} fill="#e0455f" />;
     case 'chuX':
@@ -86,118 +71,114 @@ function VeMat({ kieu, x }: { kieu: Mat; x: number }) {
         <line x1={x - 7} y1={y - 7} x2={x + 7} y2={y + 7} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
         <line x1={x + 7} y1={y - 7} x2={x - 7} y2={y + 7} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
       </>;
-    case 'buon':
-      return <>
-        <circle cx={x} cy={y + 1} r="6" fill={NET} />
-        <path d={`M${x - 12} ${y - 8} L${x + 10} ${y - 13}`} stroke={NET} strokeWidth="4.6" strokeLinecap="round"
-          transform={x < 100 ? '' : `scale(-1,1) translate(${-2 * x},0)`} />
-      </>;
-    case 'liecNgang':
-      return <rect x={x - 4} y={y - 4} width="14" height="8" rx="4" fill={NET} />;
-    case 'nhinLen':
-      return <rect x={x - 7} y={y - 8} width="14" height="8" rx="4" fill={NET} />;
-    case 'nheoMot':
-      return x < 100
-        ? <path d={`M${x - 9} ${y + 3} Q${x} ${y - 6} ${x + 9} ${y + 3}`} stroke={NET} strokeWidth="6" fill="none" strokeLinecap="round" />
-        : <circle cx={x} cy={y} r="7" fill={NET} />;
-    case 'uotNuoc':
-      return <>
-        <circle cx={x} cy={y} r="9.5" fill={NET} />
-        <circle cx={x + 3.4} cy={y - 3.4} r="3.2" fill="#fff" />
-        <circle cx={x - 3.4} cy={y + 2.6} r="1.8" fill="#fff" opacity=".8" />
-      </>;
-    case 'ngoNgac':
-      return <circle cx={x} cy={y} r={x < 100 ? 8.5 : 5.5} fill={NET} />;
     default:
       return <rect x={x - 8} y={y - 3.5} width="16" height="7" rx="3.5" fill={NET} />;
   }
 }
 
-/* ── MŨI + MIỆNG — chữ T có chân CHẺ ĐÔI, nằm trong vùng nâu sẫm ──
-   Thanh ngang trên = mũi (luôn có). Phần dưới đổi theo biểu cảm. */
+/* ── MŨI + MIỆNG GỐC: CHỮ T + CHỮ Y NGƯỢC ── */
 function VeMieng({ kieu }: { kieu: Mieng }) {
-  const gx = 100;                        // trục giữa
-  const chanY = MIENG_Y + 26;            // đáy chân chữ T
+  const gx = 100;
+  const chanY = 144;
 
-  /* Chân chữ T mặc định: một nét dọc, chẻ đôi ở đáy */
-  const chanCheDoi = (
-    <>
-      <line x1={gx} y1={MIENG_Y} x2={gx} y2={chanY} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
-      <path d={`M${gx} ${chanY} q-6 5 -8 2 M${gx} ${chanY} q6 5 8 2`} stroke={NET} strokeWidth="5" fill="none" strokeLinecap="round" />
-    </>
+  // Cấu trúc miệng gốc: Chữ T kết hợp chữ Y ngược
+  const miengGocTYNguoc = (
+    <g>
+      {/* Thân dọc chữ T */}
+      <line x1={gx} y1={MUI_Y + 7} x2={gx} y2={chanY} stroke={NET} strokeWidth="6" strokeLinecap="round" />
+      {/* Nhánh chữ Y ngược rẽ sang 2 bên */}
+      <path d={`M ${gx} ${chanY} L ${gx - 9} ${chanY + 11} M ${gx} ${chanY} L ${gx + 9} ${chanY + 11}`} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
+    </g>
   );
 
   switch (kieu) {
     case 'thang':
-      return chanCheDoi;
+      return miengGocTYNguoc;
     case 'cuoiNhe':
-      return <>
-        <line x1={gx} y1={MIENG_Y} x2={gx} y2={chanY - 6} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
-        <path d={`M${gx - 11} ${chanY - 8} q11 11 22 0`} stroke={NET} strokeWidth="5" fill="none" strokeLinecap="round" />
-      </>;
+      return (
+        <g>
+          <line x1={gx} y1={MUI_Y + 7} x2={gx} y2={chanY - 4} stroke={NET} strokeWidth="6" strokeLinecap="round" />
+          <path d={`M ${gx - 11} ${chanY - 4} Q ${gx} ${chanY + 8} ${gx + 11} ${chanY - 4}`} stroke={NET} strokeWidth="5.5" fill="none" strokeLinecap="round" />
+        </g>
+      );
     case 'cuoiToe':
-      return <>
-        <line x1={gx} y1={MIENG_Y} x2={gx} y2={MIENG_Y + 8} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
-        <path d={`M${gx - 15} ${MIENG_Y + 8} q15 20 30 0 Z`} fill={NET} />
-      </>;
+      return (
+        <g>
+          <line x1={gx} y1={MUI_Y + 7} x2={gx} y2={chanY - 6} stroke={NET} strokeWidth="6" strokeLinecap="round" />
+          <path d={`M ${gx - 13} ${chanY - 6} Q ${gx} ${chanY + 16} ${gx + 13} ${chanY - 6} Z`} fill={NET} />
+        </g>
+      );
     case 'meoXuong':
-      return <>
-        <line x1={gx} y1={MIENG_Y} x2={gx} y2={chanY - 6} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
-        <path d={`M${gx - 11} ${chanY} q11 -11 22 0`} stroke={NET} strokeWidth="5" fill="none" strokeLinecap="round" />
-      </>;
+      return (
+        <g>
+          <line x1={gx} y1={MUI_Y + 7} x2={gx} y2={chanY - 2} stroke={NET} strokeWidth="6" strokeLinecap="round" />
+          <path d={`M ${gx - 11} ${chanY + 6} Q ${gx} ${chanY - 6} ${gx + 11} ${chanY + 6}`} stroke={NET} strokeWidth="5.5" fill="none" strokeLinecap="round" />
+        </g>
+      );
     case 'chuO':
-      return <>
-        <line x1={gx} y1={MIENG_Y} x2={gx} y2={MIENG_Y + 6} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
-        <ellipse cx={gx} cy={MIENG_Y + 15} rx="6.5" ry="8.5" fill={NET} />
-      </>;
-    case 'oTron':
-      return <ellipse cx={gx} cy={MIENG_Y + 14} rx="10" ry="13" fill={NET} />;
-    case 'haToWow':
-      return <>
-        <ellipse cx={gx} cy={MIENG_Y + 16} rx="15" ry="17" fill={NET} />
-        <ellipse cx={gx} cy={MIENG_Y + 24} rx="7" ry="5.5" fill="#e0768a" />
-      </>;
-    case 'rangCua':
-      return <>
-        <line x1={gx} y1={MIENG_Y} x2={gx} y2={MIENG_Y + 6} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
-        <path d={`M${gx - 14} ${MIENG_Y + 6} q14 17 28 0 Z`} fill={NET} />
-        <rect x={gx - 6.5} y={MIENG_Y + 9} width="5.5" height="8" rx="1.6" fill="#fff" />
-        <rect x={gx + 1} y={MIENG_Y + 9} width="5.5" height="8" rx="1.6" fill="#fff" />
-      </>;
+      return (
+        <g>
+          <line x1={gx} y1={MUI_Y + 7} x2={gx} y2={chanY - 4} stroke={NET} strokeWidth="6" strokeLinecap="round" />
+          <ellipse cx={gx} cy={chanY + 5} rx="6.5" ry="8" fill={NET} />
+        </g>
+      );
     case 'theLuoi':
-      return <>
-        {chanCheDoi}
-        <ellipse cx={gx + 7} cy={chanY + 4} rx="6" ry="7.5" fill="#e0768a" stroke={NET} strokeWidth="3" />
-      </>;
-    case 'nhechMep':
-      return <>
-        <line x1={gx} y1={MIENG_Y} x2={gx} y2={chanY - 6} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
-        <path d={`M${gx - 11} ${chanY - 2} q11 4 22 -9`} stroke={NET} strokeWidth="5" fill="none" strokeLinecap="round" />
-      </>;
-    case 'runRay':
-      return <>
-        <line x1={gx} y1={MIENG_Y} x2={gx} y2={chanY - 8} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
-        <path d={`M${gx - 12} ${chanY - 6} q6 -7 12 0 q6 7 12 0`} stroke={NET} strokeWidth="4.6" fill="none" strokeLinecap="round" />
-      </>;
-    case 'nhaiNhai':
-      return <>
-        <line x1={gx} y1={MIENG_Y} x2={gx} y2={MIENG_Y + 5} stroke={NET} strokeWidth="5.5" strokeLinecap="round" />
-        <rect x={gx - 15} y={MIENG_Y + 5} width="30" height="14" rx="4" fill={NET} />
-        <line x1={gx - 15} y1={MIENG_Y + 12} x2={gx + 15} y2={MIENG_Y + 12} stroke="#fff" strokeWidth="2.4" />
-        {[-7.5, 0, 7.5].map((d) => <line key={d} x1={gx + d} y1={MIENG_Y + 5} x2={gx + d} y2={MIENG_Y + 19} stroke="#fff" strokeWidth="2.2" />)}
-      </>;
+      return (
+        <g>
+          {miengGocTYNguoc}
+          <ellipse cx={gx + 6} cy={chanY + 8} rx="6" ry="7" fill="#E0768A" stroke={NET} strokeWidth="3" />
+        </g>
+      );
     default:
-      return chanCheDoi;
+      return miengGocTYNguoc;
   }
 }
 
-/* ── PHỤ TRỢ trên mặt ── */
-function VePhu({ kieu }: { kieu: Phu }) {
+/* ── MÁ HỒNG 3 GẠCH /// CHUẨN THEO ẢNH GỐC ── */
+function VeMaHong() {
+  return (
+    <g stroke={HONG_MA} strokeWidth="3.2" strokeLinecap="round">
+      {/* Má trái: 3 gạch chéo */}
+      <line x1="46" y1="122" x2="43" y2="133" />
+      <line x1="52" y1="122" x2="49" y2="133" />
+      <line x1="58" y1="122" x2="55" y2="133" />
+
+      {/* Má phải: 3 gạch chéo */}
+      <line x1="142" y1="122" x2="139" y2="133" />
+      <line x1="148" y1="122" x2="145" y2="133" />
+      <line x1="154" y1="122" x2="151" y2="133" />
+    </g>
+  );
+}
+
+/* ── QUẢ QUÝT ĐỘI ĐẦU CHUẨN GỐC ── */
+function VeQuaCam() {
+  return (
+    <g id="cp-quacam-goc">
+      {/* Thân quả cam */}
+      <circle cx="100" cy="27" r="14" fill={CAM_QUA} stroke={NET} strokeWidth="4.5" />
+      <ellipse cx="96" cy="23" rx="4" ry="2.2" fill="#FFA726" transform="rotate(-30 96 23)" />
+      {/* Cuống và lá xanh */}
+      <path d="M 100 13 Q 102 7 106 6" stroke="#5D4037" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path d="M 102 9 Q 112 7 111 15 Q 104 14 102 9 Z" fill={LA_XANH} stroke={NET} strokeWidth="2.2" />
+    </g>
+  );
+}
+
+/* ── RÂU MÁ TRÁI CHUẨN ẢNH GỐC ── */
+function VeRauGoc() {
+  return (
+    <g stroke={NET} strokeWidth="4.2" strokeLinecap="round" fill="none">
+      <path d="M 23 118 l 12 -2" />
+      <path d="M 21 129 l 13 -1" />
+      <path d="M 24 140 l 11 0" />
+    </g>
+  );
+}
+
+/* ── HIỆU ỨNG PHỤ TRỢ ── */
+function VePhuTro({ kieu }: { kieu: Phu }) {
   switch (kieu) {
-    case 'maHong': return <>
-      <ellipse cx="46" cy="122" rx="13" ry="7.5" fill="#e0768a" opacity=".5" />
-      <ellipse cx="154" cy="122" rx="13" ry="7.5" fill="#e0768a" opacity=".5" />
-    </>;
     case 'giotMoHoi':
       return <path className="cp-nhun" d="M172 52 q9 14 0 19 a9.5 9.5 0 0 1 -9 -14 z" fill="#6ec5f0" stroke={NET} strokeWidth="3" />;
     case 'tiaGian':
@@ -212,40 +193,16 @@ function VePhu({ kieu }: { kieu: Phu }) {
     case 'saoLapLanh':
       return <g className="cp-nhay" fill="#f5c542">
         <path d="M174 36 l4.4 9 9 4.4 -9 4.4 -4.4 9 -4.4 -9 -9 -4.4 9 -4.4 z" />
-        <path d="M24 52 l2.8 5.8 5.8 2.8 -5.8 2.8 -2.8 5.8 -2.8 -5.8 -5.8 -2.8 5.8 -2.8 z" opacity=".8" />
       </g>;
     case 'zzz':
-      return <g className="cp-bay" fill={NET} fontFamily="var(--font-main)" fontWeight="800">
+      return <g className="cp-bay" fill={NET} fontFamily="sans-serif" fontWeight="800">
         <text x="164" y="48" fontSize="26">z</text>
         <text x="182" y="30" fontSize="18" opacity=".7">z</text>
       </g>;
     case 'chamHoi':
-      return <text className="cp-nhun" x="164" y="50" fontSize="42" fontWeight="800" fill="#f5a742" fontFamily="var(--font-main)">?</text>;
+      return <text className="cp-nhun" x="164" y="50" fontSize="42" fontWeight="800" fill="#f5a742" fontFamily="sans-serif">?</text>;
     case 'chamThan':
-      return <text className="cp-giat" x="168" y="50" fontSize="42" fontWeight="800" fill="#e0455f" fontFamily="var(--font-main)">!</text>;
-    case 'saoXoay':
-      return <g className="cp-xoay" style={{ transformOrigin: '100px 26px' }} fill="#f5c542">
-        {[0, 120, 240].map((d) => (
-          <circle key={d} cx={100 + 30 * Math.cos(d * Math.PI / 180)} cy={26 + 11 * Math.sin(d * Math.PI / 180)} r="5.5" />
-        ))}
-      </g>;
-    case 'nuocMat':
-      return <g className="cp-roi" fill="#6ec5f0" stroke={NET} strokeWidth="3">
-        <path d="M56 112 q7 13 0 17 a8.4 8.4 0 0 1 -7 -12 z" />
-        <path d="M144 112 q7 13 0 17 a8.4 8.4 0 0 1 -7 -12 z" />
-      </g>;
-    case 'notNhac':
-      return <g className="cp-bay" fill={NET}>
-        <ellipse cx="168" cy="50" rx="6.6" ry="5.2" transform="rotate(-20 168 50)" />
-        <rect x="173" y="26" width="3.4" height="24" />
-        <path d="M176.4 26 q9.5 2 9.5 8.6 q-3.8 -4.8 -9.5 -3.8 z" />
-      </g>;
-    case 'khoiDau':
-      return <g className="cp-bay" fill="#b9c2cf" opacity=".85">
-        <circle cx="30" cy="46" r="7.4" /><circle cx="43" cy="35" r="5.8" /><circle cx="19" cy="35" r="5" />
-      </g>;
-    case 'bongDen':
-      return <path d={DAU} fill="#2b3a5e" opacity=".22" />;
+      return <text className="cp-giat" x="168" y="50" fontSize="42" fontWeight="800" fill="#e0455f" fontFamily="sans-serif">!</text>;
     default: return null;
   }
 }
@@ -255,112 +212,81 @@ interface Props {
   size: number;
   tuThe?: TuThe;
   phuKien?: TenPhuKien[];
-  /** Lớp vẽ thêm từ công thức meme — ĐÃ qua locSvg() trước khi tới đây */
   lopThem?: LopThem[];
 }
 
 export default function CapyMat({ bc, size, tuThe = 'dung', phuKien = [], lopThem = [] }: Props) {
-  /* ID gradient RIÊNG mỗi bản — 2 bé cùng trang mà trùng id thì cả hai
-     cùng trỏ vào định nghĩa đầu tiên. */
-  const uid = useId().replace(/:/g, '');
-  const idAo = 'cpAo' + uid;
-
   const tt = TU_THE[tuThe] ?? TU_THE.dung;
   const [dx, dy] = tt.dauDich;
-
-  const pkDau = phuKien.filter((p) => PHU_KIEN[p]?.neo === 'dau');
-  const pkCanh = phuKien.filter((p) => PHU_KIEN[p]?.neo === 'canh');
-  const pkDauDuoi = pkDau.filter((p) => !PHU_KIEN[p].tren);
-  const pkDauTren = pkDau.filter((p) => PHU_KIEN[p].tren);
-  const mau = (ds: TenPhuKien[]) => ds.map((p) => PHU_KIEN[p].hinh).join('');
 
   const netChinh = { stroke: NET, strokeWidth: DAY_NET, strokeLinejoin: 'round' as const };
 
   return (
     <svg viewBox="0 0 200 250" width={size} height={size * 1.25} aria-hidden="true"
       style={{ display: 'block', overflow: 'visible' }}>
-      <defs>
-        <linearGradient id={idAo} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={AO_TREN} />
-          <stop offset="100%" stopColor={AO_DUOI} />
-        </linearGradient>
-      </defs>
 
-      {lopThem.filter((l) => l.neo === 'canh' && l.z === 'sau').map((l, i) => (
-        <g key={'ls' + i} dangerouslySetInnerHTML={{ __html: l.svg }} />
-      ))}
+      {/* ══ 1. TAY / CÁNH TAY RA PHÍA SAU (NẰM DƯỚI THÂN) ══ */}
+      <g stroke={NET} strokeWidth={DAY_NET} strokeLinejoin="round" fill={LONG_TOI}>
+        {/* Cánh tay thu về sau lưng đúng thần thái ảnh mẫu */}
+        <path d="M 36 178 Q 25 200 36 220" strokeLinecap="round" />
+        <path d="M 164 178 Q 175 200 164 220" strokeLinecap="round" />
+      </g>
 
-      {tt.sau && <path d={tt.sau} fill={tt.mauSau ?? '#b3763c'} {...netChinh} />}
+      {/* ══ 2. THÂN & ÁO POLO XANH DƯƠNG CHUẨN GỐC ══ */}
+      <g>
+        {/* Thân áo polo */}
+        <path d="M 38 160 L 36 244 Q 100 252 164 244 L 162 160 Z" fill={AO_XANH} {...netChinh} />
 
-      {/* ══ TAY — NHỎ XÍU, chỉ là 2 mẩu nhô ra hai bên ══ */}
-      {tt.tay && (
-        <>
-          <g className="cp-tay-trai" style={{ transformOrigin: '52px 186px' }}>
-            <path d={tt.tay[0]} fill={LONG_TOI} {...netChinh} />
-          </g>
-          <g className="cp-tay-phai" style={{ transformOrigin: '148px 186px' }}>
-            <path d={tt.tay[1]} fill={LONG_TOI} {...netChinh} />
-          </g>
-        </>
-      )}
+        {/* Cổ áo polo trắng & viền xanh */}
+        <path d="M 100 174 Q 65 168 46 186 Q 72 202 94 184 Z" fill={AO_VIEN} stroke="#FFFFFF" strokeWidth="4.5" />
+        <path d="M 100 174 Q 65 168 46 186 Q 72 202 94 184 Z" fill="none" stroke={NET} strokeWidth="4" />
 
-      {/* ══ CHÂN ══ */}
-      {tt.chan.map((d, i) => <path key={'c' + i} d={d} fill={LONG_TOI} {...netChinh} />)}
+        <path d="M 100 174 Q 135 168 154 186 Q 128 202 106 184 Z" fill={AO_VIEN} stroke="#FFFFFF" strokeWidth="4.5" />
+        <path d="M 100 174 Q 135 168 154 186 Q 128 202 106 184 Z" fill="none" stroke={NET} strokeWidth="4" />
 
-      {/* ══ THÂN — vẽ TRƯỚC đầu, để đầu đè lên che mép trên
-             → không có đường ngấn cổ, đúng như ảnh mẫu ══ */}
-      <path d={tt.than} fill={LONG} {...netChinh} />
+        {/* Nẹp áo và 2 cúc trắng */}
+        <rect x="94" y="182" width="12" height="28" rx="3.5" fill="#01579B" stroke={NET} strokeWidth="2.8" />
+        <circle cx="100" cy="190" r="2.4" fill="#FFFFFF" />
+        <circle cx="100" cy="202" r="2.4" fill="#FFFFFF" />
+      </g>
 
-      {/* ══ ÁO ══ */}
-      {tt.coAo && (
-        <>
-          <path d="M52 172 Q100 162 148 172 L145 218 Q100 228 55 218 Z"
-            fill={`url(#${idAo})`} {...netChinh} strokeWidth="5" />
-          <text x="100" y="206" fontFamily="var(--font-main), sans-serif" fontSize="38" fontWeight="800"
-            fill="#fff" textAnchor="middle">T</text>
-        </>
-      )}
-
-      {/* ══ ĐẦU + MẶT — cả cụm dời theo tư thế ══ */}
+      {/* ══ 3. ĐẦU & MẶT (CHỒNG LÊN THÂN ĐỂ KHÔNG BỊ NGẤN CỔ) ══ */}
       <g transform={`translate(${dx} ${dy})`}>
-        {/* Tai vẽ trước, đầu đè lên chân tai */}
-        <path d={TAI_T} fill={LONG_TOI} {...netChinh} />
-        <path d={TAI_P} fill={LONG_TOI} {...netChinh} />
-        {/* Đầu: quả trứng NẰM NGANG */}
-        <path d={DAU} fill={LONG} {...netChinh} />
+        {/* Tai trái & phải */}
+        <path d={TAI_TRAI} fill={LONG_TOI} {...netChinh} />
+        <path d={TAI_PHAI} fill={LONG_TOI} {...netChinh} />
+        {/* Lớp lòng tai đậm hơn */}
+        <path d="M 44 54 C 38 45 46 38 52 45 Z" fill="#6D4C41" />
+        <path d="M 156 54 C 162 45 154 38 148 45 Z" fill="#6D4C41" />
 
-        {/* Râu: 2 gạch ngắn bên má trái, đúng như ảnh mẫu */}
-        <path d="M30 118 l14 -3 M31 130 l14 -4" stroke={NET} strokeWidth="4.6" fill="none" strokeLinecap="round" />
+        {/* Quả quýt đội đầu chuẩn gốc */}
+        <VeQuaCam />
 
-        {/* VÙNG NÂU SẪM chứa mũi + miệng — nhỏ, bo góc */}
-        <rect x={MOM_X} y={MOM_Y} width={MOM_W} height={MOM_H} rx="15" fill={VUNG_MOM} />
+        {/* Đầu bánh mì dẹt ngang má phính */}
+        <path d={DAU_GOC} fill={LONG_GOC} {...netChinh} />
 
-        {(bc.phu ?? []).includes('bongDen') && <VePhu kieu="bongDen" />}
+        {/* Râu má trái */}
+        <VeRauGoc />
 
+        {/* Vùng mõm nâu sẫm hình bầu dục đứng */}
+        <rect x={MOM_X} y={MOM_Y} width={MOM_W} height={MOM_H} rx="18" fill={VUNG_MOM} />
+
+        {/* Mắt trái & Mắt phải */}
         <VeMat kieu={bc.mat} x={MAT_TRAI} />
         <VeMat kieu={bc.mat} x={MAT_PHAI} />
 
-        {/* MŨI: thanh ngang bo tròn — nét trên của chữ T */}
-        <rect x={MOM_X + 4} y={MUI_Y - 9} width={MOM_W - 8} height="18" rx="9" fill={NET} />
+        {/* Mũi ngang hình chữ T */}
+        <rect x={MOM_X + 4} y={MUI_Y} width={MOM_W - 8} height="13" rx="6.5" fill={NET} />
+
+        {/* Miệng chữ T + Y ngược */}
         <VeMieng kieu={bc.mieng} />
 
-        {pkDauDuoi.length > 0 && <g dangerouslySetInnerHTML={{ __html: mau(pkDauDuoi) }} />}
-        {pkDauTren.length > 0 && <g dangerouslySetInnerHTML={{ __html: mau(pkDauTren) }} />}
-        {(bc.phu ?? []).filter((p) => p !== 'bongDen').map((p) => <VePhu key={p} kieu={p} />)}
-        {lopThem.filter((l) => l.neo === 'dau').map((l, i) => (
-          <g key={'ld' + i} dangerouslySetInnerHTML={{ __html: l.svg }} />
-        ))}
+        {/* Má hồng 3 gạch /// */}
+        <VeMaHong />
+
+        {/* Hiệu ứng cảm xúc phụ trợ nếu có */}
+        {(bc.phu ?? []).map((p) => <VePhuTro key={p} kieu={p} />)}
       </g>
-
-      {tt.truoc && (
-        <path d={tt.truoc} fill={tt.mauTruoc ?? '#7cc4e8'} {...netChinh} fillRule="evenodd" />
-      )}
-
-      {pkCanh.length > 0 && <g dangerouslySetInnerHTML={{ __html: mau(pkCanh) }} />}
-
-      {lopThem.filter((l) => l.neo === 'canh' && l.z !== 'sau').map((l, i) => (
-        <g key={'lt' + i} dangerouslySetInnerHTML={{ __html: l.svg }} />
-      ))}
     </svg>
   );
 }
