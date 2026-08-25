@@ -75,6 +75,9 @@ Triết lý cốt lõi: **Xác thực bằng sự thật khách quan (Facts over
 10. **akiship** (Lenh: /akiship):
    - Quy trinh Release san pham tron goi: Tu dong chay toan bo checklist kiem tra an toan truoc khi dong goi phat hanh du an.
 
+11. **smart-md-cleaner** (Tự động kích hoạt khi có tài liệu thô / PDF / Word / Excel - Lệnh: `node scripts/smart-clean-md.cjs <input> [output.md]`):
+   - **Động cơ Smart Clean & Tối ưu hóa Token (chuẩn getMDready offline)**: Tự động loại bỏ Header/Footer lặp lại giữa các trang, xóa số trang rác, nối lại các dòng ngắt vụn, giữ nguyên vẹn Bảng và Heading, giúp tiết kiệm **35% đến 55% chi phí Token** cho AI.
+
 ---
 
 ## 3. BO 5 DINH NGHIA SUBAGENT DOC QUYEN
