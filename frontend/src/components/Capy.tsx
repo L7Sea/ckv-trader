@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { getCapy, type CapyMode } from '@/lib/capyService';
 import { getStyle } from '@/lib/greeting';
-import { bocBieuCam, layThoai, BIEU_CAM, type BieuCam } from '@/lib/capyBieuCam';
+import { bocBieuCam, layThoai, BIEU_CAM, type BieuCam, type Nhom } from '@/lib/capyBieuCam';
 import { buocVatLy, dangBay } from '@/lib/capyVatLy';
 import { layThoaiHanhDong, type HanhDong } from '@/lib/capyThoaiHanhDong';
 import { chonBoDo, type NguCanh } from '@/lib/capyBoDo';
@@ -103,6 +103,7 @@ export default function Capy() {
     const moiDich = () => {
       s.dichX = Math.random() * (window.innerWidth - co);
       s.dichY = Math.random() * (window.innerHeight - co);
+      return { x: s.dichX, y: s.dichY };
     };
     moiDich();
 
@@ -114,17 +115,13 @@ export default function Capy() {
       const maxX = window.innerWidth - co;
       const maxY = window.innerHeight - co;
 
-      if (!s.keo) buocVatLy(s, maxX, maxY, khung, () => ({
-        doiDich: moiDich,
-        ngu: () => { setTrangThai('ngu'); setBieuCam(bocBieuCam(['ngu'])); },
-        thuc: () => { setTrangThai('boi'); setBieuCam(bocBieuCam(['ngacNhien', 'ngoNgac'])); },
-      }));
+      if (!s.keo) buocVatLy(s, maxX, maxY, khung, moiDich);
 
       const dangBayNay = dangBay(s);
       if (bayTruoc && !dangBayNay) {
         setVaCham(true);
         setTimeout(() => setVaCham(false), 420);
-        noi(bocBieuCam(['hoangHot', 'chongMat', 'gian']), 3.2, 'nemXongRoi');
+        noi(bocBieuCam(['so', 'gian', 'dau']), 3.2, 'rot');
       }
       bayTruoc = dangBayNay;
 
@@ -156,7 +153,7 @@ export default function Capy() {
     s.xTruoc = e.clientX; s.yTruoc = e.clientY; s.tTruoc = performance.now();
     s.imLang = 0;
     setTrangThai('keo');
-    noi(bocBieuCam(['hoangHot', 'het', 'ngacNhien']), 2.8, 'biNhat');
+    noi(bocBieuCam(['so', 'gian']), 2.8, 'nhac');
   }
 
   function dangKeo(e: React.PointerEvent) {
@@ -182,7 +179,7 @@ export default function Capy() {
     if (vTong > NGUONG_KEO) {
       setTrangThai('bay');
       s.vXoay = (s.vx * 0.4);
-      noi(bocBieuCam(['het', 'hoangHot']), 2.6, 'biNem');
+      noi(bocBieuCam(['so', 'gian']), 2.6, 'nem');
     } else {
       s.vx = 0; s.vy = 0;
       setTrangThai('boi');
