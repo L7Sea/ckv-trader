@@ -2,8 +2,11 @@ export type TransactionType = 'BUY' | 'SELL' | 'DIVIDEND_CASH' | 'DIVIDEND_SHARE
 
 export type TradeStrategy = 
   | 'BREAKOUT' // Mua vượt đỉnh kháng cự
+  | 'BREAKOUT_ACCUMULATE' // Mua gom khi bứt phá
   | 'PULLBACK_MA20' // Bắt đáy / Chạm hỗ trợ MA20
   | 'ACCUMULATION' // Tích lũy nền giá chặt
+  | 'DCA_VALUE_BUY' // Mua bình quân giá gom vùng hỗ trợ
+  | 'TREND_FOLLOWING' // Bám xu hướng tăng trưởng
   | 'DIVIDEND' // Săn quyền cổ tức
   | 'TAKE_PROFIT' // Chốt lời mục tiêu
   | 'STOP_LOSS' // Cắt lỗ kỷ luật (-5%/-7%)
