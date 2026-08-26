@@ -29,7 +29,7 @@ export const HelpCenterModal: React.FC = () => {
     switchSubAccount
   } = useAuthStore();
 
-  const [activeTab, setActiveTab] = useState<'GUIDE' | 'BROKERAGE' | 'CUSTOM_STOCKS' | 'FAQ'>('GUIDE');
+  const [activeTab, setActiveTab] = useState<'GUIDE' | 'CAPY_TOUR' | 'BROKERAGE' | 'CUSTOM_STOCKS' | 'FAQ'>('GUIDE');
   const [selectedBroker, setSelectedBroker] = useState<string>(user?.brokerage || 'DNSE');
   const [customRate, setCustomRate] = useState<number>(user?.customMarginRate || 11.5);
 
@@ -66,19 +66,19 @@ export const HelpCenterModal: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-white">Trung Tâm Hướng Dẫn & Cẩm Nang Sử Dụng</h3>
+              <h3 className="text-base font-bold text-white">Trung Tâm Cẩm Nang & Hướng Dẫn Sử Dụng</h3>
               <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-mono">
                 Knowledge Base
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Giải đáp cách tùy chỉnh CTCK, giao dịch thuần tiền mặt, thêm mã cổ phiếu lạ & quản trị danh mục
+              Cẩm nang 8 trang, Hướng dẫn Capy Gunny, tùy chỉnh CTCK, giao dịch tiền mặt & mã cổ phiếu lạ
             </p>
           </div>
         </div>
 
-        {/* 4 Tabs Menu */}
-        <div className="grid grid-cols-4 gap-1.5 p-1.5 bg-slate-950 rounded-2xl border border-slate-800 text-xs font-bold shrink-0">
+        {/* 5 Tabs Menu */}
+        <div className="grid grid-cols-5 gap-1 p-1 bg-slate-950 rounded-2xl border border-slate-800 text-[11px] sm:text-xs font-bold shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab('GUIDE')}
@@ -90,12 +90,21 @@ export const HelpCenterModal: React.FC = () => {
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab('CAPY_TOUR')}
+            className={`py-2 px-1 rounded-xl transition text-center truncate ${
+              activeTab === 'CAPY_TOUR' ? 'bg-amber-500 text-slate-950 font-black' : 'text-amber-400/80 hover:text-amber-300'
+            }`}
+          >
+            🐾 HƯỚNG DẪN CAPY
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab('BROKERAGE')}
             className={`py-2 px-1 rounded-xl transition text-center truncate ${
               activeTab === 'BROKERAGE' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
             }`}
           >
-            🏦 CHỌN CTCK & VAY
+            🏦 CHỌN CTCK
           </button>
           <button
             type="button"
@@ -104,7 +113,7 @@ export const HelpCenterModal: React.FC = () => {
               activeTab === 'CUSTOM_STOCKS' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
             }`}
           >
-            🔍 MÃ LẠ & UPCOM
+            🔍 MÃ LẠ
           </button>
           <button
             type="button"
@@ -113,7 +122,7 @@ export const HelpCenterModal: React.FC = () => {
               activeTab === 'FAQ' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
             }`}
           >
-            ❓ HỎI ĐÁP FAQ
+            ❓ FAQ
           </button>
         </div>
 
@@ -142,6 +151,66 @@ export const HelpCenterModal: React.FC = () => {
                   <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-300">
                     💬 <b>Kênh Hỗ Trợ Trực Tuyến:</b> Nhắn tin trực tiếp với Admin bất kỳ lúc nào để nhận giải đáp.
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'CAPY_TOUR' && (
+            <div className="space-y-4">
+              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-amber-400" />
+                    <span>Trợ Lý Capy Gunny — Hướng Dẫn Toàn Diện 8 Trang</span>
+                  </h4>
+                  <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/40">
+                    Capy AI Assistant
+                  </span>
+                </div>
+                <p className="text-slate-300 text-xs">
+                  Capy Gunny là trợ lý thông minh đồng hành cùng bạn trên toàn bộ 8 phân hệ cốt lõi của nền tảng CKV Pro Trader:
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono">
+                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+                    1️⃣ <b>Sổ Lệnh & Vị Thế:</b> Đặt lệnh Deal/Thường, quản trị danh mục và theo dõi lãi lỗ thực.
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+                    2️⃣ <b>Quản Trị Rủi Ro:</b> Kéo thanh trượt mô phỏng DCA, tính giá hòa vốn và rủi ro sập sàn.
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+                    3️⃣ <b>Radar 150 Thuật Toán:</b> Quét tín hiệu kỹ thuật & AI chấm điểm dòng tiền dẫn sóng.
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+                    4️⃣ <b>Bảng Giá Trực Tiếp:</b> Bảng giá 3 cấp DNSE style & biểu đồ nến PRO đa khung thời gian.
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+                    5️⃣ <b>Lãi Suất Vĩ Mô:</b> Ma trận 20 Ngân Hàng & Top 10 FinTech tính chi phí đòn bẩy.
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+                    6️⃣ <b>Tin Tức & BCTC:</b> Tổng hợp báo cáo tài chính và sự kiện thị trường theo thời gian thực.
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+                    7️⃣ <b>Cơ Cấu Nguồn Vốn:</b> Phân tích tỷ trọng Tiền - Cổ - Nợ vay Margin chuẩn xác.
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+                    8️⃣ <b>Hiệu Suất & Excel:</b> Xuất báo cáo tài chính kiểm toán và đo lường Alpha / Beta.
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeHelpCenter();
+                      openOnboarding();
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 uppercase tracking-wide"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    <span>🚀 Khởi Chạy Tour Hướng Dẫn Trực Quan Trên Màn Hình</span>
+                  </button>
                 </div>
               </div>
             </div>

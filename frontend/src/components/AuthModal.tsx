@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, ShieldCheck, Mail, Lock, LogIn, UserPlus, Sparkles, User, KeyRound, Calendar, Hash } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
+import { Pin6Input } from './Pin6Input';
 
 export const AuthModal: React.FC = () => {
   const {
@@ -166,18 +167,15 @@ export const AuthModal: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-amber-300 mb-1 flex items-center gap-1">
+                <label className="block text-[11px] font-semibold text-amber-300 mb-1 flex items-center justify-center gap-1">
                   <KeyRound className="h-3.5 w-3.5 text-amber-400" />
-                  <span>MÃ PIN 6 SỐ CỦA NGÀY HÔM NAY (BẮT BUỘC):</span>
+                  <span>MÃ PIN 6 SỐ HÔM NAY (BẮT BUỘC):</span>
                 </label>
-                <input
-                  type="text"
-                  maxLength={6}
+                <Pin6Input
                   value={dailyPin}
-                  onChange={(e) => setDailyPin(e.target.value)}
-                  placeholder="Nhập 6 số PIN ngày hôm nay (VD: 861482)"
-                  className="w-full bg-slate-950 border border-amber-500/50 rounded-xl px-3.5 py-2 text-xs text-amber-300 focus:outline-none focus:border-amber-400 font-mono font-bold tracking-widest text-center"
-                  required
+                  onChange={setDailyPin}
+                  borderColor="amber"
+                  mask={false}
                 />
               </div>
 

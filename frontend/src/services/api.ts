@@ -12,8 +12,11 @@ const getHeaders = (extra: Record<string, string> = {}) => ({
 });
 
 export const api = {
-  // 1. Lấy tổng quan tài sản từ Supabase
+  // 1. Lấy tổng quan tài sản từ Supabase (Chỉ dành cho Admin Master)
   async getPortfolio(): Promise<Portfolio> {
+    if (!localTradingEngine.isAdmin()) {
+      return localTradingEngine.getPortfolio();
+    }
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/portfolios?id=eq.default&limit=1`, {
         headers: getHeaders(),
@@ -37,8 +40,11 @@ export const api = {
     return localTradingEngine.getPortfolio();
   },
 
-  // 2. Lấy danh sách vị thế cổ phiếu từ Supabase
+  // 2. Lấy danh sách vị thế cổ phiếu từ Supabase (Chỉ dành cho Admin Master)
   async getPositions(): Promise<Position[]> {
+    if (!localTradingEngine.isAdmin()) {
+      return localTradingEngine.getPositions();
+    }
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/positions`, {
         headers: getHeaders(),
@@ -66,8 +72,11 @@ export const api = {
     return localTradingEngine.getPositions();
   },
 
-  // 3. Lấy lịch sử giao dịch từ Supabase
+  // 3. Lấy lịch sử giao dịch từ Supabase (Chỉ dành cho Admin Master)
   async getTransactions(): Promise<Transaction[]> {
+    if (!localTradingEngine.isAdmin()) {
+      return localTradingEngine.getTransactions();
+    }
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/transactions?order=created_at.desc`, {
         headers: getHeaders(),

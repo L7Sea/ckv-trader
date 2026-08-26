@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, User, Plus, ShieldCheck, ArrowLeft, KeyRound, Check, Lock, ChevronRight } from 'lucide-react';
 import { useAuthStore, UserProfile, ADMIN_MASTER_PROFILE, isValidRegistrationPin, generateMemberAccountNumber } from '../store/useAuthStore';
 import { localTradingEngine } from '../services/localTradingEngine';
+import { Pin6Input } from './Pin6Input';
 
 export const GoogleAuthPickerModal: React.FC = () => {
   const {
@@ -238,20 +239,17 @@ export const GoogleAuthPickerModal: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-center gap-1.5">
                 <Lock className="h-3.5 w-3.5 text-amber-400" />
                 <span>Nhập mã PIN / Mật khẩu Admin bảo mật:</span>
               </label>
-              <input
-                type="password"
-                autoFocus
+              <Pin6Input
                 value={adminPin}
-                onChange={(e) => setAdminPin(e.target.value)}
-                placeholder="••••••"
-                className="w-full bg-slate-950 border border-amber-500/50 rounded-2xl px-4 py-2.5 text-sm text-amber-300 font-mono font-bold tracking-widest focus:outline-none focus:border-amber-400"
-                required
+                onChange={setAdminPin}
+                mask={true}
+                borderColor="amber"
               />
-              {adminError && <p className="text-rose-400 text-xs mt-1 font-bold">{adminError}</p>}
+              {adminError && <p className="text-rose-400 text-xs mt-1 text-center font-bold">{adminError}</p>}
             </div>
 
             <div className="flex gap-2 pt-1">
@@ -317,15 +315,12 @@ export const GoogleAuthPickerModal: React.FC = () => {
             </div>
 
             <div>
-              <label className="block font-semibold text-amber-300 mb-1">MÃ PIN 6 SỐ HÔM NAY (BẮT BUỘC):</label>
-              <input
-                type="text"
-                maxLength={6}
+              <label className="block font-semibold text-amber-300 mb-1 text-center">MÃ PIN 6 SỐ HÔM NAY (BẮT BUỘC):</label>
+              <Pin6Input
                 value={dailyPin}
-                onChange={(e) => setDailyPin(e.target.value)}
-                placeholder="VD: 861482"
-                className="w-full bg-slate-950 border border-amber-500/50 rounded-xl px-3 py-2 text-amber-300 font-mono font-bold tracking-widest text-center focus:outline-none"
-                required
+                onChange={setDailyPin}
+                mask={false}
+                borderColor="amber"
               />
             </div>
 

@@ -252,53 +252,9 @@ export const Header: React.FC = () => {
                       className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-amber-300 hover:bg-amber-500/10 rounded-xl transition font-semibold"
                     >
                       <Users className="h-4 w-4 text-amber-400" />
-                      <span>Quản trị người dùng</span>
+                      <span>Quản trị người dùng (Admin)</span>
                     </button>
                   )}
-
-                  <button
-                    onClick={() => {
-                      setIsUserMenuOpen(false);
-                      openHelpCenter();
-                    }}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-emerald-300 hover:bg-emerald-500/10 rounded-xl transition font-semibold"
-                  >
-                    <HelpCircle className="h-4 w-4 text-emerald-400" />
-                    <span>Cẩm nang & Chọn CTCK</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setIsUserMenuOpen(false);
-                      openSupportChat();
-                    }}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-indigo-300 hover:bg-indigo-500/10 rounded-xl transition"
-                  >
-                    <MessageSquare className="h-4 w-4 text-indigo-400" />
-                    <span>Hộp thư nhắn tin Admin</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setIsUserMenuOpen(false);
-                      openShareModal();
-                    }}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-cyan-300 hover:bg-cyan-500/10 rounded-xl transition"
-                  >
-                    <Share2 className="h-4 w-4 text-cyan-400" />
-                    <span>Lấy link chia sẻ bạn bè</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setIsUserMenuOpen(false);
-                      openOnboarding();
-                    }}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 rounded-xl transition"
-                  >
-                    <Sparkles className="h-4 w-4 text-amber-400" />
-                    <span>Hướng dẫn Capy Onboarding</span>
-                  </button>
 
                   <button
                     onClick={() => {

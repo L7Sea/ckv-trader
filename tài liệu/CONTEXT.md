@@ -85,11 +85,21 @@
 ---
 
 ## 7. 🛡️ MÔ HÌNH BẢO MẬT & PHÂN QUYỀN (TỰ ĐỘNG NHẬN DIỆN ADMIN VS THÀNH VIÊN ĐĂNG KÝ)
+- **Giao Diện Mã PIN 6 Ô Vuông To Rời Nhau (`Pin6Input`)**:
+  - Gồm 6 ô vuông kích thước lớn (44x50px) với ký tự/dấu `*` hoặc số màu vàng amber to đùng nằm chính giữa mỗi ô.
+  - Tự động nhảy focus sang ô tiếp theo khi nhập số, phím Backspace tự động lùi ô.
+  - Không hiển thị placeholder lộ liễu mã PIN mẫu.
+- **Cô Lập Dữ Liệu Tài Khoản Phụ Tuyệt Đối (Zero-Balance Isolation)**:
+  - Tài khoản thành viên phụ khi đăng ký/đăng nhập mặc định Tiền mặt = 0 đ, Nợ Margin = 0 đ, NAV = 0 đ, Danh mục rỗng.
+  - Supabase chỉ nạp dữ liệu TPB thực tế cho Admin Master, chặn hoàn toàn không để tài khoản thành viên tải dữ liệu của Admin.
 - **Modal Chọn Tài Khoản Google (`GoogleAuthPickerModal`)**:
   - Giao diện chuẩn Google Sign-In (`accounts.google.com`) với logo Google 4 màu.
   - Hiển thị danh sách tài khoản Google có sẵn trên máy (Lê Minh Hải - `leminhhaia5890@gmail.com`, tài khoản thành viên khác) và tùy chọn `+ Sử dụng một tài khoản khác`.
   - Chọn tài khoản Admin $\rightarrow$ Xác thực mật khẩu bảo mật `542463` để vào thẳng Master.
   - Chọn tài khoản thành viên $\rightarrow$ 1-Click đăng nhập ngay.
+- **Tích Hợp Hướng Dẫn Capy Vào Trung Tâm Cẩm Nang (`HelpCenterModal`) & Tinh Gọn Header**:
+  - Hướng dẫn Capy 8 bước được tích hợp trực tiếp làm 1 tab trong Cẩm Nang.
+  - Xóa bỏ các nút trùng lặp rườm rà giữa Header bar và Dropdown Menu.
 - **Tính Năng Xóa Người Dùng (Admin Master Control)**:
   - Admin có quyền xóa vĩnh viễn bất kỳ tài khoản thành viên nào trong `AdminPanelModal`.
   - Khi xóa, toàn bộ dữ liệu storage, danh mục, sổ lệnh và tin nhắn của thành viên đó sẽ bị thanh lọc triệt để.
