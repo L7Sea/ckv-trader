@@ -162,40 +162,28 @@ export const HelpCenterModal: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <h4 className="text-sm font-bold text-white flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-amber-400" />
-                    <span>Trợ Lý Capy Gunny — Hướng Dẫn Toàn Diện 8 Trang</span>
+                    <span>Trợ Lý Capy Gunny — Thú Cưng Tương Tác & Game Gunny Mini</span>
                   </h4>
                   <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/40">
-                    Capy AI Assistant
+                    Interactive Pet
                   </span>
                 </div>
                 <p className="text-slate-300 text-xs">
-                  Capy Gunny là trợ lý thông minh đồng hành cùng bạn trên toàn bộ 8 phân hệ cốt lõi của nền tảng CKV Pro Trader:
+                  Capy Gunny ở góc màn hình có 4 cách chơi đùa & tương tác vật lý cực kỳ thú vị:
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono">
                   <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
-                    1️⃣ <b>Sổ Lệnh & Vị Thế:</b> Đặt lệnh Deal/Thường, quản trị danh mục và theo dõi lãi lỗ thực.
+                    😊 <b>1. Chạm 1 Lần:</b> Capy chớp mắt, đổi 4 biểu cảm (vui vẻ, ngạc nhiên, ngầu, troll) và phát câu thoại chứng khoán dí dỏm.
                   </div>
                   <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
-                    2️⃣ <b>Quản Trị Rủi Ro:</b> Kéo thanh trượt mô phỏng DCA, tính giá hòa vốn và rủi ro sập sàn.
+                    👒 <b>2. Nhấp Đúp (Double-Click):</b> Capy xoay vòng đổi trang phục (Nón cam, Mũ cối, Kính râm Cyberpunk, Vương miện, Đồ Gunny).
                   </div>
                   <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
-                    3️⃣ <b>Radar 150 Thuật Toán:</b> Quét tín hiệu kỹ thuật & AI chấm điểm dòng tiền dẫn sóng.
+                    🚀 <b>3. Kéo Thả & Quăng Ném:</b> Cầm nắm Capy kéo ném khắp màn hình, Capy bay lượn, nảy bật vào tường và rơi tự do theo trọng lực.
                   </div>
                   <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
-                    4️⃣ <b>Bảng Giá Trực Tiếp:</b> Bảng giá 3 cấp DNSE style & biểu đồ nến PRO đa khung thời gian.
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
-                    5️⃣ <b>Lãi Suất Vĩ Mô:</b> Ma trận 20 Ngân Hàng & Top 10 FinTech tính chi phí đòn bẩy.
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
-                    6️⃣ <b>Tin Tức & BCTC:</b> Tổng hợp báo cáo tài chính và sự kiện thị trường theo thời gian thực.
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
-                    7️⃣ <b>Cơ Cấu Nguồn Vốn:</b> Phân tích tỷ trọng Tiền - Cổ - Nợ vay Margin chuẩn xác.
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
-                    8️⃣ <b>Hiệu Suất & Excel:</b> Xuất báo cáo tài chính kiểm toán và đo lường Alpha / Beta.
+                    🎯 <b>4. Giữ 3s "Gunny Mode":</b> Nhấn giữ chuột 3 giây để đếm ngược 3..2..1, kéo tia laser đo góc độ và thanh Power % bắn đại bác Gunny!
                   </div>
                 </div>
 
@@ -206,10 +194,10 @@ export const HelpCenterModal: React.FC = () => {
                       closeHelpCenter();
                       openOnboarding();
                     }}
-                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 uppercase tracking-wide"
+                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 uppercase tracking-wide"
                   >
                     <Sparkles className="h-4 w-4" />
-                    <span>🚀 Khởi Chạy Tour Hướng Dẫn Trực Quan Trên Màn Hình</span>
+                    <span>🚀 Khởi Chạy Hướng Dẫn Tương Tác Capy Gunny (4 Bước Chi Tiết)</span>
                   </button>
                 </div>
               </div>

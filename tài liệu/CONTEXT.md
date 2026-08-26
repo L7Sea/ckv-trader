@@ -97,9 +97,15 @@
   - Hiển thị danh sách tài khoản Google có sẵn trên máy (Lê Minh Hải - `leminhhaia5890@gmail.com`, tài khoản thành viên khác) và tùy chọn `+ Sử dụng một tài khoản khác`.
   - Chọn tài khoản Admin $\rightarrow$ Xác thực mật khẩu bảo mật `542463` để vào thẳng Master.
   - Chọn tài khoản thành viên $\rightarrow$ 1-Click đăng nhập ngay.
+- **Hướng Dẫn Chơi Đùa Cùng Trợ Lý Thú Cưng Capy Gunny (`OnboardingTourModal`)**:
+  - Hướng dẫn trực quan 4 cơ chế game tương tác của Capy Gunny:
+    1. Chạm 1 lần: Đổi 4 biểu cảm cảm xúc (vui vẻ, ngầu, ngạc nhiên, troll) & thoại dí dỏm.
+    2. Nhấp đúp (Double click): Đổi trang phục và phụ kiện độc quyền (Nón cam, Mũ cối, Kính Cyberpunk, Vương miện VIP, Đồ Gunny).
+    3. Kéo thả & quăng ném: Mô phỏng vật lý nảy bật 4 cạnh tường và rơi tự do theo trọng lực.
+    4. Giữ chuột 3 giây: Đếm ngược 3..2..1 kích hoạt "Gunny Mode" với thước laser đo góc bắn và thanh kéo lực Power % bắn đại bác.
 - **Tích Hợp Hướng Dẫn Capy Vào Trung Tâm Cẩm Nang (`HelpCenterModal`) & Tinh Gọn Header**:
-  - Hướng dẫn Capy 8 bước được tích hợp trực tiếp làm 1 tab trong Cẩm Nang.
-  - Xóa bỏ các nút trùng lặp rườm rà giữa Header bar và Dropdown Menu.
+  - Hướng dẫn Capy được tích hợp trực tiếp làm 1 tab trong Cẩm Nang, cho phép khởi chạy tour bất kỳ lúc nào.
+  - Xóa bỏ hoàn toàn các nút trùng lặp giữa Header bar và Dropdown Menu.
 - **Tính Năng Xóa Người Dùng (Admin Master Control)**:
   - Admin có quyền xóa vĩnh viễn bất kỳ tài khoản thành viên nào trong `AdminPanelModal`.
   - Khi xóa, toàn bộ dữ liệu storage, danh mục, sổ lệnh và tin nhắn của thành viên đó sẽ bị thanh lọc triệt để.
