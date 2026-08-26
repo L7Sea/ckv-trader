@@ -24,12 +24,14 @@ export const PortfolioOverview: React.FC = () => {
   const cash = portfolio?.cash !== undefined ? portfolio.cash : 171;
   const receivingCash = portfolio?.receiving_cash || 0;
   const marginDebt = portfolio?.margin_debt || 7002051;
-  const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0) || 14450000;
-  const totalEquity = portfolio?.total_equity || 7448120;
+  const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0) || 14500000;
+  const totalAssets = cash + receivingCash + stockMarketValue;
+  const totalEquity = portfolio?.total_equity || (totalAssets - marginDebt) || 7498120;
 
-  const unrealizedPnL = positions.reduce((sum, p) => sum + (p.unrealized_pnl || 0), 0) || -1468116;
+  const unrealizedPnL = positions.reduce((sum, p) => sum + (p.unrealized_pnl || 0), 0) || -1418116;
   const totalInvestedStockCost = positions.reduce((sum, p) => sum + p.total_quantity * p.avg_price, 0) || 15920000;
-  const unrealizedPnLPct = totalInvestedStockCost > 0 ? (unrealizedPnL / totalInvestedStockCost) * 100 : -9.30;
+  const unrealizedPnLPct = totalInvestedStockCost > 0 ? (unrealizedPnL / totalInvestedStockCost) * 100 : -8.99;
+  const equityRatio = totalAssets > 0 ? ((totalEquity / totalAssets) * 100).toFixed(2) : '51.55';
 
   const isProfit = unrealizedPnL >= 0;
 
@@ -88,14 +90,14 @@ export const PortfolioOverview: React.FC = () => {
               </div>
 
               <div className="px-3 py-2 rounded-2xl bg-slate-950/80 border border-slate-800 text-slate-300 text-xs font-mono">
-                Tỷ lệ tự có: <b className="text-emerald-400">51.38%</b> (An toàn)
+                Tỷ lệ tự có: <b className="text-emerald-400">{equityRatio}%</b> (An toàn)
               </div>
             </div>
           </div>
 
           {/* Bottom Row: 4 Balanced Sub-Balances (Cân đối 4 cột đồng đều) */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 font-mono text-xs">
-            {/* Box 1 - Tiền Mặt Khả Dụng (Có nút Nạp / Rút) */}
+            {/* Box 1 - Tiền Mặt KhẢ Dụng (Có nút Nạp / Rút) */}
             <div
               onClick={openCashModal}
               className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 hover:border-emerald-500/50 cursor-pointer transition flex flex-col justify-between group"
@@ -121,7 +123,11 @@ export const PortfolioOverview: React.FC = () => {
                 <PieChart className="h-4 w-4 text-cyan-400" />
               </div>
               <b className="text-base text-cyan-300 font-bold mt-1.5 block">{formatVND(stockMarketValue)}</b>
-              <span className="text-[10px] text-slate-500 font-sans mt-0.5">1,000 TPB @ 14.45</span>
+              <span className="text-[10px] text-slate-500 font-sans mt-0.5">
+                {positions.length > 0
+                  ? `${positions[0].total_quantity.toLocaleString()} ${positions[0].symbol} @ ${(positions[0].market_price / 1000).toFixed(2)}`
+                  : '1,000 TPB @ 14.50'}
+              </span>
             </div>
 
             {/* Box 3 */}
