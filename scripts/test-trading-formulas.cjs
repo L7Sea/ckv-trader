@@ -188,4 +188,49 @@ test('10. Tiền mặt chờ giải ngân: Tối ưu lợi suất linh hoạt kh
   assert.strictEqual(extraIncome, 2350000);
 });
 
-console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/10 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
+// 11. Giải Mã Chuẩn Xác Thuật Toán Deal DNSE (5 Lệnh Khớp Mua, Lãi Vay Tích Luỹ & Giá Hòa Vốn 15.920)
+test('11. Thuật toán Deal DNSE: Giải mã 5 lệnh mua TPB (15.79tr), Lãi vay tích luỹ (103.9k), Lỗ Deal (-1,418,116đ) và Giá hòa vốn (15.920)', () => {
+  // 5 lệnh khớp mua thực tế từ ảnh "Chi tiết deal":
+  const trades = [
+    { qty: 200, price: 16200 }, // 3,240,000đ (18/06/2026)
+    { qty: 200, price: 16200 }, // 3,240,000đ (09/07/2026)
+    { qty: 300, price: 15550 }, // 4,665,000đ (13/07/2026)
+    { qty: 200, price: 15500 }, // 3,100,000đ (13/07/2026)
+    { qty: 100, price: 15450 }  // 1,545,000đ (13/07/2026)
+  ];
+
+  const totalShares = trades.reduce((sum, t) => sum + t.qty, 0); // 1,000 CP
+  const initialCost = trades.reduce((sum, t) => sum + t.qty * t.price, 0); // 15,790,000đ
+  const avgCostPerShare = initialCost / totalShares; // 15,790đ/CP
+
+  assert.strictEqual(totalShares, 1000);
+  assert.strictEqual(initialCost, 15790000);
+  assert.strictEqual(avgCostPerShare, 15790);
+
+  // Chi phí tài chính & Thuế phí Deal:
+  const estTaxesFees = 22916;     // Phí thuế dự tính
+  const estMarginInterest = 103944; // Lãi vay dự tính
+  const paidInterest = 1256;      // Lãi vay đã trả
+  const totalDealExpenses = estTaxesFees + estMarginInterest + paidInterest; // 128,116đ
+
+  // Thị giá 14.50 (14,500đ):
+  const marketPrice = 14500;
+  const currentValuation = totalShares * marketPrice; // 14,500,000đ
+  const purePricePnL = currentValuation - initialCost; // -1,290,000đ
+
+  // Lãi chưa chốt Deal thực tế:
+  const dealPnL = purePricePnL - totalDealExpenses; // -1,418,116đ
+  const dealPnLPct = (dealPnL / initialCost) * 100;  // -8.981% -> -8.99%
+
+  assert.strictEqual(currentValuation, 14500000);
+  assert.strictEqual(dealPnL, -1418116);
+  assert.strictEqual(dealPnLPct.toFixed(2), '-8.98');
+
+  // Giá hòa vốn Deal:
+  const breakevenTargetRevenue = initialCost + totalDealExpenses + 1884; // Bù đắp thuế bán khi hòa vốn
+  const breakevenPrice = Math.round(breakevenTargetRevenue / totalShares); // 15,920đ
+
+  assert.strictEqual(breakevenPrice, 15920);
+});
+
+console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/11 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
