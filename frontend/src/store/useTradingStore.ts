@@ -106,8 +106,8 @@ export const useTradingStore = create<TradingState>((set, get) => ({
         api.getTransactions()
       ]);
 
-      // Tự động nạp chuẩn danh mục thực tế nếu chưa có TPB
-      if (!positions || positions.length === 0 || !positions.some((p) => p.symbol === 'TPB')) {
+      // Tự động nạp chuẩn danh mục thực tế của Chủ nhân nếu là tài khoản Admin
+      if (localTradingEngine.isAdmin() && (!positions || positions.length === 0 || !positions.some((p) => p.symbol === 'TPB'))) {
         const exact = localTradingEngine.resetToUserExactData();
         portfolio = exact.portfolio;
         positions = exact.positions;

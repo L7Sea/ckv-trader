@@ -65,7 +65,7 @@ export const PortfolioOverview: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold tracking-wide uppercase flex items-center gap-1.5">
                   <Sparkles className="h-3 w-3 text-amber-400" />
-                  VÍ TÀI SẢN TOÀN DIỆN (DNSE 26/08/2026)
+                  {user?.role === 'ADMIN' ? 'VÍ TÀI SẢN TOÀN DIỆN (VIP MASTER)' : 'VÍ TÀI SẢN MÔ PHỎNG (KHÁCH TRẢI NGHIỆM)'}
                 </span>
                 <button
                   onClick={toggleBalanceVisibility}

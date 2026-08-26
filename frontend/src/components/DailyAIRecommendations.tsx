@@ -117,66 +117,72 @@ export const DailyAIRecommendations: React.FC = () => {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {portfolioDcaPicks.map(({ stock, currentAvg, dcaPrice, gainNeeded, estDays }) => (
-                <div
-                  key={stock.symbol}
-                  className="p-4 rounded-2xl bg-[#121620] border border-amber-500/30 flex flex-col justify-between space-y-3 relative overflow-hidden shadow-lg"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-mono font-black text-sm border border-amber-500/30">
-                          {stock.symbol}
+            {portfolioDcaPicks.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {portfolioDcaPicks.map(({ stock, currentAvg, dcaPrice, gainNeeded, estDays }) => (
+                  <div
+                    key={stock.symbol}
+                    className="p-4 rounded-2xl bg-[#121620] border border-amber-500/30 flex flex-col justify-between space-y-3 relative overflow-hidden shadow-lg"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-mono font-black text-sm border border-amber-500/30">
+                            {stock.symbol}
+                          </span>
+                          <span className="text-xs font-bold text-white">{stock.name}</span>
+                        </div>
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold">
+                          ĐIỂM GOM TỐT
                         </span>
-                        <span className="text-xs font-bold text-white">{stock.name}</span>
                       </div>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold">
-                        ĐIỂM GOM TỐT
+
+                      <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-[#181d29] border border-[#2b3245] text-xs font-mono text-center">
+                        <div>
+                          <span className="text-[10px] text-slate-500 block font-sans">Giá vốn hiện tại:</span>
+                          <b className="text-amber-400 text-sm mt-0.5 block">{formatNumber(currentAvg)} đ</b>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-500 block font-sans">Vùng gom thêm:</span>
+                          <b className="text-emerald-400 text-sm mt-0.5 block">{formatNumber(dcaPrice)} đ</b>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-500 block font-sans">Cần tăng để về bờ:</span>
+                          <b className="text-emerald-300 text-sm mt-0.5 block">+{gainNeeded}%</b>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1 text-xs">
+                      <span className="text-slate-400 font-sans text-[11px]">
+                        Dự kiến về bờ: <b className="text-white font-mono">{estDays} - {estDays + 2} phiên</b>
                       </span>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-[#181d29] border border-[#2b3245] text-xs font-mono text-center">
-                      <div>
-                        <span className="text-[10px] text-slate-500 block font-sans">Giá vốn hiện tại:</span>
-                        <b className="text-amber-400 text-sm mt-0.5 block">{formatNumber(currentAvg)} đ</b>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => navigateToStock(stock.symbol, 'DECISION')}
+                          className="px-2.5 py-1.5 rounded-xl bg-amber-500/10 text-amber-300 font-bold hover:bg-amber-500/20 border border-amber-500/30 transition text-xs font-sans"
+                          title="Xem kịch bản hòa vốn chi tiết"
+                        >
+                          Hòa Vốn
+                        </button>
+                        <button
+                          onClick={() => navigateToStock(stock.symbol, 'TRADE', 'BUY', dcaPrice)}
+                          className="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold hover:bg-amber-400 transition flex items-center gap-1 font-sans shadow"
+                          title="Chuyển sang form đặt lệnh mua gom"
+                        >
+                          <span>Đặt Lệnh Gom</span>
+                          <ArrowUpRight className="h-3.5 w-3.5" />
+                        </button>
                       </div>
-                      <div>
-                        <span className="text-[10px] text-slate-500 block font-sans">Vùng gom thêm:</span>
-                        <b className="text-emerald-400 text-sm mt-0.5 block">{formatNumber(dcaPrice)} đ</b>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-slate-500 block font-sans">Cần tăng để về bờ:</span>
-                        <b className="text-emerald-300 text-sm mt-0.5 block">+{gainNeeded}%</b>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1 text-xs">
-                    <span className="text-slate-400 font-sans text-[11px]">
-                      Dự kiến về bờ: <b className="text-white font-mono">{estDays} - {estDays + 2} phiên</b>
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => navigateToStock(stock.symbol, 'DECISION')}
-                        className="px-2.5 py-1.5 rounded-xl bg-amber-500/10 text-amber-300 font-bold hover:bg-amber-500/20 border border-amber-500/30 transition text-xs font-sans"
-                        title="Xem kịch bản hòa vốn chi tiết"
-                      >
-                        Hòa Vốn
-                      </button>
-                      <button
-                        onClick={() => navigateToStock(stock.symbol, 'TRADE', 'BUY', dcaPrice)}
-                        className="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold hover:bg-amber-400 transition flex items-center gap-1 font-sans shadow"
-                        title="Chuyển sang form đặt lệnh mua gom"
-                      >
-                        <span>Đặt Lệnh Gom</span>
-                        <ArrowUpRight className="h-3.5 w-3.5" />
-                      </button>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-4 rounded-2xl bg-[#121620] border border-slate-800 text-center text-xs text-slate-400 font-sans">
+                Danh mục chưa có vị thế cổ phiếu nắm giữ. Hãy khám phá <b className="text-emerald-400">Top 5 mã đột biến HOSE</b> bên dưới để bắt đầu giải ngân!
+              </div>
+            )}
           </div>
 
           {/* PHẦN B: TOP 5 MÃ HOSE ĐẠT ĐIỂM AI CAO NHẤT HÔM NAY */}

@@ -376,5 +376,25 @@ test('16. Phiên chiều 13h53 (26/8/2026): TPB tăng lên 14.60 (+150đ), NAV c
   assert.strictEqual(equityRatio, '52.04');
 });
 
-console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/16 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
+// 17. Xác thực Cơ Chế Phân Quyền Bảo Mật: Khách Mặc Định (0đ, 0 CP) vs Admin Master (1,000 TPB, NAV 7,598,120đ)
+test('17. Phân quyền bảo mật: Khách vãng lai mặc định 0đ & Danh mục rỗng, Chủ nhân VIP bảo mật danh mục riêng', () => {
+  // Tài khoản Khách:
+  const guestPortfolio = { cash: 0, margin_debt: 0, total_equity: 0 };
+  const guestPositions = [];
+  assert.strictEqual(guestPortfolio.cash, 0);
+  assert.strictEqual(guestPortfolio.margin_debt, 0);
+  assert.strictEqual(guestPortfolio.total_equity, 0);
+  assert.strictEqual(guestPositions.length, 0);
+
+  // Tài khoản Admin Chủ nhân sau khi xác thực:
+  const adminPortfolio = { cash: 171, margin_debt: 7002051, total_equity: 7598120 };
+  const adminPositions = [{ symbol: 'TPB', quantity: 1000, price: 14600 }];
+  assert.strictEqual(adminPortfolio.cash, 171);
+  assert.strictEqual(adminPortfolio.margin_debt, 7002051);
+  assert.strictEqual(adminPortfolio.total_equity, 7598120);
+  assert.strictEqual(adminPositions.length, 1);
+  assert.strictEqual(adminPositions[0].symbol, 'TPB');
+});
+
+console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/17 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
 

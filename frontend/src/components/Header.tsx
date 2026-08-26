@@ -17,7 +17,8 @@ import {
   Share2,
   MessageSquare,
   Users,
-  HelpCircle
+  HelpCircle,
+  LogIn
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 import { useAuthStore } from '../store/useAuthStore';
@@ -99,8 +100,8 @@ export const Header: React.FC = () => {
                 )}
               </div>
               <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                <span>Tài khoản: <b className="text-emerald-400">{user?.name || 'VIP Trader'}</b></span>
+                <ShieldCheck className={`h-3.5 w-3.5 ${isAdmin ? 'text-amber-400' : 'text-slate-400'}`} />
+                <span>Tài khoản: <b className={isAdmin ? 'text-amber-300 font-bold' : 'text-slate-300'}>{user?.name || 'Khách Trải Nghiệm'}</b></span>
               </div>
             </div>
           </div>
@@ -201,29 +202,41 @@ export const Header: React.FC = () => {
               <Settings className="h-4 w-4 text-indigo-400" />
             </button>
 
-            {/* User Profile Dropdown */}
-            <div className="relative">
+            {/* User Profile / Login Button */}
+            {!user?.isLoggedIn || user?.id === 'guest' ? (
               <button
-                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center gap-2 pl-2 pr-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-semibold hover:border-slate-700 transition"
+                onClick={openAuthModal}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black transition active:scale-95 shadow-md shadow-emerald-500/20 shrink-0 uppercase tracking-wide"
+                title="Đăng nhập Gmail / Tài khoản Chủ Nhân VIP"
               >
-                <div className="h-6 w-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
-                  {user?.name ? user.name[0].toUpperCase() : 'V'}
-                </div>
-                <span className="max-w-[70px] truncate hidden md:inline">{user?.name || 'VIP Trader'}</span>
-                <ChevronDown className="h-3 w-3 text-slate-500" />
+                <LogIn className="h-4 w-4" />
+                <span>ĐĂNG NHẬP</span>
               </button>
-
-              {/* Dropdown Menu */}
-              {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in">
-                  <div className="p-2 border-b border-slate-800/80 mb-1">
-                    <p className="text-xs font-bold text-white truncate">{user?.name || 'VIP Trader'}</p>
-                    <p className="text-[11px] font-mono text-emerald-400">STK: {user?.accountNumber || '001C888999'}</p>
-                    <span className="text-[10px] font-bold text-slate-400">
-                      CTCK: <b className="text-purple-400">{user?.brokerage || 'DNSE'}</b> ({user?.customMarginRate || 11.5}%)
-                    </span>
+            ) : (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-2 pl-2 pr-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-semibold hover:border-slate-700 transition"
+                >
+                  <div className={`h-6 w-6 rounded-lg flex items-center justify-center font-bold text-xs ${
+                    isAdmin ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-emerald-500/20 text-emerald-400'
+                  }`}>
+                    {isAdmin ? '👑' : user?.name ? user.name[0].toUpperCase() : 'V'}
                   </div>
+                  <span className="max-w-[85px] truncate hidden md:inline font-bold">{user?.name || 'VIP Master'}</span>
+                  <ChevronDown className="h-3 w-3 text-slate-500" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in">
+                    <div className="p-2 border-b border-slate-800/80 mb-1">
+                      <p className="text-xs font-bold text-white truncate">{user?.name || 'VIP Master'}</p>
+                      <p className="text-[11px] font-mono text-emerald-400">Email: {user?.email || 'admin@ckv.pro'}</p>
+                      <span className="text-[10px] font-bold text-slate-400">
+                        CTCK: <b className="text-purple-400">{user?.brokerage || 'DNSE'}</b> ({user?.customMarginRate || 11.5}%)
+                      </span>
+                    </div>
                   
                   {isAdmin && (
                     <button
@@ -306,7 +319,8 @@ export const Header: React.FC = () => {
                   </button>
                 </div>
               )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </header>

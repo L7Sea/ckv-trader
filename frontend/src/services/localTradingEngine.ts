@@ -137,8 +137,8 @@ const initialTransactions: Transaction[] = [
   }
 ];
 
-let activeUserId = 'user-vip';
-let isActiveUserAdmin = true;
+let activeUserId = 'guest';
+let isActiveUserAdmin = false;
 
 const emptyUserPortfolio: Portfolio = {
   cash: 0,
@@ -156,8 +156,12 @@ export const localTradingEngine = {
     isActiveUserAdmin = isAdmin;
   },
 
+  isAdmin() {
+    return isActiveUserAdmin || activeUserId === 'admin_hai_master';
+  },
+
   getStorageKeys() {
-    if (isActiveUserAdmin || activeUserId === 'user-vip') {
+    if (isActiveUserAdmin || activeUserId === 'admin_hai_master') {
       return {
         portfolio: PORTFOLIO_KEY,
         positions: POSITIONS_KEY,

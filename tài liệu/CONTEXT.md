@@ -82,4 +82,17 @@
   5. `aurora`: Emerald Matrix (Xanh tím thịnh vượng)
 - **Đồng bộ đa thiết bị (Máy tính $\leftrightarrow$ Điện thoại)**: Hỗ trợ nạp trực tiếp Direct Image URL và đóng gói cấu hình nền vào file sao lưu `exportDataAsJson()` / `importDataFromJson()`.
 
+---
+
+## 7. 🛡️ MÔ HÌNH BẢO MẬT & PHÂN QUYỀN (GUEST 0Đ VS ADMIN MASTER VIP)
+- **Mặc định khi mở link (`https://ckv-trader.pages.dev`) trên bất kỳ máy/trình duyệt mới**:
+  - Hệ thống tự động gán là **Khách Trải Nghiệm (Guest Trader)**.
+  - Số dư tiền mặt: **0 đ**, Nợ Margin: **0 đ**, NAV: **0 đ**, Danh mục cổ phiếu: **Trống (0 CP)**.
+  - Tuyệt đối không nhìn thấy tên hay số dư 1,000 TPB của Chủ nhân.
+- **Tài khoản Admin Master của Chủ nhân**:
+  - Đăng nhập riêng bằng **Gmail / Google Account** hoặc mã PIN bảo mật `542463`.
+  - Khi xác thực thành công, toàn bộ danh mục thực tế của Chủ nhân (**1,000 TPB @ 14.60, NAV 7,598,120 đ, Nợ Margin 7,002,051 đ, Tiền mặt 171 đ**) được kích hoạt trên phiên làm việc của Chủ nhân.
+- **Cơ chế Kích Phiên Cũ (Session Reset Lock)**:
+  - Nâng cấp key lưu trữ lên `v5` (`ckv_registered_users_v5`, `ckv_active_user_id_v5`), tự động đăng xuất tất cả thiết bị lạ về chế độ Khách 0đ.
+
 
