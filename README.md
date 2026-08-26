@@ -30,11 +30,13 @@
   - Hàng T+2 $\rightarrow$ Hàng T+1.
   - Tiền chờ về $\rightarrow$ Tiền mặt khả dụng.
 
-### 2. Quản Trị Vị Thế Thực Tế (Anh Hải - VIP Trader)
-- **Cổ phiếu trọng tâm:** 1,000 CP TPB (Giá vốn: 15.918đ, Thị giá: 14.450đ).
-- **Vốn tự có thực tế (NAV):** 7.551.893 đ (52.3%).
-- **Vốn vay Margin DNSE:** 6.898.107 đ (47.7%).
-- **Tổng quy mô tài sản:** 14.450.000 đ.
+### 2. Quản Trị Vị Thế Thực Tế (Anh Hải - VIP Trader - DNSE 26/08/2026)
+- **Vị thế cổ phiếu:** 1,000 CP TPB (Giá vốn hòa vốn Deal: 15.920đ, Thị giá: 14.450đ, Giá trị: 14.450.000đ).
+- **Tiền mặt khả dụng:** 171 đ.
+- **Tổng Nợ Margin thực tế:** 7.002.051 đ (Gốc vay Deal: 6.898.107đ + Lãi vay Margin tích luỹ: 103.944đ).
+- **Lãi suất vay Margin Deal thực tế:** 11.50%/năm (~2,173 đ/ngày).
+- **Tài sản ròng thực có (NAV):** 7.448.120 đ (Tỷ lệ tự có: 51.38%).
+- **Lỗ chưa chốt Deal:** -1.468.116 đ (-9.30%).
 
 ---
 
