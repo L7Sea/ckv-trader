@@ -84,18 +84,20 @@
 
 ---
 
-## 7. 🛡️ MÔ HÌNH BẢO MẬT & PHÂN QUYỀN (THÀNH VIÊN ĐĂNG KÝ + PIN 6 SỐ DAILY RANDOM VS ADMIN MASTER)
-- **Bỏ Chế độ Khách (Guest) tự do**: Mọi người dùng khi mở link `https://ckv-trader.pages.dev` đều phải qua Cổng Đăng Nhập / Đăng Ký Thành Viên (Registration Gate).
+## 7. 🛡️ MÔ HÌNH BẢO MẬT & PHÂN QUYỀN (TỰ ĐỘNG NHẬN DIỆN ADMIN VS THÀNH VIÊN ĐĂNG KÝ)
+- **Xóa bỏ nút "Đăng nhập Admin"**: Giao diện đăng nhập hoàn toàn sạch sẽ, không để lộ bất kỳ nút hay dấu hiệu backdoor nào cho người ngoài.
+- **Tự động nhận diện Chủ Nhân Admin VIP qua Email**:
+  - Email Master độc quyền: **`leminhhaia5890@gmail.com`**.
+  - Khi email này đăng nhập (qua Form hoặc Google Sign-In) $\rightarrow$ Hệ thống tự động nhận diện Chủ nhân và yêu cầu mã PIN/mật khẩu Master (`542463`) để mở tài khoản Admin.
+  - Mã tài khoản độc quyền của Admin: **`026A00000`**.
+  - Toàn bộ danh mục thực tế của Chủ nhân (**1,000 TPB @ 14.60, NAV 7,598,120 đ, Nợ Margin 7,002,051 đ, Tiền mặt 171 đ**) được bảo vệ độc quyền 100%.
+- **Quy luật tạo Mã Số Tài Khoản Thành Viên**:
+  - Định dạng: **`026` + `[Chữ cái in hoa đầu tiên của Tên]` + `[5 số ngẫu nhiên 10001 - 99999]`**.
+  - Ví dụ: Nguyễn Văn Nam $\rightarrow$ `026N54892`, Trần Thu Trang $\rightarrow$ `026T38192`.
+  - Tuyệt đối không trùng mã `026A00000` của Admin.
 - **Mã PIN 6 Số Biến Đổi Tự Động Hàng Ngày (`getDailyAccessPin()`)**:
-  - Dựa trên thuật toán ngày tháng duy nhất mỗi ngày (VD: Ngày 26/08/2026 là `861482`).
-  - Thành viên đăng ký lần đầu (dù qua Form đăng ký hay qua Gmail Sign-In) **bắt buộc phải nhập đúng Mã PIN 6 số của ngày hôm nay** do Admin Hải cung cấp.
-- **Biểu Mẫu Đăng Ký Thành Viên Đầy Đủ**:
-  - Yêu cầu: Họ tên thật, Tên gọi trong App (Nickname), Tuổi, Giới tính (Nam/Nữ/Khác), Gmail/Email, Mật khẩu cá nhân, Mã PIN 6 số ngày hôm nay.
+  - Biến đổi mỗi ngày 1 mã duy nhất (VD: Ngày 26/08/2026 là `861482`). Thành viên mới đăng ký bắt buộc phải có mã PIN ngày do Admin cung cấp.
 - **Cô Lập Kênh Chat 1-1 Tuyệt Đối**:
-  - **Thành viên**: Chỉ có 1 luồng chat duy nhất gửi trực tiếp tới Admin Hải (không thể nhắn tin hay thấy nhau).
-  - **Admin VIP (Chủ nhân)**: Master Console với danh sách chọn từng thành viên để trả lời riêng tư 1-1.
-- **Tài khoản Admin Master của Chủ nhân**:
-  - Đăng nhập riêng bằng **Gmail / Google Account** hoặc mã PIN Master bí mật `542463`.
-  - Toàn bộ danh mục thực tế của Chủ nhân (**1,000 TPB @ 14.60, NAV 7,598,120 đ, Nợ Margin 7,002,051 đ, Tiền mặt 171 đ**) được bảo vệ độc quyền.
+  - Thành viên chỉ gửi tin trực tiếp tới Admin, không thấy nhau. Admin chọn từng thành viên để trả lời riêng tư 1-1.
 
 

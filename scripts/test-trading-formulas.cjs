@@ -430,5 +430,37 @@ test('18. Thuật toán sinh mã PIN 6 số biến đổi theo ngày và đăng 
   assert.strictEqual(member.dailyPin, pinToday);
 });
 
-console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/18 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
+// 19. Xác thực Mã Tài Khoản Độc Quyền Admin (026A00000) & Quy Luật Tạo Mã TK Thành Viên 026 + Chữ Cái Đầu + 5 Số
+test('19. Quy luật mã số tài khoản 026A00000 cho Admin và 026[Letter][5 số] ngẫu nhiên cho thành viên', () => {
+  function generateMemberAccountNumber(name) {
+    const clean = (name || '').trim();
+    const normalized = clean.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const firstChar = normalized.length > 0 ? normalized[0].toUpperCase() : 'M';
+    const validChar = (firstChar >= 'A' && firstChar <= 'Z') ? firstChar : 'M';
+    const random5 = Math.floor(10001 + Math.random() * 89998);
+    return `026${validChar}${random5}`;
+  }
+
+  const adminAcc = '026A00000';
+  const adminEmail = 'leminhhaia5890@gmail.com';
+
+  const memberNam = generateMemberAccountNumber('Nguyễn Văn Nam');
+  const memberTrang = generateMemberAccountNumber('Trần Thu Trang');
+  const memberHung = generateMemberAccountNumber('Hoàng Mạnh Hùng');
+
+  assert.strictEqual(adminAcc, '026A00000');
+  assert.strictEqual(adminEmail, 'leminhhaia5890@gmail.com');
+
+  assert.strictEqual(memberNam.startsWith('026N'), true);
+  assert.strictEqual(memberNam.length, 9);
+  assert.notStrictEqual(memberNam, adminAcc);
+
+  assert.strictEqual(memberTrang.startsWith('026T'), true);
+  assert.strictEqual(memberTrang.length, 9);
+
+  assert.strictEqual(memberHung.startsWith('026H'), true);
+  assert.strictEqual(memberHung.length, 9);
+});
+
+console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/19 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
 

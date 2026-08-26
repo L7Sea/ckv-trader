@@ -17,8 +17,8 @@ const defaultWelcomeMessages: SupportMessage[] = [
   {
     id: 'msg_welcome_1',
     userId: 'admin_hai_master',
-    userName: 'Hải Đẹp Trai (VIP Master)',
-    userEmail: 'admin@ckv.pro',
+    userName: 'Lê Minh Hải (VIP Master)',
+    userEmail: 'leminhhaia5890@gmail.com',
     message: 'Chào mừng bạn đến với CKV Pro Trader! Tôi là Hải (Admin VIP). Mọi thắc mắc của bạn về điểm hòa vốn, lãi suất Margin hay quản trị danh mục đều được trao đổi bảo mật 1-1 trực tiếp với tôi tại đây.',
     isFromAdmin: true,
     isRead: true,

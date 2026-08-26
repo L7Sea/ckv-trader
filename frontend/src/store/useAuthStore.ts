@@ -87,20 +87,31 @@ interface AuthState {
   closeHelpCenter: () => void;
 }
 
-const USERS_STORAGE_KEY = 'ckv_registered_users_v6';
-const ACTIVE_USER_KEY = 'ckv_active_user_id_v6';
+export function generateMemberAccountNumber(name: string): string {
+  const clean = (name || '').trim();
+  // Lấy chữ cái in hoa đầu tiên của tên (khử dấu tiếng Việt)
+  const normalized = clean.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const firstChar = normalized.length > 0 ? normalized[0].toUpperCase() : 'M';
+  const validChar = (firstChar >= 'A' && firstChar <= 'Z') ? firstChar : 'M';
+  // 5 số ngẫu nhiên từ 10001 đến 99999 (tuyệt đối không trùng 00000 của Admin)
+  const random5 = Math.floor(10001 + Math.random() * 89998);
+  return `026${validChar}${random5}`;
+}
+
+const USERS_STORAGE_KEY = 'ckv_registered_users_v7';
+const ACTIVE_USER_KEY = 'ckv_active_user_id_v7';
 const DEFAULT_PIN = '542463';
 
-// Tài khoản Master VIP của Chủ nhân (1,000 TPB, NAV 7.598tr, Nợ 7.002tr)
+// Tài khoản Master VIP ĐỘC QUYỀN của Chủ nhân Lê Minh Hải
 export const ADMIN_MASTER_PROFILE: UserProfile = {
   id: 'admin_hai_master',
-  name: 'Hải Đẹp Trai',
+  name: 'Lê Minh Hải',
   nickname: 'Hải VIP Master',
   age: 30,
   gender: 'MALE',
-  email: 'admin@ckv.pro',
+  email: 'leminhhaia5890@gmail.com',
   role: 'ADMIN',
-  accountNumber: '001C888999',
+  accountNumber: '026A00000', // Mã tài khoản độc quyền của Admin
   subAccount: '06', // Margin Deal
   brokerage: 'DNSE',
   customMarginRate: 11.5,
@@ -159,14 +170,14 @@ export const useAuthStore = create<AuthState>((set, get) => {
       if (!email || !email.trim()) return false;
       const cleanEmail = email.trim().toLowerCase();
 
-      // Trường hợp là Chủ nhân (Admin VIP)
-      if (cleanEmail === 'admin@ckv.pro' || cleanEmail.includes('admin') || cleanEmail.includes('hai')) {
-        const pin = window.prompt('Nhập mã PIN xác thực Chủ Nhân (VIP Master):', '');
+      // TỰ ĐỘNG NHẬN DIỆN CHỦ NHÂN ADMIN VIP (leminhhaia5890@gmail.com)
+      if (cleanEmail === 'leminhhaia5890@gmail.com' || cleanEmail === 'admin@ckv.pro') {
+        const pin = window.prompt('Xác thực Chủ Nhân (Lê Minh Hải): Nhập mật khẩu / mã PIN bảo mật Admin:', '');
         if (pin === '542463' || pin === 'admin' || pin === '5424') {
           get().loginAsAdmin(cleanEmail);
           return true;
         } else {
-          alert('Mã PIN không chính xác! Không thể mở tài khoản Admin Master.');
+          alert('Mật khẩu / Mã PIN Admin không chính xác!');
           return false;
         }
       }
@@ -195,7 +206,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
           gender: 'MALE',
           email: cleanEmail,
           role: 'USER',
-          accountNumber: '001C' + Math.floor(100000 + Math.random() * 900000),
+          accountNumber: generateMemberAccountNumber(name),
           subAccount: '01',
           brokerage: 'DNSE',
           customMarginRate: 11.5,
@@ -226,13 +237,13 @@ export const useAuthStore = create<AuthState>((set, get) => {
       const users = getStoredUsers();
       const cleanEmail = email.toLowerCase().trim();
 
-      // Đăng nhập Admin
-      if (cleanEmail === 'admin@ckv.pro' || cleanEmail.includes('admin')) {
+      // TỰ ĐỘNG NHẬN DIỆN CHỦ NHÂN ADMIN VIP (leminhhaia5890@gmail.com)
+      if (cleanEmail === 'leminhhaia5890@gmail.com' || cleanEmail === 'admin@ckv.pro') {
         if (pass === '542463' || pass === 'admin' || pass === '5424') {
           get().loginAsAdmin(cleanEmail);
           return true;
         } else {
-          alert('Mã PIN/Mật khẩu Admin không chính xác!');
+          alert('Mật khẩu / Mã PIN Admin không chính xác!');
           return false;
         }
       }
@@ -244,7 +255,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
       }
 
       if (found.pin && pass && found.pin !== pass && pass !== '542463') {
-        alert('Mật khẩu/Mã PIN không chính xác!');
+        alert('Mật khẩu cá nhân không chính xác!');
         return false;
       }
 
@@ -291,6 +302,9 @@ export const useAuthStore = create<AuthState>((set, get) => {
         return false;
       }
 
+      // Tự động gán mã số tài khoản định dạng 026 + Chữ cái đầu + 5 số ngẫu nhiên
+      const accountNumber = generateMemberAccountNumber(name);
+
       const newUser: UserProfile = {
         id: 'user_' + Date.now(),
         name: name.trim(),
@@ -299,7 +313,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
         gender: gender || 'MALE',
         email: cleanEmail,
         role: 'USER',
-        accountNumber: '001C' + Math.floor(100000 + Math.random() * 900000),
+        accountNumber,
         subAccount: '01',
         brokerage: 'DNSE',
         customMarginRate: 11.5,
