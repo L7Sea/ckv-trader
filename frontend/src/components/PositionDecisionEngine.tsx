@@ -27,11 +27,11 @@ export const PositionDecisionEngine: React.FC = () => {
   const stockInfo = watchlist.find((s) => s.symbol === activeTicker);
 
   const marketPrice = heldPos?.market_price || stockInfo?.price || 14450;
-  const avgCostPrice = heldPos?.avg_price || Math.round(marketPrice * 1.08); // Giá vốn
-  const totalQuantity = heldPos?.total_quantity || 1000;
-  const unrealizedPnL = heldPos ? heldPos.unrealized_pnl : (marketPrice - avgCostPrice) * totalQuantity;
-  const unrealizedPnLPct = heldPos ? heldPos.unrealized_pnl_pct : ((marketPrice - avgCostPrice) / avgCostPrice) * 100;
-  const marginDebt = portfolio?.margin_debt || 7002051;
+  const avgCostPrice = heldPos ? heldPos.avg_price : marketPrice;
+  const totalQuantity = heldPos ? heldPos.total_quantity : 0;
+  const unrealizedPnL = heldPos ? heldPos.unrealized_pnl : 0;
+  const unrealizedPnLPct = heldPos ? heldPos.unrealized_pnl_pct : 0;
+  const marginDebt = portfolio?.margin_debt !== undefined ? portfolio.margin_debt : 0;
 
   // State kịch bản mua thêm bình quân giá
   const [extraQty, setExtraQty] = useState<number>(1000);
@@ -42,10 +42,18 @@ export const PositionDecisionEngine: React.FC = () => {
   const currentCostTotal = currentShares * avgCostPrice;
   const newBuyCost = extraQty * extraPrice;
   const totalSharesAfter = currentShares + extraQty;
-  const newAvgPrice = Math.round((currentCostTotal + newBuyCost) / totalSharesAfter);
-  const costReduction = avgCostPrice - newAvgPrice;
-  const neededGainToBreakevenCurrent = (((avgCostPrice - marketPrice) / marketPrice) * 100).toFixed(2);
-  const neededGainToBreakevenNew = (((newAvgPrice - extraPrice) / extraPrice) * 100).toFixed(2);
+  const newAvgPrice = totalSharesAfter > 0 ? Math.round((currentCostTotal + newBuyCost) / totalSharesAfter) : extraPrice;
+  const costReduction = avgCostPrice > 0 ? avgCostPrice - newAvgPrice : 0;
+  const neededGainToBreakevenCurrent = marketPrice > 0 && avgCostPrice > 0 ? (((avgCostPrice - marketPrice) / marketPrice) * 100).toFixed(2) : '0.00';
+  const neededGainToBreakevenNew = extraPrice > 0 ? (((newAvgPrice - extraPrice) / extraPrice) * 100).toFixed(2) : '0.00';
+
+  // Stress test: 3 cây sàn liên tiếp (-21%)
+  const drop3FloorsPrice = Math.round(marketPrice * 0.79);
+  const drop3FloorsValue = currentShares * drop3FloorsPrice;
+  const drop3FloorsNav = (portfolio?.cash || 0) + drop3FloorsValue - marginDebt;
+  const drop3FloorsMarginRate = (drop3FloorsValue + (portfolio?.cash || 0)) > 0 ? (drop3FloorsNav / (drop3FloorsValue + (portfolio?.cash || 0))) * 100 : 100;
+  const isMarginCallRisk = marginDebt > 0 && drop3FloorsMarginRate < 35;
+  const requiredCallDeposit = isMarginCallRisk ? Math.max(0, Math.round(marginDebt * 0.4 - drop3FloorsNav)) : 0;
 
   // Ước tính thời gian hòa vốn (dựa trên biên độ trung bình 1.2% - 1.5%/phiên)
   const estDaysCurrent = Math.max(1, Math.ceil(Number(neededGainToBreakevenCurrent) / 1.3));

@@ -20,15 +20,15 @@ const COLORS = ['#10B981', '#06B6D4', '#8B5CF6', '#F59E0B', '#EC4899', '#3B82F6'
 export const PortfolioCharts: React.FC = () => {
   const { portfolio, positions } = useTradingStore();
 
-  const cash = portfolio?.cash !== undefined ? portfolio.cash : 171;
-  const receivingCash = portfolio?.receiving_cash || 0;
-  const marginDebt = portfolio?.margin_debt || 7002051;
-  const totalEquity = portfolio?.total_equity || 7448120;
-  const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0) || 14450000;
+  const cash = portfolio?.cash ?? 0;
+  const receivingCash = portfolio?.receiving_cash ?? 0;
+  const marginDebt = portfolio?.margin_debt ?? 0;
+  const totalEquity = portfolio?.total_equity ?? 0;
+  const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0);
 
   const totalCapital = totalEquity + marginDebt;
-  const navPct = totalCapital > 0 ? ((totalEquity / totalCapital) * 100).toFixed(1) : '51.38';
-  const debtPct = totalCapital > 0 ? ((marginDebt / totalCapital) * 100).toFixed(1) : '48.62';
+  const navPct = totalCapital > 0 ? ((totalEquity / totalCapital) * 100).toFixed(1) : '100.0';
+  const debtPct = totalCapital > 0 ? ((marginDebt / totalCapital) * 100).toFixed(1) : '0.0';
 
   // 1. Dữ liệu Cơ Cấu Vốn: Vốn Tự Có (NAV thực tế) vs Vốn Vay Margin DNSE
   const capitalStructureData = React.useMemo(() => {

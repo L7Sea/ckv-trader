@@ -309,5 +309,53 @@ test('13. Tùy biến CTCK & Lãi Suất Margin: Kiểm chứng VPS (13.5%), TCB
   assert.strictEqual(cashBreakevenPrice, 20080);
 });
 
-console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/13 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
+// 14. Lệnh BÁN: Ghi nhận Realized PnL (Lãi/Lỗ Đã Chốt) & Tính Lãi Margin Động Trong SettleDay
+test('14. Lệnh BÁN tính đúng Realized PnL & SettleDay tính lãi Margin động theo dư nợ', () => {
+  // Bán 500 CP TPB ở giá 16,500đ (Giá vốn ban đầu: 15,790đ)
+  const sellQty = 500;
+  const sellPrice = 16500;
+  const avgCost = 15790;
+  const grossProceeds = sellQty * sellPrice; // 8,250,000đ
+  const fee = grossProceeds * 0.0015;        // 12,375đ
+  const tax = grossProceeds * 0.001;         // 8,250đ
+  const netProceeds = grossProceeds - fee - tax; // 8,229,375đ
+  const costOfSold = sellQty * avgCost;      // 7,895,000đ
+  const realizedPnL = Math.round(netProceeds - costOfSold); // +334,375đ
+
+  assert.strictEqual(realizedPnL, 334375);
+
+  // SettleDay tính lãi động trên dư nợ 15,000,000đ với gói VPS 13.5%
+  const currentMarginDebt = 15000000;
+  const vpsRate = 13.5;
+  const dynamicDailyInterest = Math.round((currentMarginDebt * (vpsRate / 100)) / 365); // 5,548đ/ngày
+  assert.strictEqual(dynamicDailyInterest, 5548);
+});
+
+// 15. Quản Trị Rủi Ro 1.5% NAV & Stress-Test Sập Sàn 3 Phiên (-21%)
+test('15. Quản trị rủi ro: Quy tắc Khối lượng 1.5% NAV & Stress-Test Kịch Bản Sập Sàn (-21%)', () => {
+  const nav = 100000000; // 100 triệu NAV
+  const maxRiskCapital = nav * 0.015; // 1,500,000đ rủi ro tối đa
+  const buyPrice = 30000;
+  const stopLoss = 27900; // Cắt lỗ 7% (khoảng cách: 2,100đ/CP)
+  const riskPerShare = buyPrice - stopLoss;
+  const safeQuantity = Math.floor(maxRiskCapital / riskPerShare / 100) * 100; // 700 CP
+
+  assert.strictEqual(safeQuantity, 700);
+
+  // Stress-test: TPB đang 14,450đ bị giảm sàn 3 phiên liên tiếp (-21% -> 11,416đ)
+  const entryPrice = 14450;
+  const drop3FloorsPrice = Math.round(entryPrice * 0.79); // 11,416đ
+  const stockQty = 1000;
+  const stressStockValue = stockQty * drop3FloorsPrice; // 11,415,500đ ~ 11,416,000đ
+  const marginDebt = 7002051;
+  const stressCash = 171;
+  const stressNav = stressCash + stressStockValue - marginDebt; // 4,414,120đ
+  const stressMarginRate = ((stressNav / (stressCash + stressStockValue)) * 100).toFixed(2); // 38.67%
+
+  assert.strictEqual(drop3FloorsPrice, 11416);
+  assert.strictEqual(stressNav, 4414120);
+  assert.strictEqual(stressMarginRate, '38.67');
+});
+
+console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/15 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
 

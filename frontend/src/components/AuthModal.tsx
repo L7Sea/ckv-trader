@@ -174,7 +174,14 @@ export const AuthModal: React.FC = () => {
         <div className="pt-2 border-t border-slate-800 text-center">
           <button
             type="button"
-            onClick={loginAsAdmin}
+            onClick={() => {
+              const pin = prompt('Nhập mã PIN xác thực Chủ Nhân (VIP Master):');
+              if (pin === '542463' || pin === 'admin' || pin === '5424') {
+                loginAsAdmin();
+              } else if (pin !== null) {
+                alert('Mã PIN không chính xác! Không thể truy cập tài khoản Master của Chủ nhân.');
+              }
+            }}
             className="w-full py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-bold text-xs transition flex items-center justify-center gap-1.5"
           >
             <Sparkles className="h-3.5 w-3.5 text-amber-400" />

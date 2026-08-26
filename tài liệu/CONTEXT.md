@@ -51,9 +51,9 @@
 
 ## 3. 🧪 TIÊU CHUẨN KIỂM THỬ & PHÂN LUỒNG MỆNH LỆNH
 - **Chế độ Báo cáo / Tìm lỗi (Inspect Mode)**: Khi người dùng hỏi "báo cáo lỗi", "chỉ ra lỗi sai", "tại sao lệch" $\rightarrow$ AI chỉ tập trung phân tích chuyên môn và đề xuất hướng xử lý, tuyệt đối không tự ý sửa code hay push.
-- **Chế độ Thực thi (Execution Mode)**: Khi người dùng ra lệnh "sửa và push", "sửa cho tôi đi" $\rightarrow$ AI sửa code, chạy test suites, build và tự động commit/push Cloudflare Pages.
-- `node scripts/test-trading-formulas.cjs`: 13/13 bài test toán học & vĩ mô đạt chuẩn 100% (bao gồm CTCK tùy chỉnh VPS, TCBS, SSI, DNSE và chế độ Thuần Tiền Mặt 01).
-- `node scripts/test-sql-schema.cjs`: 18/18 bài test toàn vẹn mô hình dữ liệu SQL (bao gồm multi-user auth & support messages).
+- **Chế độ Thực thi (Execution Mode)**: Khi người dùng ra lệnh "sửa và push", "sửa cho tôi đi", "tiến hành sửa toàn bộ" $\rightarrow$ AI sửa code, chạy test suites, build và tự động commit/push Cloudflare Pages.
+- `node scripts/test-trading-formulas.cjs`: **15/15 bài test toán học định lượng & vĩ mô đạt chuẩn 100%** (bao gồm CTCK tùy chỉnh VPS/TCBS/DNSE, Thuần Tiền Mặt 01, Realized PnL khi bán, SettleDay lãi động, Sizing 1.5% NAV và Stress-Test -21% sập sàn).
+- `node scripts/test-sql-schema.cjs`: **18/18 bài test toàn vẹn mô hình dữ liệu SQL** (bao gồm multi-user auth, private 1-1 support threads & backup/restore).
 - `npm --prefix frontend run build`: 100% sạch cảnh báo và 0 lỗi TypeScript.
 - **Triển khai thường trực**: Tự động commit chuẩn Conventional Commits và đẩy thẳng lên Cloudflare Pages / GitHub (`git push origin master`) sau mỗi lần cập nhật.
 

@@ -81,6 +81,7 @@ export const AnalyticsReport: React.FC = () => {
         { 'Chỉ Tiêu': 'Tiền Mặt Khả Dụng', 'Giá Trị (VNĐ)': portfolio?.cash || 0 },
         { 'Chỉ Tiêu': 'Tiền Chờ Về (T+2.5)', 'Giá Trị (VNĐ)': portfolio?.receiving_cash || 0 },
         { 'Chỉ Tiêu': 'Tổng Giá Trị Cổ Phiếu', 'Giá Trị (VNĐ)': positions.reduce((s, p) => s + p.market_value, 0) },
+        { 'Chỉ Tiêu': 'Tổng Nợ Vay Margin', 'Giá Trị (VNĐ)': portfolio?.margin_debt || 0 },
         { 'Chỉ Tiêu': 'Tổng Tài Sản Ròng (NAV)', 'Giá Trị (VNĐ)': portfolio?.total_equity || 0 },
         { 'Chỉ Tiêu': 'Tổng Lãi/Lỗ Đã Chốt', 'Giá Trị (VNĐ)': portfolio?.total_profit_loss || 0 },
         { 'Chỉ Tiêu': 'Tổng Phí GD Đã Trả', 'Giá Trị (VNĐ)': totalFeesPaid },
@@ -91,7 +92,7 @@ export const AnalyticsReport: React.FC = () => {
 
       const fileName = `Bao_Cao_CKV_${new Date().toISOString().slice(0, 10)}.xlsx`;
       XLSX.writeFile(wb, fileName);
-      alert(`Đã xuất báo cáo thành công file: ${fileName}`);
+      alert(`Đã xuất báo cáo kiểm toán thành công file: ${fileName}`);
     } catch (err: any) {
       alert('Lỗi xuất Excel: ' + err.message);
     }

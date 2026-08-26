@@ -349,7 +349,11 @@ export const localTradingEngine = {
       }
 
       const netProceeds = grossAmount - fee - tax;
+      const costOfSoldShares = quantity * (existingPos.avg_price || 0);
+      const realizedPnL = Math.round(netProceeds - costOfSoldShares);
+
       portfolio.receiving_cash += netProceeds;
+      portfolio.total_profit_loss = (portfolio.total_profit_loss || 0) + realizedPnL;
 
       existingPos.available_quantity -= quantity;
       existingPos.total_quantity -= quantity;
@@ -361,8 +365,7 @@ export const localTradingEngine = {
     }
 
     const stockValuation = positions.reduce((sum, p) => sum + p.market_value, 0);
-    const totalProfit = positions.reduce((sum, p) => sum + p.unrealized_pnl, 0);
-    portfolio.total_profit_loss = totalProfit;
+    const totalUnrealizedProfit = positions.reduce((sum, p) => sum + p.unrealized_pnl, 0);
     portfolio.total_equity = portfolio.cash + portfolio.receiving_cash + stockValuation - portfolio.margin_debt;
     portfolio.updated_at = new Date().toISOString();
 
@@ -377,6 +380,7 @@ export const localTradingEngine = {
       tax,
       total_amount: grossAmount,
       net_amount: type === 'BUY' ? grossAmount + fee : grossAmount - fee - tax,
+      realized_pnl: type === 'SELL' ? Math.round((grossAmount - fee - tax) - (quantity * (existingPos?.avg_price || 0))) : undefined,
       strategy,
       target_price,
       stop_loss,
@@ -390,7 +394,19 @@ export const localTradingEngine = {
     this.savePositions(finalPositions);
     this.saveTransactions([transaction, ...transactions]);
 
-    const activePos = existingPos || finalPositions[0];
+    const activePos = existingPos || finalPositions[0] || {
+      symbol,
+      total_quantity: 0,
+      available_quantity: 0,
+      t1_quantity: 0,
+      t2_quantity: 0,
+      avg_price: price,
+      market_price: price,
+      market_value: 0,
+      unrealized_pnl: 0,
+      unrealized_pnl_pct: 0,
+      updated_at: new Date().toISOString()
+    };
     return { transaction, position: activePos, portfolio };
   },
 
@@ -410,15 +426,13 @@ export const localTradingEngine = {
 
     const portfolio = this.getPortfolio();
     const stockValuation = positions.reduce((sum, p) => sum + p.market_value, 0);
-    const totalProfit = positions.reduce((sum, p) => sum + p.unrealized_pnl, 0);
-    portfolio.total_profit_loss = totalProfit;
     portfolio.total_equity = portfolio.cash + portfolio.receiving_cash + stockValuation - portfolio.margin_debt;
     this.savePortfolio(portfolio);
 
     return pos;
   },
 
-  settleDay(): string {
+  settleDay(customMarginRate = 11.5): string {
     const positions = this.getPositions();
     const portfolio = this.getPortfolio();
 
@@ -437,38 +451,46 @@ export const localTradingEngine = {
     portfolio.cash += cashReceived;
     portfolio.receiving_cash = 0;
 
-    // Tính lãi vay Margin lũy kế theo ngày thực tế DNSE Deal (11.5%/năm ~ 2,173đ/ngày)
+    // Tính lãi vay Margin lũy kế theo ngày thực tế dựa trên số dư nợ hiện hành
     let marginInterestToday = 0;
     if (portfolio.margin_debt > 0) {
-      marginInterestToday = Math.round((6898107 * 0.115) / 365); // Đúng 2,173đ/ngày
+      marginInterestToday = Math.round((portfolio.margin_debt * (customMarginRate / 100)) / 365);
       portfolio.margin_debt += marginInterestToday;
       
-      // Cập nhật giá hòa vốn tương ứng cho vị thế nắm giữ
-      const tpbPos = positions.find((p) => p.symbol === 'TPB');
-      if (tpbPos && tpbPos.total_quantity > 0) {
-        tpbPos.avg_price = Math.round(tpbPos.avg_price + marginInterestToday / tpbPos.total_quantity);
-        tpbPos.unrealized_pnl = tpbPos.market_value - (14450000 + 1468116 + marginInterestToday);
-        tpbPos.unrealized_pnl_pct = (tpbPos.unrealized_pnl / (tpbPos.total_quantity * tpbPos.avg_price)) * 100;
-        tpbPos.updated_at = new Date().toISOString();
+      // Phân bổ chi phí lãi vay vào giá hòa vốn các vị thế
+      const totalMarginPositions = positions.filter((p) => p.total_quantity > 0);
+      if (totalMarginPositions.length > 0) {
+        const interestPerPos = Math.round(marginInterestToday / totalMarginPositions.length);
+        totalMarginPositions.forEach((pos) => {
+          if (pos.breakeven_price && pos.total_quantity > 0) {
+            pos.breakeven_price = Math.round(pos.breakeven_price + interestPerPos / pos.total_quantity);
+            pos.updated_at = new Date().toISOString();
+          }
+        });
       }
     }
 
+    // Tăng ngày mô phỏng thêm 1 ngày giao dịch
+    try {
+      const curDate = new Date(portfolio.current_simulated_date || new Date());
+      curDate.setDate(curDate.getDate() + 1);
+      portfolio.current_simulated_date = curDate.toISOString().slice(0, 10);
+    } catch {}
+
     const stockValuation = positions.reduce((sum, p) => sum + p.market_value, 0);
-    const totalProfit = positions.reduce((sum, p) => sum + p.unrealized_pnl, 0);
-    portfolio.total_profit_loss = totalProfit;
     portfolio.total_equity = portfolio.cash + portfolio.receiving_cash + stockValuation - portfolio.margin_debt;
     portfolio.updated_at = new Date().toISOString();
 
     this.savePositions(positions);
     this.savePortfolio(portfolio);
 
-    return `Đã chốt ngày T+2.5 thành công! +${cashReceived.toLocaleString()}đ tiền mặt, +${movedShares.toLocaleString()} CP khả dụng. ${marginInterestToday > 0 ? `(Lãi vay Margin phát sinh: +${marginInterestToday.toLocaleString()}đ/ngày)` : ''}`;
+    return `Đã chốt ngày T+2.5 thành công! +${cashReceived.toLocaleString()}đ tiền mặt, +${movedShares.toLocaleString()} CP khả dụng. ${marginInterestToday > 0 ? `(Lãi vay phát sinh: +${marginInterestToday.toLocaleString()}đ/ngày)` : ''}`;
   },
 
   adjustCash(amount: number, action: 'DEPOSIT' | 'WITHDRAW'): Portfolio {
     const portfolio = this.getPortfolio();
     if (action === 'WITHDRAW' && portfolio.cash < amount) {
-      throw new Error(`Số dư tiền mặt không đủ để rút ${amount.toLocaleString()}đ!`);
+      throw new Error(`Số dư tiền mặt không đủ để rút ${amount.toLocaleString()}đ (Hiện có: ${portfolio.cash.toLocaleString()}đ)!`);
     }
 
     if (action === 'DEPOSIT') {
@@ -488,11 +510,14 @@ export const localTradingEngine = {
 
   repayMarginDebt(amount: number): Portfolio {
     const portfolio = this.getPortfolio();
+    if (portfolio.cash < amount) {
+      throw new Error(`Tiền mặt khả dụng (${portfolio.cash.toLocaleString()}đ) không đủ để trả ${amount.toLocaleString()}đ nợ Deal!`);
+    }
+
     const actualRepay = Math.min(portfolio.margin_debt, amount);
     portfolio.margin_debt = Math.max(0, portfolio.margin_debt - actualRepay);
-    if (portfolio.cash >= actualRepay) {
-      portfolio.cash -= actualRepay;
-    }
+    portfolio.cash = Math.max(0, portfolio.cash - actualRepay);
+
     const positions = this.getPositions();
     const stockValuation = positions.reduce((sum, p) => sum + p.market_value, 0);
     portfolio.total_equity = portfolio.cash + portfolio.receiving_cash + stockValuation - portfolio.margin_debt;
@@ -507,8 +532,6 @@ export const localTradingEngine = {
     portfolio.cash = Math.max(0, cash);
     portfolio.margin_debt = Math.max(0, marginDebt);
     const stockValuation = positions.reduce((sum, p) => sum + p.market_value, 0);
-    const totalProfit = positions.reduce((sum, p) => sum + p.unrealized_pnl, 0);
-    portfolio.total_profit_loss = totalProfit;
     portfolio.total_equity = portfolio.cash + portfolio.receiving_cash + stockValuation - portfolio.margin_debt;
     portfolio.updated_at = new Date().toISOString();
     this.savePortfolio(portfolio);
@@ -516,5 +539,29 @@ export const localTradingEngine = {
       this.savePositions(positions);
     }
     return { portfolio, positions };
+  },
+
+  exportDataAsJson(): string {
+    const data = {
+      portfolio: this.getPortfolio(),
+      positions: this.getPositions(),
+      transactions: this.getTransactions(),
+      exportedAt: new Date().toISOString(),
+      version: CURRENT_DATA_VERSION
+    };
+    return JSON.stringify(data, null, 2);
+  },
+
+  importDataFromJson(jsonStr: string): boolean {
+    try {
+      const data = JSON.parse(jsonStr);
+      if (data.portfolio && Array.isArray(data.positions) && Array.isArray(data.transactions)) {
+        this.savePortfolio(data.portfolio);
+        this.savePositions(data.positions);
+        this.saveTransactions(data.transactions);
+        return true;
+      }
+    } catch {}
+    return false;
   }
 };

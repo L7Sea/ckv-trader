@@ -7,6 +7,7 @@ export interface SupportMessage {
   isFromAdmin: boolean;
   isRead: boolean;
   timestamp: string;
+  recipientId?: string;
   replyToId?: string;
 }
 
@@ -44,7 +45,8 @@ export const supportService = {
 
   getMessagesForUser(userId: string): SupportMessage[] {
     const all = this.getMessages();
-    return all.filter((m) => m.userId === userId || m.userId === 'user-vip');
+    if (userId === 'user-vip') return all;
+    return all.filter((m) => m.userId === userId || m.recipientId === userId || (m.userId === 'user-vip' && !m.recipientId));
   },
 
   getUnreadCountForAdmin(): number {
@@ -54,10 +56,18 @@ export const supportService = {
 
   getUnreadCountForUser(userId: string): number {
     const all = this.getMessages();
-    return all.filter((m) => m.userId === userId && m.isFromAdmin && !m.isRead).length;
+    return all.filter((m) => (m.recipientId === userId || m.userId === userId) && m.isFromAdmin && !m.isRead).length;
   },
 
-  sendMessage(userId: string, userName: string, userEmail: string, text: string, isFromAdmin = false, replyToId?: string): SupportMessage {
+  sendMessage(
+    userId: string,
+    userName: string,
+    userEmail: string,
+    text: string,
+    isFromAdmin = false,
+    recipientId?: string,
+    replyToId?: string
+  ): SupportMessage {
     const all = this.getMessages();
     const newMsg: SupportMessage = {
       id: 'msg_' + Date.now(),
@@ -68,6 +78,7 @@ export const supportService = {
       isFromAdmin,
       isRead: isFromAdmin,
       timestamp: new Date().toISOString(),
+      recipientId,
       replyToId
     };
 
@@ -83,7 +94,7 @@ export const supportService = {
       if (byAdmin && !m.isFromAdmin && !m.isRead) {
         m.isRead = true;
         updated = true;
-      } else if (!byAdmin && m.userId === userId && m.isFromAdmin && !m.isRead) {
+      } else if (!byAdmin && (m.recipientId === userId || m.userId === userId) && m.isFromAdmin && !m.isRead) {
         m.isRead = true;
         updated = true;
       }

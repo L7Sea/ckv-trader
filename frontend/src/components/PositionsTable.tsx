@@ -46,7 +46,7 @@ export const PositionsTable: React.FC = () => {
             <tbody className="divide-y divide-slate-800/60">
               {positions.map((pos) => {
                 const isProfit = (pos.unrealized_pnl || 0) >= 0;
-                const breakevenVal = pos.breakeven_price || 15920;
+                const breakevenVal = pos.breakeven_price ?? Math.round((pos.avg_price || pos.market_price) * 1.0025);
                 return (
                   <tr key={pos.symbol} className="hover:bg-slate-800/40 transition group">
                     {/* Mã CP */}
@@ -78,7 +78,7 @@ export const PositionsTable: React.FC = () => {
 
                     {/* Giá vốn mua ban đầu */}
                     <td className="py-3.5 px-2 text-right font-semibold text-slate-300">
-                      {formatNumber(pos.avg_price || 15790)}
+                      {formatNumber(pos.avg_price || pos.market_price)}
                     </td>
 
                     {/* Giá hòa vốn Deal (bao gồm lãi vay Margin và phí thuế) */}

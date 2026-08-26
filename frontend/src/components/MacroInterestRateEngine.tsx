@@ -52,7 +52,7 @@ export default function MacroInterestRateEngine() {
 
   // Sample stocks for Macro Valuation Matrix
   const sampleStocks = [
-    { symbol: 'TPB', pe: 6.8, pb: 1.1, roe: 17.5, price: 18500, eps: 2720, consensusScore: 94 },
+    { symbol: 'TPB', pe: 5.3, pb: 0.95, roe: 17.5, price: 14450, eps: 2720, consensusScore: 95 },
     { symbol: 'ACB', pe: 6.4, pb: 1.2, roe: 21.0, price: 24800, eps: 3875, consensusScore: 92 },
     { symbol: 'MBB', pe: 5.9, pb: 1.15, roe: 22.5, price: 23500, eps: 3980, consensusScore: 95 },
     { symbol: 'HPG', pe: 11.2, pb: 1.45, roe: 14.8, price: 29200, eps: 2607, consensusScore: 89 },
@@ -63,12 +63,12 @@ export default function MacroInterestRateEngine() {
   // Custom calculator state
   const [calcStock, setCalcStock] = useState({
     symbol: 'TPB',
-    pe: 6.8,
-    pb: 1.1,
+    pe: 5.3,
+    pb: 0.95,
     roe: 17.5,
-    price: 18500,
+    price: 14450,
     eps: 2720,
-    consensusScore: 94,
+    consensusScore: 95,
   });
 
   const customValuation = useMemo(() => {

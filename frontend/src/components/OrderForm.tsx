@@ -248,22 +248,29 @@ export const OrderForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Khối Lượng (Lô 100) */}
+        {/* Khối Lượng (Lô 100) & Quản Trị Rủi Ro 1.5% NAV */}
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-slate-400">
-            <span className="font-semibold">Khối lượng (Lô 100):</span>
+            <span className="font-semibold flex items-center gap-1.5">
+              <span>Khối lượng (Lô 100):</span>
+              {quantity % 100 !== 0 && (
+                <span className="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/30">
+                  Lô lẻ
+                </span>
+              )}
+            </span>
             <span className="font-mono text-emerald-400">{formatNumber(quantity)} CP</span>
           </div>
           <input
             type="number"
             step="100"
-            min="100"
+            min="1"
             value={quantity || ''}
             onChange={(e) => setQuantity(Number(e.target.value))}
             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-emerald-500"
           />
-          {/* Quick Quantity Shortcuts */}
-          <div className="grid grid-cols-4 gap-1 pt-1">
+          {/* Quick Quantity Shortcuts & 1.5% Risk Rule */}
+          <div className="grid grid-cols-5 gap-1 pt-1">
             {[100, 500, 1000, 2000].map((q) => (
               <button
                 key={q}
@@ -274,6 +281,19 @@ export const OrderForm: React.FC = () => {
                 +{formatNumber(q)}
               </button>
             ))}
+            <button
+              type="button"
+              onClick={() => {
+                const nav = portfolio?.total_equity || 7448120;
+                const riskDist = price > stopLoss && stopLoss > 0 ? price - stopLoss : price * 0.07;
+                const safeQty = Math.max(100, Math.floor((nav * 0.015) / riskDist / 100) * 100);
+                setQuantity(safeQty);
+              }}
+              title="Tính khối lượng theo quy tắc quản trị rủi ro tối đa 1.5% NAV của Trader 50 năm"
+              className="py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-[10px] font-mono text-indigo-300 hover:bg-indigo-500/20 font-bold"
+            >
+              🎯 1.5% NAV
+            </button>
           </div>
         </div>
 
