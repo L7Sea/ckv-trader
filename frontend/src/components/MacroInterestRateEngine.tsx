@@ -410,8 +410,9 @@ export default function MacroInterestRateEngine() {
                     <input
                       type="number"
                       step="50000000"
-                      value={simAmount}
-                      onChange={(e) => setSimAmount(Number(e.target.value))}
+                      min="0"
+                      value={simAmount || ''}
+                      onChange={(e) => setSimAmount(Math.max(0, Number(e.target.value) || 0))}
                       className="w-full bg-[#121824] border border-[#26334d] rounded-lg px-3 py-2 text-white font-mono font-bold text-sm focus:outline-none focus:border-cyan-500"
                     />
                     <div className="flex flex-wrap gap-1.5 mt-2">

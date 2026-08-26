@@ -126,7 +126,16 @@ export default function Capy() {
   }, []);
 
   useEffect(() => {
-    const f = () => setCo(tinhCo());
+    const f = () => {
+      setCo(tinhCo());
+      if (typeof window !== 'undefined') {
+        const maxW = Math.max(10, window.innerWidth - 120);
+        const maxH = Math.max(10, window.innerHeight - 120);
+        v.current.x = Math.min(Math.max(10, v.current.x), maxW);
+        v.current.y = Math.min(Math.max(10, v.current.y), maxH);
+        setViTri({ x: v.current.x, y: v.current.y });
+      }
+    };
     window.addEventListener('resize', f);
     return () => window.removeEventListener('resize', f);
   }, []);

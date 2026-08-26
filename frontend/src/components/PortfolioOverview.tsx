@@ -99,9 +99,28 @@ export const PortfolioOverview: React.FC = () => {
                 </span>
               </div>
 
-              <div className="px-3 py-2 rounded-2xl bg-slate-950/80 border border-slate-800 text-slate-300 text-xs font-mono">
-                Tỷ lệ tự có: <b className="text-emerald-400">{equityRatio}%</b> (An toàn)
-              </div>
+              {(() => {
+                const ratioNum = parseFloat(equityRatio);
+                const isCallMargin = !isCashAccount && marginDebt > 0 && ratioNum < 35;
+                const isForceSell = !isCashAccount && marginDebt > 0 && ratioNum < 30;
+                return (
+                  <div className={`px-3 py-2 rounded-2xl border text-xs font-mono flex items-center gap-1.5 ${
+                    isForceSell
+                      ? 'bg-rose-950/80 border-rose-500/50 text-rose-300 animate-pulse'
+                      : isCallMargin
+                      ? 'bg-amber-950/80 border-amber-500/50 text-amber-300'
+                      : 'bg-slate-950/80 border-slate-800 text-slate-300'
+                  }`}>
+                    <span>Tỷ lệ tự có:</span>
+                    <b className={isForceSell ? 'text-rose-400' : isCallMargin ? 'text-amber-400' : 'text-emerald-400'}>
+                      {equityRatio}%
+                    </b>
+                    <span className="text-[11px] font-sans">
+                      {isForceSell ? '(⚠️ Force Sell)' : isCallMargin ? '(⚠️ Call Margin)' : '(An toàn)'}
+                    </span>
+                  </div>
+                );
+              })()}
             </div>
           </div>
 

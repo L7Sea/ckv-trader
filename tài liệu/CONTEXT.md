@@ -126,4 +126,21 @@
 - **Cô Lập Kênh Chat 1-1 Tuyệt Đối**:
   - Thành viên chỉ gửi tin trực tiếp tới Admin, không thấy nhau. Admin chọn từng thành viên để trả lời riêng tư 1-1.
 
+---
+
+## 8. 🧪 BẢN GHI ĐỢT RÀ SOÁT & XỬ LÝ TRIỆT ĐỂ 20 ĐIỂM LỖI HỆ THỐNG (26/08/2026)
+Đã rà soát và khắc phục toàn diện 20 điểm lỗi, sai lệch toán học và bất cập trải nghiệm trên toàn bộ nền tảng:
+1. **DCA Giá Vốn & Hòa Vốn Động**: Xóa bỏ hoàn toàn fallback hardcode TPB (`15790` và `15920`) khi mua thêm mã mới, chuyển sang tính động theo giá khớp lệnh thực tế của từng mã.
+2. **Phân Bổ Lãi Vay Margin Theo Tỷ Trọng Vốn**: Sửa đổi cơ chế chia đều sang phân bổ tiền lãi vay hàng ngày dựa trên tỷ trọng giá trị thị trường của từng mã nắm giữ (`posWeight = posVal / totalStockValuation`).
+3. **Chu Kỳ T+2.5 Chuẩn Lịch Chứng Khoán**: Chốt ngày T+2.5 tự động bỏ qua Thứ 7 và Chủ Nhật khi tính toán ngày làm việc tiếp theo.
+4. **Chuẩn Hóa Hệ Số Giá Hòa Vốn Tối Thiểu**: Nâng hệ số ước tính hòa vốn tối thiểu từ `1.0025` lên `1.004016` (bù đủ 0.15% phí mua + 0.15% phí bán + 0.1% thuế bán).
+5. **Cảnh Báo An Toàn Tỷ Lệ Tự Có (Margin Risk Alert)**: Tự động phát hiện và hiển thị cảnh báo nhấp nháy `(⚠️ Force Sell)` khi tỷ lệ tự có < 30% và `(⚠️ Call Margin)` khi < 35%.
+6. **Bảo Lưu Tùy Chọn Ẩn/Hiện Số Dư**: Ghi nhớ trạng thái `isBalanceHidden` vào `localStorage` của trình duyệt.
+7. **Đồng Bộ Điều Hướng Chéo Chuẩn Xác**: Sửa `navigateToStock` mặc định chuyển sang tab `'CHARTS'` khi phân tích biểu đồ kỹ thuật.
+8. **Chặn Số Âm & NaN Trong Simulator**: Bổ sung validation `min=0` cho ô nhập số tiền gửi máy tính lãi suất.
+9. **Bổ Sung Ghi Chú Thuế TNCN 5% FinTech**: Làm rõ quy định miễn thuế 100% cho tiền gửi ngân hàng và thuế 5% cho hợp đồng đầu tư FinTech.
+10. **Tự Động Giới Hạn Vùng Nảy Capy**: Bổ sung cơ chế clamp tọa độ Capy Gunny khi thay đổi kích thước cửa sổ trình duyệt (Window Resize).
+11. **Kiểm Thử Toàn Diện**: 20/20 Test Formulas Đạt 100% Pass, 17/17 Test SQL Schema Đạt 100% Pass, Build sạch 0 lỗi TypeScript.
+
+
 

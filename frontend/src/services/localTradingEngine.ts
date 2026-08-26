@@ -325,12 +325,13 @@ export const localTradingEngine = {
       } else {
         const oldTotal = existingPos.total_quantity;
         const newTotal = oldTotal + quantity;
-        const oldCost = oldTotal * (existingPos.avg_price || 15790);
+        const oldCost = oldTotal * (existingPos.avg_price || price);
         const newCost = oldCost + grossAmount + fee;
         const newAvg = newCost / newTotal;
 
-        // Tính lại giá hòa vốn Deal mới sau khi mua thêm (DCA)
-        const oldBreakevenCost = oldTotal * (existingPos.breakeven_price || 15920);
+        // Tính lại giá hòa vốn Deal mới sau khi mua thêm (DCA) - Không hardcode mã TPB
+        const defaultBreakeven = Math.round((existingPos.avg_price || price) * 1.004016);
+        const oldBreakevenCost = oldTotal * (existingPos.breakeven_price || defaultBreakeven);
         const newBreakevenCost = oldBreakevenCost + grossAmount + fee;
         const newBreakevenPrice = Math.round(newBreakevenCost / newTotal);
 
@@ -462,23 +463,31 @@ export const localTradingEngine = {
       marginInterestToday = Math.round((portfolio.margin_debt * (customMarginRate / 100)) / 365);
       portfolio.margin_debt += marginInterestToday;
       
-      // Phân bổ chi phí lãi vay vào giá hòa vốn các vị thế
+      // Phân bổ chi phí lãi vay vào giá hòa vốn theo TỶ TRỌNG VỐN (thay vì chia đều)
       const totalMarginPositions = positions.filter((p) => p.total_quantity > 0);
-      if (totalMarginPositions.length > 0) {
-        const interestPerPos = Math.round(marginInterestToday / totalMarginPositions.length);
+      const totalStockValuation = totalMarginPositions.reduce((sum, p) => sum + (p.market_value || p.total_quantity * p.avg_price), 0);
+      
+      if (totalMarginPositions.length > 0 && totalStockValuation > 0) {
         totalMarginPositions.forEach((pos) => {
-          if (pos.breakeven_price && pos.total_quantity > 0) {
-            pos.breakeven_price = Math.round(pos.breakeven_price + interestPerPos / pos.total_quantity);
+          const posVal = pos.market_value || (pos.total_quantity * pos.avg_price);
+          const posWeight = posVal / totalStockValuation;
+          const interestForPos = Math.round(marginInterestToday * posWeight);
+          if (pos.total_quantity > 0) {
+            const currentBreakeven = pos.breakeven_price || Math.round(pos.avg_price * 1.004016);
+            pos.breakeven_price = Math.round(currentBreakeven + (interestForPos / pos.total_quantity));
             pos.updated_at = new Date().toISOString();
           }
         });
       }
     }
 
-    // Tăng ngày mô phỏng thêm 1 ngày giao dịch
+    // Tăng ngày mô phỏng thêm 1 ngày giao dịch (bỏ qua Thứ 7 & Chủ Nhật)
     try {
       const curDate = new Date(portfolio.current_simulated_date || new Date());
       curDate.setDate(curDate.getDate() + 1);
+      while (curDate.getDay() === 0 || curDate.getDay() === 6) {
+        curDate.setDate(curDate.getDate() + 1);
+      }
       portfolio.current_simulated_date = curDate.toISOString().slice(0, 10);
     } catch {}
 

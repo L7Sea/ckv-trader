@@ -66,13 +66,13 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   watchlist: marketDataService.getWatchlist(),
   isLoading: false,
   isLiveSyncing: false,
-  isBalanceHidden: false,
+  isBalanceHidden: typeof window !== 'undefined' ? localStorage.getItem('ckv_balance_hidden') === 'true' : false,
   error: null,
   successMessage: null,
 
   activeTab: 'TRADE',
   setActiveTab: (tab: TabType) => set({ activeTab: tab }),
-  navigateToStock: (symbol: string, targetTab: TabType = 'MARKET', action: 'BUY' | 'SELL' = 'BUY', targetPrice?: number) => {
+  navigateToStock: (symbol: string, targetTab: TabType = 'CHARTS', action: 'BUY' | 'SELL' = 'BUY', targetPrice?: number) => {
     const s = get().watchlist.find((w) => w.symbol === symbol) || marketDataService.generateCompleteInfo(symbol);
     const price = targetPrice || s.price;
     set({
@@ -94,7 +94,13 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   priceModalCurrentPrice: 0,
 
   toggleBalanceVisibility: () => {
-    set((state) => ({ isBalanceHidden: !state.isBalanceHidden }));
+    set((state) => {
+      const next = !state.isBalanceHidden;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ckv_balance_hidden', String(next));
+      }
+      return { isBalanceHidden: next };
+    });
   },
 
   fetchData: async () => {
