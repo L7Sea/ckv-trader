@@ -199,10 +199,7 @@ export const AppContent: React.FC = () => {
         {activeTab === 'ANALYTICS' && <PerformanceAnalyticsPage />}
       </main>
 
-      {/* Floating Mascot Capy */}
-      <Capy />
-
-      {/* Floating Mascot Capy */}
+      {/* Floating Mascot Capy (Duy nhất 1 trợ lý) */}
       <Capy />
 
       {/* Mobile Bottom Navigation (Chuẩn Mobile Native 5 Nút & Bottom Sheet Khám Phá Đầy Đủ 8 Trang) */}
