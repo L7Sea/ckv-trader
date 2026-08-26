@@ -55,6 +55,7 @@ interface AuthState {
   openShareModal: () => void;
   closeShareModal: () => void;
   openOnboarding: () => void;
+  closeOnboarding: () => void;
   openHelpCenter: () => void;
   closeHelpCenter: () => void;
 }

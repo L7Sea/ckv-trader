@@ -281,12 +281,12 @@ test('12. Giải ngân Margin Deal: Kiểm chứng mua bằng Vốn tự có, Va
 
 // 13. Tùy Biến CTCK & Lãi Suất Margin (VPS 13.5%, TCBS 10.5%, SSI 12%) vs Giao Dịch Thuần Tiền Mặt (TK 01)
 test('13. Tùy biến CTCK & Lãi Suất Margin: Kiểm chứng VPS (13.5%), TCBS (10.5%), DNSE (11.5%) & Chế độ Thuần Tiền Mặt (0% Lãi)', () => {
-  const marginDebt = 7002051;
+  const marginPrincipal = 6898107; // Gốc vay Deal thực tế 6.898tr
 
   // Lãi vay 1 ngày theo từng CTCK:
-  const dnseDailyInterest = Math.round(marginDebt * 0.115 / 365); // DNSE 11.5% -> 2,173đ/ngày
-  const vpsDailyInterest = Math.round(marginDebt * 0.135 / 365);  // VPS 13.5%  -> 2,551đ/ngày
-  const tcbsDailyInterest = Math.round(marginDebt * 0.105 / 365); // TCBS 10.5% -> 1,984đ/ngày
+  const dnseDailyInterest = Math.round(marginPrincipal * 0.115 / 365); // DNSE 11.5% -> 2,173đ/ngày
+  const vpsDailyInterest = Math.round(marginPrincipal * 0.135 / 365);  // VPS 13.5%  -> 2,551đ/ngày
+  const tcbsDailyInterest = Math.round(marginPrincipal * 0.105 / 365); // TCBS 10.5% -> 1,984đ/ngày
 
   assert.strictEqual(dnseDailyInterest, 2173);
   assert.strictEqual(vpsDailyInterest, 2551);
