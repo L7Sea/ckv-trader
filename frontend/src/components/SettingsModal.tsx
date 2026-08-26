@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Settings, Image, Sparkles, Lock, X, Upload, Trash2, Sliders, Check } from 'lucide-react';
-import { useBackground } from '../lib/backgroundContext';
+import { useBackground, PRESET_WALLPAPERS } from '../lib/backgroundContext';
 import { getGreetingStyle, setGreetingStyle, GreetingStyle } from '../lib/greeting';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -10,7 +10,7 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const { bgUrl, dim, uploadBg, removeBg, setDim } = useBackground();
+  const { bgUrl, dim, activePresetId, uploadBg, setPresetBg, removeBg, setDim } = useBackground();
   const { user } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -90,6 +90,31 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             <span>Ảnh Nền Tùy Biến (Custom Background)</span>
           </label>
 
+          {/* Preset Wallpaper Buttons */}
+          <div className="space-y-1.5">
+            <span className="text-[11px] text-slate-400 font-semibold block">Chọn nhanh hình nền 4K chuẩn Trader:</span>
+            <div className="grid grid-cols-3 gap-1.5">
+              {PRESET_WALLPAPERS.map((preset) => (
+                <button
+                  key={preset.id}
+                  onClick={() => {
+                    setPresetBg(preset);
+                    setSaveSuccess(true);
+                    setTimeout(() => setSaveSuccess(false), 2000);
+                  }}
+                  className={`p-2 rounded-xl border text-[11px] font-bold text-slate-200 transition text-center truncate ${
+                    activePresetId === preset.id
+                      ? 'bg-indigo-600/30 border-indigo-500 text-indigo-300 shadow-md'
+                      : 'bg-slate-950/80 border-slate-800 hover:border-slate-700'
+                  }`}
+                  title={preset.name}
+                >
+                  {preset.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <input
             type="file"
             ref={fileInputRef}
@@ -98,20 +123,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             className="hidden"
           />
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pt-1">
             <button
               onClick={() => fileInputRef.current?.click()}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition active:scale-95"
             >
               <Upload className="h-4 w-4" />
-              <span>{bgUrl ? 'Thay ảnh nền khác' : 'Tải ảnh nền lên'}</span>
+              <span>{bgUrl ? 'Tải ảnh từ máy' : 'Tải ảnh nền riêng'}</span>
             </button>
 
             {bgUrl && (
               <button
                 onClick={removeBg}
                 className="p-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition"
-                title="Xóa ảnh nền"
+                title="Xóa ảnh nền (Về mặc định)"
               >
                 <Trash2 className="h-4 w-4" />
               </button>

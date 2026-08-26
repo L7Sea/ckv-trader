@@ -140,12 +140,20 @@ export default function Capy() {
     let xTruoc = v.current.x;
 
     const chonDichNgauNhien = () => {
-      const pad = 24;
+      const pad = 16;
+      const isMobile = window.innerWidth < 640;
       const maxX = Math.max(10, window.innerWidth - co - pad);
-      const maxY = Math.max(10, window.innerHeight - co - pad);
+      const maxY = Math.max(10, window.innerHeight - co - (isMobile ? 80 : pad));
+      
+      // Trên điện thoại, không để Capy bơi vào vùng y 80-360px (Vùng Master Card)
+      let targetY = pad + Math.random() * (maxY - pad);
+      if (isMobile && targetY > 70 && targetY < 370) {
+        targetY = Math.random() > 0.5 ? Math.min(60, targetY) : Math.max(380, targetY);
+      }
+
       return {
         x: pad + Math.random() * (maxX - pad),
-        y: pad + Math.random() * (maxY - pad),
+        y: Math.min(maxY, targetY),
       };
     };
 

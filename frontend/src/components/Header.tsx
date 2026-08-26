@@ -138,33 +138,33 @@ export const Header: React.FC = () => {
             <button
               onClick={syncLiveMarketData}
               disabled={isLiveSyncing}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 hover:from-emerald-500/30 hover:to-cyan-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition active:scale-95 disabled:opacity-50 shadow-md shadow-emerald-500/10"
-              title="Đồng bộ toàn diện: 300 mã giá thực + Lãi suất 20 Ngân hàng & FinTech + Tài sản NAV (7.448tr) & Nợ Margin (7.002tr)"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 hover:from-emerald-500/30 hover:to-cyan-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition active:scale-95 disabled:opacity-50 shadow-md shadow-emerald-500/10 shrink-0"
+              title="Đồng bộ toàn diện: 300 mã giá thực + Lãi suất 20 Ngân hàng & FinTech + Tài sản NAV"
             >
-              <RefreshCw className={`h-3.5 w-3.5 text-emerald-400 ${isLiveSyncing ? 'animate-spin' : ''}`} />
-              <span className="font-sans">{isLiveSyncing ? 'Đang đồng bộ...' : 'Đồng Bộ Toàn Diện'}</span>
+              <RefreshCw className={`h-4 w-4 text-emerald-400 shrink-0 ${isLiveSyncing ? 'animate-spin' : ''}`} />
+              <span className="font-sans hidden xs:inline sm:inline">{isLiveSyncing ? 'Đang đồng bộ...' : 'Đồng Bộ'}</span>
             </button>
 
             {/* Nút Cẩm Nang & Hướng Dẫn (Help Center) */}
             <button
               onClick={openHelpCenter}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition active:scale-95 shadow-sm"
+              className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition active:scale-95 shadow-sm shrink-0"
               title="Mở Cẩm Nang & Hướng Dẫn Sử Dụng (Chọn CTCK, Lãi suất, Mã lạ, Giao dịch tiền mặt)"
             >
-              <HelpCircle className="h-3.5 w-3.5 text-emerald-400" />
-              <span className="hidden sm:inline">Cẩm Nang</span>
+              <HelpCircle className="h-4 w-4 text-emerald-400" />
+              <span className="hidden md:inline">Cẩm Nang</span>
             </button>
 
             {/* Nút Nhắn Tin Cho Admin / Khách Hàng (Support Chat) */}
             <button
               onClick={openSupportChat}
-              className="relative p-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 transition active:scale-95 flex items-center gap-1 text-xs font-bold"
+              className="relative p-2 sm:px-3 sm:py-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 transition active:scale-95 flex items-center gap-1.5 text-xs font-bold shrink-0"
               title={isAdmin ? 'Mở kênh chat với khách hàng' : 'Nhắn tin trực tiếp cho Admin (anh Hải)'}
             >
               <MessageSquare className="h-4 w-4 text-indigo-400" />
-              <span className="hidden sm:inline">{isAdmin ? 'Chat Khách' : 'Hỗ Trợ Admin'}</span>
+              <span className="hidden md:inline">{isAdmin ? 'Chat Khách' : 'Hỗ Trợ Admin'}</span>
               {unreadCount > 0 && (
-                <span className="h-4 w-4 rounded-full bg-rose-500 text-white text-[10px] font-mono font-bold flex items-center justify-center animate-pulse">
+                <span className="absolute -top-1 -right-1 sm:static h-4 w-4 rounded-full bg-rose-500 text-white text-[10px] font-mono font-bold flex items-center justify-center animate-pulse">
                   {unreadCount}
                 </span>
               )}
@@ -173,7 +173,7 @@ export const Header: React.FC = () => {
             {/* Nút Chia Sẻ App (Share) */}
             <button
               onClick={openShareModal}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition active:scale-95"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition active:scale-95 shrink-0"
               title="Chia sẻ link ứng dụng cho bạn bè"
             >
               <Share2 className="h-3.5 w-3.5 text-cyan-400" />
@@ -184,7 +184,7 @@ export const Header: React.FC = () => {
             {isAdmin && (
               <button
                 onClick={openAdminPanel}
-                className="hidden xl:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold transition active:scale-95"
+                className="hidden xl:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold transition active:scale-95 shrink-0"
                 title="Quản trị danh sách người dùng & số dư"
               >
                 <Users className="h-3.5 w-3.5 text-amber-400" />
@@ -195,8 +195,8 @@ export const Header: React.FC = () => {
             {/* Nút Cài Đặt (Settings) */}
             <button
               onClick={() => setIsSettingsModalOpen(true)}
-              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition active:scale-95"
-              title="Tùy biến hình nền & giao diện"
+              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition active:scale-95 shrink-0"
+              title="Tùy biến hình nền 4K & giao diện"
             >
               <Settings className="h-4 w-4 text-indigo-400" />
             </button>

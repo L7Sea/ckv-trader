@@ -38,6 +38,7 @@ import {
 
 export const AppContent: React.FC = () => {
   const { activeTab, setActiveTab, fetchData, error, successMessage, clearMessages } = useTradingStore();
+  const [isMobileMoreOpen, setIsMobileMoreOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -201,70 +202,160 @@ export const AppContent: React.FC = () => {
       {/* Floating Mascot Capy */}
       <Capy />
 
-      {/* Mobile Bottom Navigation (Siêu ứng dụng 6 nút có Lãi Suất Vĩ Mô) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0e1117]/95 border-t border-[#212636] backdrop-blur-xl px-2 py-2 shadow-2xl">
-        <div className="grid grid-cols-6 gap-1 text-center">
+      {/* Floating Mascot Capy */}
+      <Capy />
+
+      {/* Mobile Bottom Navigation (Chuẩn Mobile Native 5 Nút & Bottom Sheet Khám Phá Đầy Đủ 8 Trang) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 border-t border-slate-800 backdrop-blur-2xl px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),10px)] shadow-2xl">
+        <div className="grid grid-cols-5 gap-1 text-center">
           <button
             onClick={() => setActiveTab('TRADE')}
-            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
-              activeTab === 'TRADE' ? 'text-emerald-400 font-bold' : 'text-slate-400'
+            className={`flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl transition ${
+              activeTab === 'TRADE' ? 'text-emerald-400 font-bold bg-emerald-500/10' : 'text-slate-400'
             }`}
           >
             <TrendingUp className="h-4 w-4" />
-            <span className="text-[9px]">Sổ Lệnh</span>
+            <span className="text-[10px]">Sổ Lệnh</span>
           </button>
 
           <button
             onClick={() => setActiveTab('DECISION')}
-            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
-              activeTab === 'DECISION' ? 'text-amber-400 font-bold' : 'text-slate-400'
+            className={`flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl transition ${
+              activeTab === 'DECISION' ? 'text-amber-400 font-bold bg-amber-500/10' : 'text-slate-400'
             }`}
           >
             <Scale className="h-4 w-4" />
-            <span className="text-[9px]">Hòa Vốn</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('ALGORITHMS')}
-            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
-              activeTab === 'ALGORITHMS' ? 'text-indigo-400 font-bold' : 'text-slate-400'
-            }`}
-          >
-            <Cpu className="h-4 w-4" />
-            <span className="text-[9px]">Thuật Toán</span>
+            <span className="text-[10px]">Hòa Vốn</span>
           </button>
 
           <button
             onClick={() => setActiveTab('MARKET')}
-            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
-              activeTab === 'MARKET' ? 'text-cyan-400 font-bold' : 'text-slate-400'
+            className={`flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl transition ${
+              activeTab === 'MARKET' ? 'text-cyan-400 font-bold bg-cyan-500/10' : 'text-slate-400'
             }`}
           >
             <LayoutGrid className="h-4 w-4" />
-            <span className="text-[9px]">Bảng Giá</span>
+            <span className="text-[10px]">Bảng Giá</span>
           </button>
 
           <button
-            onClick={() => setActiveTab('MACRO')}
-            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
-              activeTab === 'MACRO' ? 'text-emerald-400 font-bold' : 'text-slate-400'
+            onClick={() => setActiveTab('ALGORITHMS')}
+            className={`flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl transition ${
+              activeTab === 'ALGORITHMS' ? 'text-indigo-400 font-bold bg-indigo-500/10' : 'text-slate-400'
             }`}
           >
-            <Landmark className="h-4 w-4" />
-            <span className="text-[9px]">Lãi Suất</span>
+            <Cpu className="h-4 w-4" />
+            <span className="text-[10px]">Radar AI</span>
           </button>
 
+          {/* Nút Khám Phá Mở Bottom Sheet 4 Trang Còn Lại */}
           <button
-            onClick={() => setActiveTab('CHARTS')}
-            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition ${
-              activeTab === 'CHARTS' ? 'text-purple-400 font-bold' : 'text-slate-400'
+            onClick={() => setIsMobileMoreOpen(!isMobileMoreOpen)}
+            className={`flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl transition ${
+              ['MACRO', 'CHARTS', 'ANALYTICS', 'INTELLIGENCE'].includes(activeTab) || isMobileMoreOpen
+                ? 'text-purple-400 font-bold bg-purple-500/10'
+                : 'text-slate-400'
             }`}
           >
-            <PieChart className="h-4 w-4" />
-            <span className="text-[9px]">Tài Sản</span>
+            <Compass className="h-4 w-4" />
+            <span className="text-[10px]">Khám Phá ☰</span>
           </button>
         </div>
       </div>
+
+      {/* Mobile More Bottom Sheet (Trang Vĩ Mô, Tài Sản, Hiệu Suất, Tin Tức) */}
+      {isMobileMoreOpen && (
+        <div className="md:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col justify-end animate-in fade-in">
+          <div className="bg-slate-900 border-t border-slate-800 rounded-t-3xl p-5 space-y-4 shadow-2xl animate-in slide-in-from-bottom pb-[max(env(safe-area-inset-bottom),20px)]">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Compass className="h-5 w-5 text-purple-400" />
+                <h3 className="text-sm font-bold text-white">Khám Phá Toàn Diện CKV Pro</h3>
+              </div>
+              <button
+                onClick={() => setIsMobileMoreOpen(false)}
+                className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5 text-xs font-semibold">
+              <button
+                onClick={() => {
+                  setActiveTab('MACRO');
+                  setIsMobileMoreOpen(false);
+                }}
+                className={`p-3 rounded-2xl border text-left flex items-center gap-2.5 transition ${
+                  activeTab === 'MACRO'
+                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
+                    : 'bg-slate-950/80 border-slate-800 text-slate-300'
+                }`}
+              >
+                <Landmark className="h-5 w-5 text-emerald-400 shrink-0" />
+                <div>
+                  <div className="font-bold">Lãi Suất Vĩ Mô</div>
+                  <div className="text-[10px] text-slate-400 font-normal">20 Bank & FinTech</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('CHARTS');
+                  setIsMobileMoreOpen(false);
+                }}
+                className={`p-3 rounded-2xl border text-left flex items-center gap-2.5 transition ${
+                  activeTab === 'CHARTS'
+                    ? 'bg-purple-500/20 border-purple-500/50 text-purple-300'
+                    : 'bg-slate-950/80 border-slate-800 text-slate-300'
+                }`}
+              >
+                <PieChart className="h-5 w-5 text-purple-400 shrink-0" />
+                <div>
+                  <div className="font-bold">Cơ Cấu Vốn & NAV</div>
+                  <div className="text-[10px] text-slate-400 font-normal">Phân bổ tài sản</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('ANALYTICS');
+                  setIsMobileMoreOpen(false);
+                }}
+                className={`p-3 rounded-2xl border text-left flex items-center gap-2.5 transition ${
+                  activeTab === 'ANALYTICS'
+                    ? 'bg-rose-500/20 border-rose-500/50 text-rose-300'
+                    : 'bg-slate-950/80 border-slate-800 text-slate-300'
+                }`}
+              >
+                <Award className="h-5 w-5 text-rose-400 shrink-0" />
+                <div>
+                  <div className="font-bold">Hiệu Suất & Excel</div>
+                  <div className="text-[10px] text-slate-400 font-normal">Xuất file kiểm toán</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('INTELLIGENCE');
+                  setIsMobileMoreOpen(false);
+                }}
+                className={`p-3 rounded-2xl border text-left flex items-center gap-2.5 transition ${
+                  activeTab === 'INTELLIGENCE'
+                    ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300'
+                    : 'bg-slate-950/80 border-slate-800 text-slate-300'
+                }`}
+              >
+                <Newspaper className="h-5 w-5 text-cyan-400 shrink-0" />
+                <div>
+                  <div className="font-bold">Tin Tức Thị Trường</div>
+                  <div className="text-[10px] text-slate-400 font-normal">BCTC & Gợi ý AI</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Cash Deposit / Withdraw Modal */}
       <CashModal />
