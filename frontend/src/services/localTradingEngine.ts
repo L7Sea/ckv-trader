@@ -1,4 +1,5 @@
 import { OrderRequestPayload, Portfolio, Position, Transaction } from '../types';
+import { wallpaperService } from './wallpaperService';
 
 const PORTFOLIO_KEY = 'ckv_local_portfolio';
 const POSITIONS_KEY = 'ckv_local_positions';
@@ -546,6 +547,7 @@ export const localTradingEngine = {
       portfolio: this.getPortfolio(),
       positions: this.getPositions(),
       transactions: this.getTransactions(),
+      wallpaper: wallpaperService.getConfig(),
       exportedAt: new Date().toISOString(),
       version: CURRENT_DATA_VERSION
     };
@@ -559,6 +561,9 @@ export const localTradingEngine = {
         this.savePortfolio(data.portfolio);
         this.savePositions(data.positions);
         this.saveTransactions(data.transactions);
+        if (data.wallpaper) {
+          wallpaperService.importConfig(data.wallpaper);
+        }
         return true;
       }
     } catch {}

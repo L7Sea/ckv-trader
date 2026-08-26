@@ -71,10 +71,15 @@
 
 ---
 
-## 5. 🔄 CƠ CHẾ TỰ ĐỘNG CẬP NHẬT BỐI CẢNH (REAL-TIME CONTEXT EVOLUTION)
-Mỗi khi có thông tin tài chính mới, ảnh chụp màn hình hoặc công thức mới:
-1. **Ghi đè Single Source of Truth**: Cập nhật ngay file này (`tài liệu/CONTEXT.md`) để bảo đảm mọi phiên làm việc tiếp theo luôn đọc được bối cảnh chính xác nhất.
-2. **Cập nhật Test Suite**: Bổ sung kiểm thử vào `scripts/test-trading-formulas.cjs` hoặc `scripts/test-sql-schema.cjs`.
-3. **Cập nhật Code & Tự Động Deploy**: Sửa logic code, build và push thẳng lên Cloudflare Pages.
+## 6. 🖼️ MODULE LƯU TRỮ & ĐỒNG BỘ HÌNH NỀN ĐA THIẾT BỊ (`wallpaperService.ts`)
+- **Quản lý tập trung**: File `src/services/wallpaperService.ts` là Single Source of Truth cho toàn bộ hình nền & chủ đề hiển thị.
+- **Xóa bỏ triệt để chuỗi Base64 cũ**: Loại bỏ hoàn toàn việc lưu trữ file blob Base64 vài Megabyte vào `localStorage`, giải phóng 100% dung lượng tránh lỗi `QuotaExceededError`.
+- **Kho 5 Preset 4K CDN Pro Trader**:
+  1. `cyberpunk`: Cyberpunk Trading (Đa sắc neon)
+  2. `wallstreet`: Wall Street Bull (Bò tót phố Wall)
+  3. `bloomberg`: Bloomberg Dark (Bảng điện tử tối giản)
+  4. `deepsea`: Deep Sea Obsidian (Đại dương tĩnh lặng)
+  5. `aurora`: Emerald Matrix (Xanh tím thịnh vượng)
+- **Đồng bộ đa thiết bị (Máy tính $\leftrightarrow$ Điện thoại)**: Hỗ trợ nạp trực tiếp Direct Image URL và đóng gói cấu hình nền vào file sao lưu `exportDataAsJson()` / `importDataFromJson()`.
 
 
