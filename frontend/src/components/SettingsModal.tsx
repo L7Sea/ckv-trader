@@ -10,7 +10,7 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const { bgUrl, dim, activePresetId, uploadBg, setPresetBg, removeBg, setDim } = useBackground();
+  const { bgUrl, dim, activePresetId, uploadBg, setPresetBg, setDirectUrl, removeBg, setDim } = useBackground();
   const { user } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -129,7 +129,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition active:scale-95"
             >
               <Upload className="h-4 w-4" />
-              <span>{bgUrl ? 'Tải ảnh từ máy' : 'Tải ảnh nền riêng'}</span>
+              <span>{bgUrl ? 'Tải ảnh từ máy' : 'Tải ảnh nền riêng từ máy'}</span>
             </button>
 
             {bgUrl && (
@@ -141,6 +141,35 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 <Trash2 className="h-4 w-4" />
               </button>
             )}
+          </div>
+
+          {/* Dán URL ảnh online để đồng bộ đa thiết bị */}
+          <div className="space-y-1 pt-1">
+            <div className="flex items-center gap-1.5">
+              <input
+                type="text"
+                placeholder="Hoặc dán Link URL ảnh online (Unsplash/Pinterest)..."
+                id="direct_bg_url_input"
+                className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const input = document.getElementById('direct_bg_url_input') as HTMLInputElement;
+                  if (input && input.value.trim()) {
+                    setDirectUrl(input.value.trim());
+                    setSaveSuccess(true);
+                    setTimeout(() => setSaveSuccess(false), 2000);
+                  }
+                }}
+                className="px-3 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition shrink-0"
+              >
+                Áp Dụng
+              </button>
+            </div>
+            <p className="text-[10px] text-slate-500">
+              💡 Mẹo: Chọn <b>Preset 4K</b> ở trên hoặc <b>dán Link online</b> để ảnh hiện giống hệt nhau trên cả Máy tính lẫn Điện thoại!
+            </p>
           </div>
 
           {/* Dim Slider */}

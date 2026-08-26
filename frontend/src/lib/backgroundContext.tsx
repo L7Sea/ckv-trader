@@ -49,6 +49,7 @@ interface BackgroundState {
   activePresetId: string | null;
   uploadBg: (file: File) => void;
   setPresetBg: (preset: BgPreset) => void;
+  setDirectUrl: (url: string) => void;
   removeBg: () => void;
   setDim: (dim: number) => void;
 }
@@ -104,6 +105,15 @@ export const BackgroundProvider: React.FC<{ children: ReactNode }> = ({ children
     } catch {}
   };
 
+  const setDirectUrl = (url: string) => {
+    setBgUrl(url);
+    setActivePresetId(null);
+    try {
+      localStorage.setItem(BG_STORAGE_KEY, url);
+      localStorage.removeItem('ckv_background_preset_id');
+    } catch {}
+  };
+
   const removeBg = () => {
     setBgUrl(null);
     setActivePresetId(null);
@@ -121,7 +131,7 @@ export const BackgroundProvider: React.FC<{ children: ReactNode }> = ({ children
   };
 
   return (
-    <BackgroundContext.Provider value={{ bgUrl, dim, activePresetId, uploadBg, setPresetBg, removeBg, setDim }}>
+    <BackgroundContext.Provider value={{ bgUrl, dim, activePresetId, uploadBg, setPresetBg, setDirectUrl, removeBg, setDim }}>
       {/* Background layer container */}
       <div className="relative min-h-screen">
         {bgUrl && (
