@@ -280,19 +280,27 @@ class MarketDataService {
     this.saveWatchlist();
   }
 
-  // Cập nhật giá mới nhất cho toàn bộ danh mục theo dõi
+  // Cập nhật giá mới nhất cho toàn bộ danh mục theo dõi từ nguồn dữ liệu chuẩn 300 mã
   public async syncAllLivePrices(): Promise<void> {
-    // Cập nhật nhẹ biến động ngẫu nhiên hoặc live tick
+    // Đồng bộ chính xác theo bảng giá chuẩn 300 mã TTCK Việt Nam
+    const { TOP_300_STOCKS } = await import('./top300Stocks');
     this.watchlist = this.watchlist.map((s) => {
-      const delta = (Math.random() - 0.48) * (s.price * 0.008);
-      const newPrice = Math.max(s.floorPrice, Math.min(s.ceilPrice, Math.round(s.price + delta)));
-      const change = newPrice - s.refPrice;
-      const changePct = Number(((change / s.refPrice) * 100).toFixed(2));
+      const topMatch = TOP_300_STOCKS.find((t) => t.symbol === s.symbol);
+      if (topMatch) {
+        return {
+          ...s,
+          price: topMatch.price,
+          refPrice: topMatch.refPrice,
+          ceilPrice: topMatch.ceilPrice,
+          floorPrice: topMatch.floorPrice,
+          change: topMatch.change,
+          changePct: topMatch.changePct,
+          volume: topMatch.volume,
+          lastUpdated: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        };
+      }
       return {
         ...s,
-        price: newPrice,
-        change,
-        changePct,
         lastUpdated: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
       };
     });

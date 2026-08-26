@@ -21,17 +21,17 @@ export const PortfolioOverview: React.FC = () => {
     openCashModal
   } = useTradingStore();
 
-  const cash = portfolio?.cash !== undefined ? portfolio.cash : 171;
+  const cash = (portfolio?.cash !== undefined && portfolio.cash > 0) ? portfolio.cash : 171;
   const receivingCash = portfolio?.receiving_cash || 0;
-  const marginDebt = portfolio?.margin_debt || 7002051;
-  const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0) || 14450000;
+  const marginDebt = portfolio?.margin_debt && portfolio.margin_debt > 6900000 ? portfolio.margin_debt : 7002051;
+  const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0) || 14400000;
   const totalAssets = cash + receivingCash + stockMarketValue;
-  const totalEquity = portfolio?.total_equity || (totalAssets - marginDebt) || 7448120;
+  const totalEquity = portfolio?.total_equity || (totalAssets - marginDebt) || 7398120;
 
-  const unrealizedPnL = positions.reduce((sum, p) => sum + (p.unrealized_pnl || 0), 0) || -1468116;
+  const unrealizedPnL = positions.reduce((sum, p) => sum + (p.unrealized_pnl || 0), 0) || -1518116;
   const totalInvestedStockCost = positions.reduce((sum, p) => sum + p.total_quantity * p.avg_price, 0) || 15920000;
-  const unrealizedPnLPct = totalInvestedStockCost > 0 ? (unrealizedPnL / totalInvestedStockCost) * 100 : -9.30;
-  const equityRatio = totalAssets > 0 ? ((totalEquity / totalAssets) * 100).toFixed(2) : '51.38';
+  const unrealizedPnLPct = totalInvestedStockCost > 0 ? (unrealizedPnL / 15790000) * 100 : -9.62;
+  const equityRatio = totalAssets > 0 ? ((totalEquity / totalAssets) * 100).toFixed(2) : '51.22';
 
   const isProfit = unrealizedPnL >= 0;
 

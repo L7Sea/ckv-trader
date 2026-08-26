@@ -115,15 +115,19 @@ test('6. Cơ cấu nguồn vốn DNSE: Xác thực chuẩn xác Lãi Margin 11.5
   const pnl26AugRef = -1468116; // Khi TPB ở 14.45
   const actualDailyLossIncrease = Math.abs(pnl26AugRef) - Math.abs(pnl25Aug); // 2,173đ
 
-  // Khi TPB tăng +50đ lên 14.50:
-  const priceGain = (14500 - 14450) * 1000; // +50,000đ
-  const pnlLive = pnl26AugRef + priceGain;   // -1,418,116đ (Khớp 100% ảnh Tab Deal 9h42)
+  const stockValueAt1440 = 1000 * 14400; // 14,400,000đ khi TPB ở 14.40 (-50đ)
+  const totalAssetsAt1440 = cash + receivingCash + stockValueAt1440; // 14,400,171đ
+  const totalEquityAt1440 = totalAssetsAt1440 - marginDebt; // 7,398,120đ (Khớp 100% ảnh Tab Trang chủ 10h11)
 
-  assert.strictEqual(totalEquity, 7498120);
+  // Khi TPB giảm -50đ từ tham chiếu về 14.40:
+  const priceLoss = (14400 - 14450) * 1000; // -50,000đ
+  const pnlLive1440 = pnl26AugRef + priceLoss; // -1,518,116đ (Khớp 100% ảnh Tab Deal 10h11)
+
+  assert.strictEqual(totalEquityAt1440, 7398120);
+  assert.strictEqual(pnlLive1440, -1518116);
   assert.strictEqual(marginDebt, 7002051);
   assert.strictEqual(dailyInterest, 2173);
   assert.strictEqual(actualDailyLossIncrease, 2173);
-  assert.strictEqual(pnlLive, -1418116);
 });
 
 // 7. Kiểm thử Hệ số Đồng thuận Đa lớp (Consensus Scoring Formula)

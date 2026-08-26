@@ -23,19 +23,19 @@
 3. **Mạng Lưới Điều Hướng Chéo (Cross-Navigation Engine)**:
    - `navigateToStock(symbol, targetTab, action, targetPrice)` kết nối tức thì giữa Tin tức / Gợi ý AI / Radar / Danh mục / Vĩ mô sang Bảng Giá & Nến Kỹ Thuật hoặc Sổ Lệnh / Hòa Vốn.
 
-4. **Dữ Liệu Tài Sản Thực Tế & Lãi Suất Vay Margin Deal (DNSE 26/08/2026 - 10h06)**:
+4. **Dữ Liệu Tài Sản Thực Tế & Lãi Suất Vay Margin Deal (DNSE 26/08/2026 - 10h11)**:
    - **Vị thế**: 1,000 cổ phiếu TPB (Khả dụng: 1,000 CP).
-   - **Thị giá**: 14.45 (14,450 đ/CP - Tham chiếu) $\rightarrow$ Giá trị CP: **14,450,000 đ**.
+   - **Thị giá**: 14.40 (14,400 đ/CP - Giảm -0.05 / -0.35% so với tham chiếu 14.45) $\rightarrow$ Giá trị CP: **14,400,000 đ**.
    - **Tiền mặt**: **171 đ**.
    - **Gốc vay Deal ban đầu**: **6,898,107 đ** (tổng ứng 6,997,221đ - đã trả 99,114đ).
    - **Lãi suất vay Margin Deal thực tế**: **11.50% / năm** ($\approx \mathbf{2,173 \text{ đ/ngày}}$).
    - **Lãi vay tích luỹ qua các ngày**: **103,944 đ** (Lãi đã trả trước đó: 1,256đ, Phí thuế deal: 22,916đ).
    - **Tổng Nợ Margin thực tế**: $6,898,107 + 103,944 = \mathbf{7,002,051 \text{ đ}}$.
-   - **Tài Sản Ròng Thực Có (NAV)**: $14,450,171 - 7,002,051 = \mathbf{7,448,120 \text{ đ}}$.
+   - **Tài Sản Ròng Thực Có (NAV)**: $14,400,171 - 7,002,051 = \mathbf{7,398,120 \text{ đ}}$.
    - **Giá hòa vốn Deal**: **15.920 (15,920 đ)**.
-   - **Lãi/Lỗ chưa chốt Deal**: **-1,468,116 đ (-9.30%)**.
-   - **Tỷ lệ ký quỹ Deal**: **51.38%**.
-   - **Cơ chế Auto-Migration Cache**: Khóa phiên bản `ckv_data_version_lock` tự động làm mới LocalStorage của trình duyệt client.
+   - **Lãi/Lỗ chưa chốt Deal**: **-1,518,116 đ (-9.62%)**.
+   - **Tỷ lệ ký quỹ Deal**: **51.22%**.
+   - **Cơ chế Auto-Migration Cache**: Khóa phiên bản `ckv_data_version_lock` (`2026-08-26-1011-v4`) tự động làm mới LocalStorage của trình duyệt client và triệt tiêu mọi sai lệch giá ngẫu nhiên.
 
 ---
 

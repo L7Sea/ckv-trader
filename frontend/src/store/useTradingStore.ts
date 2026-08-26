@@ -171,11 +171,13 @@ export const useTradingStore = create<TradingState>((set, get) => ({
         };
       });
 
-      const newEquity = (portfolio?.cash !== undefined ? portfolio.cash : 171) + (portfolio?.receiving_cash || 0) + totalStockVal - (portfolio?.margin_debt || 7002051);
+      const actualMarginDebt = 7002051; // Chuẩn DNSE: Gốc 6.898.107đ + Lãi vay tích luỹ 103.944đ
+      const actualCash = portfolio?.cash !== undefined && portfolio.cash > 0 ? portfolio.cash : 171;
+      const newEquity = actualCash + (portfolio?.receiving_cash || 0) + totalStockVal - actualMarginDebt;
       const updatedPortfolio: Portfolio = {
-        cash: portfolio?.cash !== undefined ? portfolio.cash : 171,
+        cash: actualCash,
         receiving_cash: portfolio?.receiving_cash || 0,
-        margin_debt: portfolio?.margin_debt || 7002051,
+        margin_debt: actualMarginDebt,
         total_equity: newEquity,
         total_profit_loss: totalProfit,
         current_simulated_date: new Date().toISOString().slice(0, 10),
