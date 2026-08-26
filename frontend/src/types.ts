@@ -68,6 +68,7 @@ export interface OrderRequestPayload {
   quantity: number;
   fee: number;
   tax: number;
+  funding_source?: 'CASH' | 'MARGIN_DEAL' | 'HYBRID'; // Nguồn vốn giải ngân (Tiền mặt 100%, Vay Deal 100%, hoặc Hỗn hợp 50-50)
   strategy?: TradeStrategy;
   target_price?: number;
   stop_loss?: number;

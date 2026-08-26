@@ -140,18 +140,25 @@ export const PortfolioOverview: React.FC = () => {
               <span className="text-[10px] text-slate-500 font-sans mt-0.5">Đang trong chu kỳ bù trừ</span>
             </div>
 
-            {/* Box 4 - Nợ Vay Margin & Lãi Suất Thực Tế */}
-            <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-indigo-500/30 flex flex-col justify-between">
-              <div className="flex items-center justify-between text-indigo-300">
-                <span className="font-sans text-[11px] font-semibold">Nợ Vay Margin Thực Tế</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30 font-mono">
-                  11.50%/năm
+            {/* Box 4 - Nợ Vay Margin & Lãi Suất Thực Tế (Có nút Trả Nợ) */}
+            <div
+              onClick={openCashModal}
+              className="p-3.5 rounded-2xl bg-slate-950/70 border border-purple-500/30 hover:border-purple-500/60 cursor-pointer transition flex flex-col justify-between group"
+              title="Nhấn để Trả Nợ Deal hoặc Hiệu chỉnh số dư"
+            >
+              <div className="flex items-center justify-between text-purple-300">
+                <span className="font-sans text-[11px] font-semibold group-hover:text-purple-300 transition">Nợ Vay Margin Thực Tế</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 font-mono">
+                  Trả Nợ Deal
                 </span>
               </div>
-              <b className="text-base text-indigo-300 font-bold mt-1.5 block">{formatVND(marginDebt)}</b>
+              <b className="text-base text-purple-300 font-bold mt-1.5 block">{formatVND(marginDebt)}</b>
               <div className="flex flex-col text-[10px] text-slate-400 font-sans mt-0.5 space-y-0.5">
-                <span className="text-amber-300/90 font-mono">Chi phí lãi: ~2,173 đ/ngày</span>
-                <span className="text-slate-500">Gốc: 6.898tr • Lãi luỹ kế: 103.9kđ</span>
+                <span className="text-amber-300/90 font-mono">Lãi: 11.5% (~2,173 đ/ngày)</span>
+                <span className="text-slate-500 flex justify-between items-center">
+                  <span>Gốc: 6.898tr • Lãi: 103.9k</span>
+                  <span className="text-purple-400 opacity-0 group-hover:opacity-100 transition text-[9px] font-bold">Trả nợ →</span>
+                </span>
               </div>
             </div>
           </div>

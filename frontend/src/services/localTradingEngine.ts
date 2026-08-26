@@ -226,11 +226,23 @@ export const localTradingEngine = {
 
     if (type === 'BUY') {
       const totalRequired = grossAmount + fee;
-      if (portfolio.cash < totalRequired) {
-        throw new Error(`Sức mua tiền mặt không đủ (${portfolio.cash.toLocaleString()}đ)! Anh có thể bấm Nạp tiền hoặc sử dụng tính năng Mô phỏng Mua thêm.`);
-      }
+      const funding = payload.funding_source || (portfolio.cash >= totalRequired ? 'CASH' : 'MARGIN_DEAL');
 
-      portfolio.cash -= totalRequired;
+      if (funding === 'CASH') {
+        if (portfolio.cash < totalRequired) {
+          throw new Error(`Sức mua tiền mặt không đủ (${portfolio.cash.toLocaleString()}đ)! Anh có thể chọn nguồn vốn 'Vay Margin Deal (11.5%)' hoặc Nạp tiền.`);
+        }
+        portfolio.cash -= totalRequired;
+      } else if (funding === 'MARGIN_DEAL') {
+        // Vay 100% qua Margin Deal DNSE
+        portfolio.margin_debt += totalRequired;
+      } else if (funding === 'HYBRID') {
+        // Hỗn hợp 50% tự có + 50% Margin
+        const cashPart = Math.min(portfolio.cash, Math.round(totalRequired * 0.5));
+        const debtPart = totalRequired - cashPart;
+        portfolio.cash -= cashPart;
+        portfolio.margin_debt += debtPart;
+      }
 
       if (!existingPos) {
         existingPos = {
@@ -239,7 +251,8 @@ export const localTradingEngine = {
           available_quantity: 0,
           t1_quantity: 0,
           t2_quantity: quantity,
-          avg_price: (grossAmount + fee) / quantity,
+          avg_price: Math.round((grossAmount + fee) / quantity),
+          breakeven_price: Math.round((grossAmount + fee + (funding !== 'CASH' ? grossAmount * 0.01 : 0)) / quantity),
           market_price: price,
           market_value: grossAmount,
           unrealized_pnl: grossAmount - (grossAmount + fee),
@@ -252,13 +265,19 @@ export const localTradingEngine = {
       } else {
         const oldTotal = existingPos.total_quantity;
         const newTotal = oldTotal + quantity;
-        const oldCost = oldTotal * existingPos.avg_price;
+        const oldCost = oldTotal * (existingPos.avg_price || 15790);
         const newCost = oldCost + grossAmount + fee;
         const newAvg = newCost / newTotal;
 
+        // Tính lại giá hòa vốn Deal mới sau khi mua thêm (DCA)
+        const oldBreakevenCost = oldTotal * (existingPos.breakeven_price || 15920);
+        const newBreakevenCost = oldBreakevenCost + grossAmount + fee;
+        const newBreakevenPrice = Math.round(newBreakevenCost / newTotal);
+
         existingPos.total_quantity = newTotal;
         existingPos.t2_quantity += quantity;
-        existingPos.avg_price = newAvg;
+        existingPos.avg_price = Math.round(newAvg);
+        existingPos.breakeven_price = newBreakevenPrice;
         existingPos.market_price = price;
         existingPos.market_value = newTotal * price;
         existingPos.unrealized_pnl = existingPos.market_value - newCost;
@@ -410,5 +429,37 @@ export const localTradingEngine = {
 
     this.savePortfolio(portfolio);
     return portfolio;
+  },
+
+  repayMarginDebt(amount: number): Portfolio {
+    const portfolio = this.getPortfolio();
+    const actualRepay = Math.min(portfolio.margin_debt, amount);
+    portfolio.margin_debt = Math.max(0, portfolio.margin_debt - actualRepay);
+    if (portfolio.cash >= actualRepay) {
+      portfolio.cash -= actualRepay;
+    }
+    const positions = this.getPositions();
+    const stockValuation = positions.reduce((sum, p) => sum + p.market_value, 0);
+    portfolio.total_equity = portfolio.cash + portfolio.receiving_cash + stockValuation - portfolio.margin_debt;
+    portfolio.updated_at = new Date().toISOString();
+    this.savePortfolio(portfolio);
+    return portfolio;
+  },
+
+  directUpdateAssets(cash: number, marginDebt: number, positionsUpdate?: Position[]): { portfolio: Portfolio; positions: Position[] } {
+    const portfolio = this.getPortfolio();
+    let positions = positionsUpdate || this.getPositions();
+    portfolio.cash = Math.max(0, cash);
+    portfolio.margin_debt = Math.max(0, marginDebt);
+    const stockValuation = positions.reduce((sum, p) => sum + p.market_value, 0);
+    const totalProfit = positions.reduce((sum, p) => sum + p.unrealized_pnl, 0);
+    portfolio.total_profit_loss = totalProfit;
+    portfolio.total_equity = portfolio.cash + portfolio.receiving_cash + stockValuation - portfolio.margin_debt;
+    portfolio.updated_at = new Date().toISOString();
+    this.savePortfolio(portfolio);
+    if (positionsUpdate) {
+      this.savePositions(positions);
+    }
+    return { portfolio, positions };
   }
 };

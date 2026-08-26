@@ -39,6 +39,8 @@ interface TradingState {
   updatePrice: (symbol: string, price: number) => Promise<boolean>;
   settleDay: () => Promise<boolean>;
   adjustCash: (amount: number, action: 'DEPOSIT' | 'WITHDRAW') => Promise<boolean>;
+  repayMarginDebt: (amount: number) => Promise<boolean>;
+  directUpdateAssets: (cash: number, marginDebt: number, positions?: Position[]) => Promise<boolean>;
   resetCleanSlate: (startingCash?: number) => void;
   resetToUserExactData: () => void;
   
@@ -339,6 +341,39 @@ export const useTradingStore = create<TradingState>((set, get) => ({
       return true;
     } catch (err: any) {
       set({ error: err.message || 'Lỗi thay đổi tiền mặt', isLoading: false });
+      return false;
+    }
+  },
+
+  repayMarginDebt: async (amount: number) => {
+    set({ isLoading: true, error: null, successMessage: null });
+    try {
+      const portfolio = localTradingEngine.repayMarginDebt(amount);
+      set({
+        portfolio,
+        isLoading: false,
+        successMessage: `Đã trả ${amount.toLocaleString()}đ nợ gốc Margin Deal thành công! Dư nợ còn lại: ${(portfolio.margin_debt).toLocaleString()}đ.`
+      });
+      return true;
+    } catch (err: any) {
+      set({ error: err.message || 'Lỗi trả nợ margin', isLoading: false });
+      return false;
+    }
+  },
+
+  directUpdateAssets: async (cash: number, marginDebt: number, positions?: Position[]) => {
+    set({ isLoading: true, error: null, successMessage: null });
+    try {
+      const { portfolio, positions: updatedPositions } = localTradingEngine.directUpdateAssets(cash, marginDebt, positions);
+      set({
+        portfolio,
+        positions: updatedPositions,
+        isLoading: false,
+        successMessage: `Đã hiệu chỉnh số dư tài sản thành công: Tiền mặt ${cash.toLocaleString()}đ, Nợ Margin ${marginDebt.toLocaleString()}đ, NAV ${(portfolio.total_equity).toLocaleString()}đ!`
+      });
+      return true;
+    } catch (err: any) {
+      set({ error: err.message || 'Lỗi cập nhật tài sản', isLoading: false });
       return false;
     }
   },

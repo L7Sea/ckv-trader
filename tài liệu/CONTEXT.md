@@ -52,7 +52,7 @@
 ## 3. 🧪 TIÊU CHUẨN KIỂM THỬ & PHÂN LUỒNG MỆNH LỆNH
 - **Chế độ Báo cáo / Tìm lỗi (Inspect Mode)**: Khi người dùng hỏi "báo cáo lỗi", "chỉ ra lỗi sai", "tại sao lệch" $\rightarrow$ AI chỉ tập trung phân tích chuyên môn và đề xuất hướng xử lý, tuyệt đối không tự ý sửa code hay push.
 - **Chế độ Thực thi (Execution Mode)**: Khi người dùng ra lệnh "sửa và push", "sửa cho tôi đi" $\rightarrow$ AI sửa code, chạy test suites, build và tự động commit/push Cloudflare Pages.
-- `node scripts/test-trading-formulas.cjs`: 11/11 bài test toán học & vĩ mô đạt chuẩn 100%.
+- `node scripts/test-trading-formulas.cjs`: 12/12 bài test toán học & vĩ mô đạt chuẩn 100% (bao gồm Cơ chế giải ngân Vay Margin Deal và Sức mua mở rộng).
 - `node scripts/test-sql-schema.cjs`: 13/13 bài test toàn vẹn mô hình dữ liệu SQL.
 - `npm --prefix frontend run build`: 100% sạch cảnh báo và 0 lỗi TypeScript.
 - **Triển khai thường trực**: Tự động commit chuẩn Conventional Commits và đẩy thẳng lên Cloudflare Pages / GitHub (`git push origin master`) sau mỗi lần cập nhật.

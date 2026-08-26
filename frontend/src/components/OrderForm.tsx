@@ -19,6 +19,7 @@ export const OrderForm: React.FC = () => {
   const [symbol, setSymbol] = useState('');
   const [price, setPrice] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(100);
+  const [fundingSource, setFundingSource] = useState<'CASH' | 'MARGIN_DEAL' | 'HYBRID'>('MARGIN_DEAL');
   const feeRate = 0.15; // 0.15% phí giao dịch chuẩn
   const taxRate = 0.1;  // 0.1% thuế bán chứng khoán
   const [strategy, setStrategy] = useState<TradeStrategy>('PULLBACK_MA20');
@@ -59,8 +60,9 @@ export const OrderForm: React.FC = () => {
   const t1Shares = currentPos?.t1_quantity || 0;
   const t2Shares = currentPos?.t2_quantity || 0;
 
-  const isBuyValid = type === 'BUY' && price > 0 && quantity > 0 && cash >= netAmount;
-  const isSellValid = type === 'SELL' && price > 0 && quantity > 0 && availableShares >= quantity;
+  // Sức mua tối đa có thể giải ngân (Tiền mặt + Sức mua nở ra từ Đòn bẩy Margin 1:1)
+  const maxCashBuyQty = price > 0 ? Math.floor(cash / (price * 1.0015)) : 0;
+  const maxMarginBuyQty = price > 0 ? Math.floor((cash * 2 + 50000000) / (price * 1.0015)) : 0;
 
   const formatNumber = (num: number) => num.toLocaleString('vi-VN');
 
@@ -70,8 +72,8 @@ export const OrderForm: React.FC = () => {
     if (price <= 0) return alert('Giá phải lớn hơn 0');
     if (quantity <= 0) return alert('Khối lượng phải lớn hơn 0');
 
-    if (type === 'BUY' && cash < netAmount) {
-      return alert(`Không đủ sức mua! Cần ${formatNumber(netAmount)}đ, hiện có ${formatNumber(cash)}đ`);
+    if (type === 'BUY' && fundingSource === 'CASH' && cash < netAmount) {
+      return alert(`Không đủ tiền mặt khả dụng! Cần ${formatNumber(netAmount)}đ, hiện có ${formatNumber(cash)}đ. Anh có thể chọn 'Vay Margin Deal (11.5%)' để giải ngân!`);
     }
 
     if (type === 'SELL' && availableShares < quantity) {
@@ -85,11 +87,12 @@ export const OrderForm: React.FC = () => {
       quantity,
       fee,
       tax,
+      funding_source: fundingSource,
       strategy,
       target_price: targetPrice > 0 ? targetPrice : undefined,
       stop_loss: stopLoss > 0 ? stopLoss : undefined,
       trade_date: tradeDate,
-      notes
+      notes: notes || (fundingSource === 'MARGIN_DEAL' ? 'Giải ngân bằng Vốn Vay Margin Deal (11.5%)' : fundingSource === 'HYBRID' ? 'Giải ngân Hỗn Hợp (50% Tiền Mặt + 50% Margin)' : 'Mua bằng Tiền Mặt')
     });
 
     if (success) {
@@ -135,6 +138,51 @@ export const OrderForm: React.FC = () => {
           GHI BÁN (CHỐT / CẮT)
         </button>
       </div>
+
+      {/* Tùy Chọn Nguồn Vốn Khi MUA */}
+      {type === 'BUY' && (
+        <div className="p-2.5 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-1.5">
+          <label className="text-[11px] text-slate-400 font-semibold block">Nguồn Vốn Giải Ngân:</label>
+          <div className="grid grid-cols-3 gap-1.5 text-[11px] font-mono font-bold">
+            <button
+              type="button"
+              onClick={() => setFundingSource('CASH')}
+              className={`py-1.5 px-2 rounded-xl border transition flex flex-col items-center justify-center gap-0.5 ${
+                fundingSource === 'CASH'
+                  ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
+                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>100% Tiền Mặt</span>
+              <span className="text-[9px] font-normal text-slate-400 font-sans">Tiểu khoản 01</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setFundingSource('MARGIN_DEAL')}
+              className={`py-1.5 px-2 rounded-xl border transition flex flex-col items-center justify-center gap-0.5 ${
+                fundingSource === 'MARGIN_DEAL'
+                  ? 'bg-purple-500/20 border-purple-500 text-purple-300'
+                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>100% Vay Deal</span>
+              <span className="text-[9px] font-normal text-purple-300/80 font-sans">Margin 11.5%</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setFundingSource('HYBRID')}
+              className={`py-1.5 px-2 rounded-xl border transition flex flex-col items-center justify-center gap-0.5 ${
+                fundingSource === 'HYBRID'
+                  ? 'bg-amber-500/20 border-amber-500 text-amber-300'
+                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>Hỗn Hợp (50-50)</span>
+              <span className="text-[9px] font-normal text-amber-300/80 font-sans">Tự có + Vay</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-3.5">
         {/* Ngày Giao Dịch */}

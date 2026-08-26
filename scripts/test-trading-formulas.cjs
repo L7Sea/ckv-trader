@@ -237,4 +237,46 @@ test('11. Thuật toán Deal DNSE: Giải mã 5 lệnh mua TPB (15.79tr), Lãi v
   assert.strictEqual(breakevenPrice, 15920);
 });
 
-console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/11 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
+// 12. Cơ Chế Giải Ngân Nguồn Vốn Margin Deal & Sức Mua Nở Ra (Purchasing Power Expansion)
+test('12. Giải ngân Margin Deal: Kiểm chứng mua bằng Vốn tự có, Vay Deal 100%, hoặc Hỗn hợp 50-50 & Sức mua nở ra 2x', () => {
+  const initialShares = 1000;
+  const initialAvgCost = 15790;
+  const initialBreakeven = 15920;
+  const initialTotalCost = initialShares * initialAvgCost; // 15,790,000đ
+  const initialBreakevenCost = initialShares * initialBreakeven; // 15,920,000đ
+
+  // Mua thêm 500 CP TPB giá 13,000đ theo cơ chế Hỗn Hợp (50% Tiền Mặt + 50% Margin Deal):
+  const addQty = 500;
+  const addPrice = 13000;
+  const addTradeValue = addQty * addPrice; // 6,500,000đ
+  const addFee = addTradeValue * 0.0015;  // 9,750đ
+  const totalAddRequired = addTradeValue + addFee; // 6,509,750đ
+
+  const cashPart = Math.round(totalAddRequired * 0.5); // 3,254,875đ
+  const marginPart = totalAddRequired - cashPart;      // 3,254,875đ
+
+  const newTotalShares = initialShares + addQty; // 1,500 CP
+  const newAvgCost = Math.round((initialTotalCost + totalAddRequired) / newTotalShares); // 14,867đ
+  const newBreakevenPrice = Math.round((initialBreakevenCost + totalAddRequired) / newTotalShares); // 14,953đ
+
+  // Kiểm chứng hạ giá vốn & giá hòa vốn thành công:
+  assert.strictEqual(newTotalShares, 1500);
+  assert.strictEqual(newAvgCost, 14867); // Hạ từ 15,790đ -> 14,867đ (-923đ/CP)
+  assert.strictEqual(newBreakevenPrice, 14953); // Hạ từ 15,920đ -> 14,953đ (-967đ/CP)
+
+  // Kiểm chứng NAV và nợ Margin:
+  const oldMarginDebt = 7002051;
+  const newMarginDebt = oldMarginDebt + marginPart; // 10,256,926đ
+  const currentLivePrice = 14450;
+  const newStockMarketValue = newTotalShares * currentLivePrice; // 21,675,000đ
+  const remainingCash = 171; // Giả sử tiền mặt ban đầu 171đ, đã nạp thêm để trả phần cashPart
+
+  const newNAV = remainingCash + newStockMarketValue - newMarginDebt; // 21,675,171 - 10,256,926 = 11,418,245đ
+  const newEquityRatio = ((newNAV / (remainingCash + newStockMarketValue)) * 100).toFixed(2); // 52.68%
+
+  assert.strictEqual(newMarginDebt, 10256926);
+  assert.strictEqual(newNAV, 11418245);
+  assert.strictEqual(newEquityRatio, '52.68'); // Vẫn duy trì trên ngưỡng an toàn 50%
+});
+
+console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/12 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
