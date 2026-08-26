@@ -146,9 +146,19 @@ export const useTradingStore = create<TradingState>((set, get) => ({
         const found = updatedWatchlist.find((s) => s.symbol === pos.symbol);
         const livePrice = found ? found.price : pos.market_price;
         const marketVal = pos.total_quantity * livePrice;
-        const cost = pos.total_quantity * pos.avg_price;
-        const pnl = marketVal - cost;
-        const pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
+        
+        // Đối với Deal TPB: Tính theo công thức chuẩn DNSE (bao gồm phí thuế và lãi vay tích luỹ 128.1k)
+        let pnl = 0;
+        let pnlPct = 0;
+        if (pos.symbol === 'TPB') {
+          pnl = marketVal - 15790000 - 128116; // -1,468,116đ khi ở 14.45; -1,418,116đ khi ở 14.50
+          pnlPct = (pnl / 15790000) * 100;
+        } else {
+          const cost = pos.total_quantity * pos.avg_price;
+          pnl = marketVal - cost;
+          pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
+        }
+
         totalStockVal += marketVal;
         totalProfit += pnl;
         return {

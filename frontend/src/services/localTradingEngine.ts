@@ -3,25 +3,27 @@ import { OrderRequestPayload, Portfolio, Position, Transaction } from '../types'
 const PORTFOLIO_KEY = 'ckv_local_portfolio';
 const POSITIONS_KEY = 'ckv_local_positions';
 const TRANSACTIONS_KEY = 'ckv_local_transactions';
+const DATA_VERSION_KEY = 'ckv_data_version_lock';
+export const CURRENT_DATA_VERSION = '2026-08-26-1006-v3';
 
-/* ═══ KHỞI TẠO CHÍNH XÁC DANH MỤC & NGUỒN VỐN CỦA ANH HẢI (VIP Trader) THEO DNSE 26/08/2026 (9h42) ═══
+/* ═══ KHỞI TẠO CHÍNH XÁC DANH MỤC & NGUỒN VỐN CỦA ANH HẢI (VIP Trader) THEO DNSE 26/08/2026 (10h06) ═══
    • Tiền mặt khả dụng: 171đ
-   • Cổ phiếu: 1,000 TPB @ 14,500đ (14.50) -> Giá trị: 14,500,000đ
+   • Cổ phiếu: 1,000 TPB @ 14,450đ (14.45) -> Giá trị: 14,450,000đ
    • Vốn vay Margin Deal gốc: 6,898,107đ
    • Lãi vay Margin lũy kế: 103,944đ (Lãi suất thực tế 11.50%/năm ~ 2,173đ/ngày)
    • Tổng Nợ vay Margin DNSE: 7,002,051đ
-   • Tài sản ròng thực có (NAV): 7,498,120đ (Tổng tài sản 14,500,171đ - Nợ 7,002,051đ)
-   • Lãi/Lỗ chưa chốt Deal TPB: -1,418,116đ (-8.99%)
+   • Tài sản ròng thực có (NAV): 7,448,120đ (Tổng tài sản 14,450,171đ - Nợ 7,002,051đ)
+   • Lãi/Lỗ chưa chốt Deal TPB: -1,468,116đ (-9.30%)
    • Giá hòa vốn thực tế trên Deal DNSE: 15.920 (15,920đ/CP)
-   • Tỷ lệ ký quỹ Deal: 51.55%
+   • Tỷ lệ ký quỹ Deal: 51.38%
 ═══════════════════════════════════════════════════════════════════════════════════ */
 
 const initialPortfolio: Portfolio = {
   cash: 171, // Tiền mặt thực tế trên app DNSE
   receiving_cash: 0,
   margin_debt: 7002051, // Tổng nợ Margin DNSE (gốc 6.898tr + lãi vay tích luỹ 103.9kđ)
-  total_equity: 7498120, // NAV thực có = 14,500,171 - 7,002,051 = 7,498,120đ
-  total_profit_loss: -1418116, // Lỗ chưa chốt Deal -8.99%
+  total_equity: 7448120, // NAV thực có = 14,450,171 - 7,002,051 = 7,448,120đ
+  total_profit_loss: -1468116, // Lỗ chưa chốt Deal -9.30%
   current_simulated_date: new Date().toISOString().slice(0, 10),
   updated_at: new Date().toISOString()
 };
@@ -34,10 +36,10 @@ const initialPositions: Position[] = [
     t1_quantity: 0,
     t2_quantity: 0,
     avg_price: 15920, // Giá hòa vốn thực tế 15.920
-    market_price: 14500, // Thị giá 14.50 (+0.35%)
-    market_value: 14500000,
-    unrealized_pnl: -1418116,
-    unrealized_pnl_pct: -8.99,
+    market_price: 14450, // Thị giá 14.45 (0.00%)
+    market_value: 14450000,
+    unrealized_pnl: -1468116,
+    unrealized_pnl_pct: -9.30,
     target_price: 16500, // Mục tiêu kỳ vọng
     stop_loss: 13800, // Ngưỡng cắt lỗ bảo vệ
     updated_at: new Date().toISOString()
@@ -133,7 +135,18 @@ const initialTransactions: Transaction[] = [
 ];
 
 export const localTradingEngine = {
+  ensureDataFreshness() {
+    try {
+      const savedVer = localStorage.getItem(DATA_VERSION_KEY);
+      if (savedVer !== CURRENT_DATA_VERSION) {
+        this.resetToUserExactData();
+        localStorage.setItem(DATA_VERSION_KEY, CURRENT_DATA_VERSION);
+      }
+    } catch {}
+  },
+
   getPortfolio(): Portfolio {
+    this.ensureDataFreshness();
     const data = localStorage.getItem(PORTFOLIO_KEY);
     if (!data) {
       this.savePortfolio(initialPortfolio);
@@ -151,6 +164,7 @@ export const localTradingEngine = {
   },
 
   getPositions(): Position[] {
+    this.ensureDataFreshness();
     const data = localStorage.getItem(POSITIONS_KEY);
     if (!data) {
       this.savePositions(initialPositions);
@@ -168,6 +182,7 @@ export const localTradingEngine = {
   },
 
   getTransactions(): Transaction[] {
+    this.ensureDataFreshness();
     const data = localStorage.getItem(TRANSACTIONS_KEY);
     if (!data) {
       this.saveTransactions(initialTransactions);
