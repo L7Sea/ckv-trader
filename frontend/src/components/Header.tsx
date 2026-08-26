@@ -30,6 +30,7 @@ import { AdminPanelModal } from './AdminPanelModal';
 import { SupportChatModal } from './SupportChatModal';
 import { ShareAppModal } from './ShareAppModal';
 import { OnboardingTourModal } from './OnboardingTourModal';
+import { HelpCenterModal } from './HelpCenterModal';
 
 export const Header: React.FC = () => {
   const { fetchData, settleDay, resetCleanSlate, isLoading, syncLiveMarketData, isLiveSyncing } = useTradingStore();
@@ -40,6 +41,7 @@ export const Header: React.FC = () => {
     openSupportChat,
     openShareModal,
     openOnboarding,
+    openHelpCenter,
     logout,
     switchSubAccount,
     lockApp
@@ -115,7 +117,7 @@ export const Header: React.FC = () => {
                     ? 'bg-emerald-500 text-slate-950 shadow-sm'
                     : 'text-slate-400 hover:text-white'
                 }`}
-                title="Tiểu khoản 01: Giao dịch Thường (Không Margin)"
+                title="Tiểu khoản 01: Giao dịch Thường (Không Margin - Thuần tiền mặt)"
               >
                 01 (Thường)
               </button>
@@ -143,6 +145,16 @@ export const Header: React.FC = () => {
               <span className="font-sans">{isLiveSyncing ? 'Đang đồng bộ...' : 'Đồng Bộ Toàn Diện'}</span>
             </button>
 
+            {/* Nút Cẩm Nang & Hướng Dẫn (Help Center) */}
+            <button
+              onClick={openHelpCenter}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition active:scale-95 shadow-sm"
+              title="Mở Cẩm Nang & Hướng Dẫn Sử Dụng (Chọn CTCK, Lãi suất, Mã lạ, Giao dịch tiền mặt)"
+            >
+              <HelpCircle className="h-3.5 w-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Cẩm Nang</span>
+            </button>
+
             {/* Nút Nhắn Tin Cho Admin / Khách Hàng (Support Chat) */}
             <button
               onClick={openSupportChat}
@@ -161,7 +173,7 @@ export const Header: React.FC = () => {
             {/* Nút Chia Sẻ App (Share) */}
             <button
               onClick={openShareModal}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition active:scale-95"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition active:scale-95"
               title="Chia sẻ link ứng dụng cho bạn bè"
             >
               <Share2 className="h-3.5 w-3.5 text-cyan-400" />
@@ -172,22 +184,13 @@ export const Header: React.FC = () => {
             {isAdmin && (
               <button
                 onClick={openAdminPanel}
-                className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold transition active:scale-95"
+                className="hidden xl:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold transition active:scale-95"
                 title="Quản trị danh sách người dùng & số dư"
               >
                 <Users className="h-3.5 w-3.5 text-amber-400" />
                 <span>Quản Trị User</span>
               </button>
             )}
-
-            {/* Nút Hướng Dẫn (Tour) */}
-            <button
-              onClick={openOnboarding}
-              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition active:scale-95"
-              title="Xem lại hướng dẫn sử dụng (Capy Onboarding)"
-            >
-              <HelpCircle className="h-4 w-4 text-emerald-400" />
-            </button>
 
             {/* Nút Cài Đặt (Settings) */}
             <button
@@ -217,7 +220,9 @@ export const Header: React.FC = () => {
                   <div className="p-2 border-b border-slate-800/80 mb-1">
                     <p className="text-xs font-bold text-white truncate">{user?.name || 'VIP Trader'}</p>
                     <p className="text-[11px] font-mono text-emerald-400">STK: {user?.accountNumber || '001C888999'}</p>
-                    <span className="text-[10px] font-bold text-slate-400">Vai trò: <b className="text-amber-400">{user?.role}</b></span>
+                    <span className="text-[10px] font-bold text-slate-400">
+                      CTCK: <b className="text-purple-400">{user?.brokerage || 'DNSE'}</b> ({user?.customMarginRate || 11.5}%)
+                    </span>
                   </div>
                   
                   {isAdmin && (
@@ -232,6 +237,17 @@ export const Header: React.FC = () => {
                       <span>Quản trị người dùng</span>
                     </button>
                   )}
+
+                  <button
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
+                      openHelpCenter();
+                    }}
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-emerald-300 hover:bg-emerald-500/10 rounded-xl transition font-semibold"
+                  >
+                    <HelpCircle className="h-4 w-4 text-emerald-400" />
+                    <span>Cẩm nang & Chọn CTCK</span>
+                  </button>
 
                   <button
                     onClick={() => {
@@ -260,9 +276,9 @@ export const Header: React.FC = () => {
                       setIsUserMenuOpen(false);
                       openOnboarding();
                     }}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-emerald-300 hover:bg-emerald-500/10 rounded-xl transition"
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 rounded-xl transition"
                   >
-                    <HelpCircle className="h-4 w-4 text-emerald-400" />
+                    <Sparkles className="h-4 w-4 text-amber-400" />
                     <span>Hướng dẫn Capy Onboarding</span>
                   </button>
 
@@ -304,6 +320,7 @@ export const Header: React.FC = () => {
       <SupportChatModal />
       <ShareAppModal />
       <OnboardingTourModal />
+      <HelpCenterModal />
     </>
   );
 };

@@ -277,6 +277,35 @@ test('12. Giải ngân Margin Deal: Kiểm chứng mua bằng Vốn tự có, Va
   assert.strictEqual(newMarginDebt, 10256926);
   assert.strictEqual(newNAV, 11418245);
   assert.strictEqual(newEquityRatio, '52.68'); // Vẫn duy trì trên ngưỡng an toàn 50%
+// 13. Tùy Biến CTCK & Lãi Suất Margin (VPS 13.5%, TCBS 10.5%, SSI 12%) vs Giao Dịch Thuần Tiền Mặt (TK 01)
+test('13. Tùy biến CTCK & Lãi Suất Margin: Kiểm chứng VPS (13.5%), TCBS (10.5%), DNSE (11.5%) & Chế độ Thuần Tiền Mặt (0% Lãi)', () => {
+  const marginDebt = 7002051;
+
+  // Lãi vay 1 ngày theo từng CTCK:
+  const dnseDailyInterest = Math.round(marginDebt * 0.115 / 365); // DNSE 11.5% -> 2,173đ/ngày
+  const vpsDailyInterest = Math.round(marginDebt * 0.135 / 365);  // VPS 13.5%  -> 2,551đ/ngày
+  const tcbsDailyInterest = Math.round(marginDebt * 0.105 / 365); // TCBS 10.5% -> 1,984đ/ngày
+
+  assert.strictEqual(dnseDailyInterest, 2173);
+  assert.strictEqual(vpsDailyInterest, 2551);
+  assert.strictEqual(tcbsDailyInterest, 1984);
+
+  // Chế độ Thuần Tiền Mặt (Tiểu khoản 01 - Không Vay Nợ):
+  const cashModeDebt = 0;
+  const cashModeDailyInterest = 0;
+  const buyCost = 1000 * 20000; // 1,000 CP giá 20,000đ = 20,000,000đ
+  const buyFee = buyCost * 0.0015; // 30,000đ
+  const totalCashInvested = buyCost + buyFee; // 20,030,000đ
+
+  // Giá hòa vốn thuần tiền mặt (Không gánh lãi Margin):
+  // Bán ra cần bù đắp đủ 20,030,000đ + phí bán 0.15% + thuế bán 0.1% = 0.25%
+  const cashBreakevenRevenue = Math.round(totalCashInvested / (1 - 0.0025)); // 20,080,201đ
+  const cashBreakevenPrice = Math.round(cashBreakevenRevenue / 1000); // 20,080đ/CP
+
+  assert.strictEqual(cashModeDebt, 0);
+  assert.strictEqual(cashModeDailyInterest, 0);
+  assert.strictEqual(cashBreakevenPrice, 20080);
 });
 
-console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/12 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
+console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/13 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
+

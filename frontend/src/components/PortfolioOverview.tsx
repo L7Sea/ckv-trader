@@ -11,6 +11,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 export const PortfolioOverview: React.FC = () => {
   const {
@@ -21,17 +22,26 @@ export const PortfolioOverview: React.FC = () => {
     openCashModal
   } = useTradingStore();
 
-  const cash = (portfolio?.cash !== undefined && portfolio.cash > 0) ? portfolio.cash : 171;
-  const receivingCash = portfolio?.receiving_cash || 0;
-  const marginDebt = portfolio?.margin_debt && portfolio.margin_debt > 6900000 ? portfolio.margin_debt : 7002051;
-  const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0) || 14450000;
-  const totalAssets = cash + receivingCash + stockMarketValue;
-  const totalEquity = portfolio?.total_equity || (totalAssets - marginDebt) || 7448120;
+  const { user } = useAuthStore();
+  const isCashAccount = user?.subAccount === '01';
+  const marginRate = user?.customMarginRate || 11.5;
+  const brokerageName = user?.brokerage || 'DNSE';
 
-  const unrealizedPnL = positions.reduce((sum, p) => sum + (p.unrealized_pnl || 0), 0) || -1468116;
-  const totalInvestedStockCost = positions.reduce((sum, p) => sum + p.total_quantity * p.avg_price, 0) || 15790000;
-  const unrealizedPnLPct = totalInvestedStockCost > 0 ? (unrealizedPnL / 15790000) * 100 : -9.30;
-  const equityRatio = totalAssets > 0 ? ((totalEquity / totalAssets) * 100).toFixed(2) : '51.38';
+  const cash = (portfolio?.cash !== undefined) ? portfolio.cash : (user?.role === 'ADMIN' ? 171 : 0);
+  const receivingCash = portfolio?.receiving_cash || 0;
+  const rawMarginDebt = portfolio?.margin_debt !== undefined ? portfolio.margin_debt : (user?.role === 'ADMIN' ? 7002051 : 0);
+  const marginDebt = isCashAccount ? 0 : rawMarginDebt;
+
+  const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0);
+  const totalAssets = cash + receivingCash + stockMarketValue;
+  const totalEquity = isCashAccount ? totalAssets : (totalAssets - marginDebt);
+
+  const unrealizedPnL = positions.reduce((sum, p) => sum + (p.unrealized_pnl || 0), 0);
+  const totalInvestedStockCost = positions.reduce((sum, p) => sum + p.total_quantity * p.avg_price, 0);
+  const unrealizedPnLPct = totalInvestedStockCost > 0 ? (unrealizedPnL / totalInvestedStockCost) * 100 : 0;
+  const equityRatio = totalAssets > 0 ? ((totalEquity / totalAssets) * 100).toFixed(2) : '100.00';
+
+  const dailyInterest = isCashAccount || marginDebt <= 0 ? 0 : Math.round(marginDebt * (marginRate / 100) / 365);
 
   const isProfit = unrealizedPnL >= 0;
 
@@ -140,27 +150,54 @@ export const PortfolioOverview: React.FC = () => {
               <span className="text-[10px] text-slate-500 font-sans mt-0.5">Đang trong chu kỳ bù trừ</span>
             </div>
 
-            {/* Box 4 - Nợ Vay Margin & Lãi Suất Thực Tế (Có nút Trả Nợ) */}
-            <div
-              onClick={openCashModal}
-              className="p-3.5 rounded-2xl bg-slate-950/70 border border-purple-500/30 hover:border-purple-500/60 cursor-pointer transition flex flex-col justify-between group"
-              title="Nhấn để Trả Nợ Deal hoặc Hiệu chỉnh số dư"
-            >
-              <div className="flex items-center justify-between text-purple-300">
-                <span className="font-sans text-[11px] font-semibold group-hover:text-purple-300 transition">Nợ Vay Margin Thực Tế</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 font-mono">
-                  Trả Nợ Deal
-                </span>
+            {/* Box 4 - Nợ Vay Margin & Lãi Suất Thực Tế hoặc Chế độ Thuần Tiền Mặt */}
+            {isCashAccount ? (
+              <div
+                onClick={openCashModal}
+                className="p-3.5 rounded-2xl bg-slate-950/70 border border-emerald-500/30 hover:border-emerald-500/60 cursor-pointer transition flex flex-col justify-between group"
+                title="Tiểu khoản 01: Giao dịch 100% Tiền mặt, không phát sinh nợ vay"
+              >
+                <div className="flex items-center justify-between text-emerald-400">
+                  <span className="font-sans text-[11px] font-semibold">Trạng Thái Ký Quỹ</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 font-mono">
+                    TK 01 Thường
+                  </span>
+                </div>
+                <b className="text-base text-emerald-400 font-bold mt-1.5 block">100% Tiền Mặt</b>
+                <div className="flex flex-col text-[10px] text-slate-400 font-sans mt-0.5 space-y-0.5">
+                  <span className="text-emerald-300/90 font-mono">Không nợ vay • 0đ lãi ngày</span>
+                  <span className="text-slate-500 flex justify-between items-center">
+                    <span>An toàn tuyệt đối</span>
+                    <span className="text-emerald-400 opacity-0 group-hover:opacity-100 transition text-[9px] font-bold">Nạp tiền →</span>
+                  </span>
+                </div>
               </div>
-              <b className="text-base text-purple-300 font-bold mt-1.5 block">{formatVND(marginDebt)}</b>
-              <div className="flex flex-col text-[10px] text-slate-400 font-sans mt-0.5 space-y-0.5">
-                <span className="text-amber-300/90 font-mono">Lãi: 11.5% (~2,173 đ/ngày)</span>
-                <span className="text-slate-500 flex justify-between items-center">
-                  <span>Gốc: 6.898tr • Lãi: 103.9k</span>
-                  <span className="text-purple-400 opacity-0 group-hover:opacity-100 transition text-[9px] font-bold">Trả nợ →</span>
-                </span>
+            ) : (
+              <div
+                onClick={openCashModal}
+                className="p-3.5 rounded-2xl bg-slate-950/70 border border-purple-500/30 hover:border-purple-500/60 cursor-pointer transition flex flex-col justify-between group"
+                title="Nhấn để Trả Nợ Deal hoặc Hiệu chỉnh số dư"
+              >
+                <div className="flex items-center justify-between text-purple-300">
+                  <span className="font-sans text-[11px] font-semibold group-hover:text-purple-300 transition">
+                    Nợ Margin ({brokerageName})
+                  </span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 font-mono">
+                    Trả Nợ Deal
+                  </span>
+                </div>
+                <b className="text-base text-purple-300 font-bold mt-1.5 block">{formatVND(marginDebt)}</b>
+                <div className="flex flex-col text-[10px] text-slate-400 font-sans mt-0.5 space-y-0.5">
+                  <span className="text-amber-300/90 font-mono">
+                    Lãi: {marginRate}%/năm (~{dailyInterest.toLocaleString('vi-VN')} đ/ngày)
+                  </span>
+                  <span className="text-slate-500 flex justify-between items-center">
+                    <span>Gốc: {formatVND(marginDebt)}</span>
+                    <span className="text-purple-400 opacity-0 group-hover:opacity-100 transition text-[9px] font-bold">Trả nợ →</span>
+                  </span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

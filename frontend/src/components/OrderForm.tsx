@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Tag, AlertCircle, Calculator, Calendar, Target, ShieldAlert, Sparkles, BookOpen } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { TradeStrategy } from '../types';
 import { VN50_WATCHLIST } from './MarketBoard';
 
@@ -15,11 +16,18 @@ export const OrderForm: React.FC = () => {
     selectedAction
   } = useTradingStore();
 
+  const { user } = useAuthStore();
+  const isCashAccount = user?.subAccount === '01';
+  const marginRate = user?.customMarginRate || 11.5;
+  const brokerageName = user?.brokerage || 'DNSE';
+
   const [type, setType] = useState<'BUY' | 'SELL'>('BUY');
   const [symbol, setSymbol] = useState('');
   const [price, setPrice] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(100);
-  const [fundingSource, setFundingSource] = useState<'CASH' | 'MARGIN_DEAL' | 'HYBRID'>('MARGIN_DEAL');
+  const [fundingSource, setFundingSource] = useState<'CASH' | 'MARGIN_DEAL' | 'HYBRID'>(
+    user?.subAccount === '01' ? 'CASH' : 'MARGIN_DEAL'
+  );
   const feeRate = 0.15; // 0.15% phí giao dịch chuẩn
   const taxRate = 0.1;  // 0.1% thuế bán chứng khoán
   const [strategy, setStrategy] = useState<TradeStrategy>('PULLBACK_MA20');
@@ -145,45 +153,57 @@ export const OrderForm: React.FC = () => {
       {/* Tùy Chọn Nguồn Vốn Khi MUA */}
       {type === 'BUY' && (
         <div className="p-2.5 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-1.5">
-          <label className="text-[11px] text-slate-400 font-semibold block">Nguồn Vốn Giải Ngân:</label>
-          <div className="grid grid-cols-3 gap-1.5 text-[11px] font-mono font-bold">
-            <button
-              type="button"
-              onClick={() => setFundingSource('CASH')}
-              className={`py-1.5 px-2 rounded-xl border transition flex flex-col items-center justify-center gap-0.5 ${
-                fundingSource === 'CASH'
-                  ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
-                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
-              }`}
-            >
-              <span>100% Tiền Mặt</span>
-              <span className="text-[9px] font-normal text-slate-400 font-sans">Tiểu khoản 01</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setFundingSource('MARGIN_DEAL')}
-              className={`py-1.5 px-2 rounded-xl border transition flex flex-col items-center justify-center gap-0.5 ${
-                fundingSource === 'MARGIN_DEAL'
-                  ? 'bg-purple-500/20 border-purple-500 text-purple-300'
-                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
-              }`}
-            >
-              <span>100% Vay Deal</span>
-              <span className="text-[9px] font-normal text-purple-300/80 font-sans">Margin 11.5%</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setFundingSource('HYBRID')}
-              className={`py-1.5 px-2 rounded-xl border transition flex flex-col items-center justify-center gap-0.5 ${
-                fundingSource === 'HYBRID'
-                  ? 'bg-amber-500/20 border-amber-500 text-amber-300'
-                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
-              }`}
-            >
-              <span>Hỗn Hợp (50-50)</span>
-              <span className="text-[9px] font-normal text-amber-300/80 font-sans">Tự có + Vay</span>
-            </button>
+          <div className="flex items-center justify-between text-[11px] text-slate-400 font-semibold">
+            <span>Nguồn Vốn Giải Ngân:</span>
+            <span className="font-mono text-emerald-400 text-[10px]">
+              {isCashAccount ? 'TK 01: Thuần Tiền Mặt' : `TK 06: Margin ${brokerageName} (${marginRate}%)`}
+            </span>
           </div>
+
+          {isCashAccount ? (
+            <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center text-xs text-emerald-300 font-bold">
+              💰 Mua 100% bằng Tiền Mặt khả dụng (Không phát sinh nợ Margin)
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-1.5 text-[11px] font-mono font-bold">
+              <button
+                type="button"
+                onClick={() => setFundingSource('CASH')}
+                className={`py-1.5 px-2 rounded-xl border transition flex flex-col items-center justify-center gap-0.5 ${
+                  fundingSource === 'CASH'
+                    ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
+                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>100% Tiền Mặt</span>
+                <span className="text-[9px] font-normal text-slate-400 font-sans">Tiền tự có</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFundingSource('MARGIN_DEAL')}
+                className={`py-1.5 px-2 rounded-xl border transition flex flex-col items-center justify-center gap-0.5 ${
+                  fundingSource === 'MARGIN_DEAL'
+                    ? 'bg-purple-500/20 border-purple-500 text-purple-300'
+                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>100% Vay {brokerageName}</span>
+                <span className="text-[9px] font-normal text-purple-300/80 font-sans">Margin {marginRate}%</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFundingSource('HYBRID')}
+                className={`py-1.5 px-2 rounded-xl border transition flex flex-col items-center justify-center gap-0.5 ${
+                  fundingSource === 'HYBRID'
+                    ? 'bg-amber-500/20 border-amber-500 text-amber-300'
+                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>Hỗn Hợp (50-50)</span>
+                <span className="text-[9px] font-normal text-amber-300/80 font-sans">Tự có + Vay</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 

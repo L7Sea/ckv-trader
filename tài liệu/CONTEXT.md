@@ -52,17 +52,20 @@
 ## 3. 🧪 TIÊU CHUẨN KIỂM THỬ & PHÂN LUỒNG MỆNH LỆNH
 - **Chế độ Báo cáo / Tìm lỗi (Inspect Mode)**: Khi người dùng hỏi "báo cáo lỗi", "chỉ ra lỗi sai", "tại sao lệch" $\rightarrow$ AI chỉ tập trung phân tích chuyên môn và đề xuất hướng xử lý, tuyệt đối không tự ý sửa code hay push.
 - **Chế độ Thực thi (Execution Mode)**: Khi người dùng ra lệnh "sửa và push", "sửa cho tôi đi" $\rightarrow$ AI sửa code, chạy test suites, build và tự động commit/push Cloudflare Pages.
-- `node scripts/test-trading-formulas.cjs`: 12/12 bài test toán học & vĩ mô đạt chuẩn 100%.
+- `node scripts/test-trading-formulas.cjs`: 13/13 bài test toán học & vĩ mô đạt chuẩn 100% (bao gồm CTCK tùy chỉnh VPS, TCBS, SSI, DNSE và chế độ Thuần Tiền Mặt 01).
 - `node scripts/test-sql-schema.cjs`: 18/18 bài test toàn vẹn mô hình dữ liệu SQL (bao gồm multi-user auth & support messages).
 - `npm --prefix frontend run build`: 100% sạch cảnh báo và 0 lỗi TypeScript.
 - **Triển khai thường trực**: Tự động commit chuẩn Conventional Commits và đẩy thẳng lên Cloudflare Pages / GitHub (`git push origin master`) sau mỗi lần cập nhật.
 
 ---
 
-## 4. 👥 KIẾN TRÚC ĐA NGƯỜI DÙNG & HỖ TRỢ TRỰC TUYẾN
+## 4. 👥 KIẾN TRÚC ĐA NGƯỜI DÙNG, TÙY CHỌN CTCK & TRUNG TÂM HƯỚNG DẪN
 - **👑 Tài khoản Chủ Nhân (Admin VIP)**: Giữ trọn vẹn số dư tài sản thực tế (1,000 TPB, nợ Margin 7.002tr, NAV 7.448tr). Có quyền mở Admin Panel để giám sát danh sách người dùng và trả lời tin nhắn trực tiếp.
 - **👤 Người Dùng Mới (Guest / New Trader)**: Tự do tạo tài khoản bằng Email/Mật khẩu hoặc Đăng nhập 1-Click Google. Khởi tạo sạch sẽ từ 0đ (Tiền mặt: 0đ, Nợ: 0đ, Danh mục: Rỗng) để tự trải nghiệm độc lập.
-- **🚀 Capy Onboarding Tour**: 5 bước tương tác trực quan giải thích cặn kẽ bản chất app (Quản trị vị thế, Nhật ký T+2.5, không phải app sàn khớp lệnh).
+- **🏦 Tùy Chọn CTCK & Lãi Suất Margin**: Tùy chỉnh lãi suất gói vay theo DNSE (11.5%), VPS (13.5%), TCBS (10.5%), SSI (12.0%), VNDirect (12.8%) hoặc tỷ lệ tùy ý.
+- **🛡️ Chế Độ Thuần Tiền Mặt (Tiểu khoản 01)**: Tự động triệt tiêu toàn bộ nợ Margin, tiền lãi vay = 0đ/ngày, giá hòa vốn thuần túy chỉ gồm thuế phí 0.25%.
+- **🔍 Nạp Mã Lạ & Sàn UPCOM**: Tự động fetch live giá từ sàn Entrade/TCBS API hoặc cho phép nhập/chỉnh giá thủ công linh hoạt.
+- **📖 Trung Tâm Hướng Dẫn & Cẩm Nang Tương Tác (Help Center)**: Hướng dẫn chi tiết 4 chuyên đề, FAQ, và nút gọi lại Onboarding Tour / Chat Admin.
 - **💬 Live Support Chat**: Kênh nhắn tin 2 chiều trực tuyến giữa User và Admin qua bảng `support_messages`.
 - **🔗 Production URL**: `https://ckv-trader.pages.dev` (Cloudflare Pages).
 

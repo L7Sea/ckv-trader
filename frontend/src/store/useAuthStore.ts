@@ -8,6 +8,8 @@ export interface UserProfile {
   role: 'ADMIN' | 'USER';
   accountNumber: string;
   subAccount: '01' | '06'; // 01: Thường, 06: Margin
+  brokerage: 'DNSE' | 'VPS' | 'TCBS' | 'SSI' | 'VNDIRECT' | 'CUSTOM';
+  customMarginRate: number; // %/năm (VD: DNSE 11.5, VPS 13.5, TCBS 10.5, SSI 12.0)
   pin: string;
   theme: 'CYBERPUNK' | 'DARK_NAVY' | 'BLACK_AMOLED';
   backgroundUrl?: string;
@@ -24,6 +26,7 @@ interface AuthState {
   isSupportChatOpen: boolean;
   isShareModalOpen: boolean;
   isOnboardingOpen: boolean;
+  isHelpCenterOpen: boolean;
   isLocked: boolean;
   requirePinForOrders: boolean;
 
@@ -35,6 +38,7 @@ interface AuthState {
   logout: () => void;
   switchUserAccount: (userId: string) => void;
   switchSubAccount: (sub: '01' | '06') => void;
+  updateBrokerage: (brokerage: 'DNSE' | 'VPS' | 'TCBS' | 'SSI' | 'VNDIRECT' | 'CUSTOM', rate: number) => void;
   updateUserProfile: (updates: Partial<UserProfile>) => void;
   completeOnboarding: () => void;
   
@@ -51,7 +55,8 @@ interface AuthState {
   openShareModal: () => void;
   closeShareModal: () => void;
   openOnboarding: () => void;
-  closeOnboarding: () => void;
+  openHelpCenter: () => void;
+  closeHelpCenter: () => void;
 }
 
 const USERS_STORAGE_KEY = 'ckv_registered_users_v3';
@@ -66,6 +71,8 @@ const ADMIN_MASTER_PROFILE: UserProfile = {
   role: 'ADMIN',
   accountNumber: '001C888999',
   subAccount: '06', // Margin Deal
+  brokerage: 'DNSE',
+  customMarginRate: 11.5,
   pin: DEFAULT_PIN,
   theme: 'CYBERPUNK',
   hasCompletedOnboarding: true,
@@ -260,6 +267,15 @@ export const useAuthStore = create<AuthState>((set, get) => {
       set({ user: updated, allUsers: users });
     },
 
+    updateBrokerage: (brokerage: 'DNSE' | 'VPS' | 'TCBS' | 'SSI' | 'VNDIRECT' | 'CUSTOM', rate: number) => {
+      const current = get().user;
+      if (!current) return;
+      const updated: UserProfile = { ...current, brokerage, customMarginRate: rate };
+      const users = getStoredUsers().map((u) => (u.id === current.id ? updated : u));
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+      set({ user: updated, allUsers: users });
+    },
+
     updateUserProfile: (updates: Partial<UserProfile>) => {
       const current = get().user;
       if (!current) return;
@@ -298,6 +314,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
     openShareModal: () => set({ isShareModalOpen: true }),
     closeShareModal: () => set({ isShareModalOpen: false }),
     openOnboarding: () => set({ isOnboardingOpen: true }),
-    closeOnboarding: () => set({ isOnboardingOpen: false })
+    closeOnboarding: () => set({ isOnboardingOpen: false }),
+    openHelpCenter: () => set({ isHelpCenterOpen: true }),
+    closeHelpCenter: () => set({ isHelpCenterOpen: false })
   };
 });
