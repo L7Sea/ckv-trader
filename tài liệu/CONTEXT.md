@@ -23,9 +23,9 @@
 3. **Mạng Lưới Điều Hướng Chéo (Cross-Navigation Engine)**:
    - `navigateToStock(symbol, targetTab, action, targetPrice)` kết nối tức thì giữa Tin tức / Gợi ý AI / Radar / Danh mục / Vĩ mô sang Bảng Giá & Nến Kỹ Thuật hoặc Sổ Lệnh / Hòa Vốn.
 
-4. **Dữ Liệu Tài Sản Thực Tế & Lãi Suất Vay Margin Deal (DNSE 26/08/2026 - 10h45)**:
+4. **Dữ Liệu Tài Sản Thực Tế & Lãi Suất Vay Margin Deal (DNSE 26/08/2026 - 13h53 Phiên Chiều)**:
    - **Vị thế**: 1,000 cổ phiếu TPB (Khả dụng: 1,000 CP).
-   - **Thị giá**: 14.45 (14,450 đ/CP) $\rightarrow$ Giá trị CP: **14,450,000 đ**.
+   - **Thị giá**: 14.60 (14,600 đ/CP) $\rightarrow$ Giá trị CP: **14,600,000 đ** (+150,000 đ).
    - **Giá vốn mua bình quân ban đầu (Avg Cost)**: **15.790 (15,790 đ/CP)** (Tổng tiền 5 lệnh mua: 15,790,000 đ).
    - **Giá hòa vốn Deal thực tế (Breakeven Price)**: **15.920 (15,920 đ/CP)** (Đã bù đắp đủ 15.79tr vốn + 103.9k lãi vay Margin + 24.1k thuế phí đóng deal).
    - **Tiền mặt**: **171 đ**.
@@ -33,11 +33,11 @@
    - **Lãi suất vay Margin Deal thực tế**: **11.50% / năm** ($\approx \mathbf{2,173 \text{ đ/ngày}}$).
    - **Lãi vay tích luỹ qua các ngày**: **103,944 đ** (Lãi đã trả trước đó: 1,256đ, Phí thuế deal: 22,916đ).
    - **Tổng Nợ Margin thực tế**: $6,898,107 + 103,944 = \mathbf{7,002,051 \text{ đ}}$.
-   - **Tài Sản Ròng Thực Có (NAV)**: $14,450,171 - 7,002,051 = \mathbf{7,448,120 \text{ đ}}$.
-   - **Lãi/Lỗ chưa chốt Deal**: **-1,468,116 đ (-9.30%)**.
-   - **Tỷ lệ ký quỹ Deal**: **51.38%**.
-   - **Nguồn cấp dữ liệu giá trực tiếp (Live Tick API)**: Tích hợp Entrade Chart API & TCBS Endpoint tự động lấy giá thời gian thực trực tiếp từ sàn.
-   - **Cơ chế Auto-Migration Cache**: Khóa phiên bản `ckv_data_version_lock` (`2026-08-26-1045-v5`) tự động đồng bộ LocalStorage client.
+   - **Tài Sản Ròng Thực Có (NAV)**: $14,600,171 - 7,002,051 = \mathbf{7,598,120 \text{ đ}}$.
+   - **Lãi/Lỗ chưa chốt Deal**: **-1,418,116 đ (-8.98%)**.
+   - **Tỷ lệ tự có thực tế**: **52.04%**.
+   - **TradingView Pro Interactive Widget**: Tích hợp trực tiếp widget TradingView Advanced Realtime với toàn bộ công cụ kỹ thuật, khung thời gian (1m, 5m, 15m, 1h, 1D, 1W, 1M), bộ chỉ báo (RSI, MACD, MA, Bollinger Bands), và sàn HOSE, HNX, UPCOM.
+   - **Cơ chế Auto-Migration Cache**: Khóa phiên bản `ckv_data_version_lock` (`2026-08-26-1353-v6`) tự động đồng bộ LocalStorage client.
 
 ---
 

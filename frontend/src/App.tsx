@@ -79,111 +79,111 @@ export const AppContent: React.FC = () => {
         {/* 1. Tổng quan tài sản Super-App (Portfolio Master Card) */}
         <PortfolioOverview />
 
-        {/* Navigation Tabs Bar (Desktop & Tablet Pill Bar - Chống chồng chéo, cuộn ngang mượt mà) */}
+        {/* Navigation Tabs Bar (Desktop & Tablet Pill Bar - Tinh gọn, vừa vặn 100% trên 1 hàng) */}
         <div className="hidden md:flex items-center justify-start border-b border-[#212636] pb-2 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-1.5 p-1.5 bg-[#121620] rounded-2xl border border-[#212636] text-xs font-semibold backdrop-blur-md shrink-0">
+          <div className="flex items-center gap-1 p-1 bg-[#121620] rounded-2xl border border-[#212636] text-xs font-semibold backdrop-blur-md shrink-0 w-full justify-between">
             <button
               data-tab="TRADE"
               onClick={() => setActiveTab('TRADE')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'TRADE'
                   ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <TrendingUp className="h-4 w-4" />
-              <span>SỔ LỆNH & VỊ THẾ</span>
+              <span>SỔ LỆNH</span>
             </button>
 
             <button
               data-tab="DECISION"
               onClick={() => setActiveTab('DECISION')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'DECISION'
                   ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <Scale className="h-4 w-4" />
-              <span>QUẢN TRỊ VỊ THẾ & HÒA VỐN</span>
+              <span>HÒA VỐN</span>
             </button>
 
             <button
               data-tab="ALGORITHMS"
               onClick={() => setActiveTab('ALGORITHMS')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'ALGORITHMS'
                   ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-500/20'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <Cpu className="h-4 w-4" />
-              <span>RADAR & THUẬT TOÁN ĐỊNH LƯỢNG</span>
+              <span>RADAR AI</span>
             </button>
 
             <button
               data-tab="MARKET"
               onClick={() => setActiveTab('MARKET')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'MARKET'
                   ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/20'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
-              <span>BẢNG GIÁ THỰC TẾ & CHART</span>
+              <span>BẢNG GIÁ & CHART</span>
             </button>
 
             <button
               data-tab="MACRO"
               onClick={() => setActiveTab('MACRO')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'MACRO'
                   ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/30'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <Landmark className="h-4 w-4 text-emerald-300" />
-              <span>LÃI SUẤT VĨ MÔ & CHI PHÍ VỐN</span>
+              <span>LÃI SUẤT VĨ MÔ</span>
             </button>
 
             <button
               data-tab="INTELLIGENCE"
               onClick={() => setActiveTab('INTELLIGENCE')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'INTELLIGENCE'
                   ? 'bg-teal-500 text-slate-950 font-bold shadow-md shadow-teal-500/20'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <Newspaper className="h-4 w-4" />
-              <span>PHÂN TÍCH THỊ TRƯỜNG & TIN TỨC</span>
+              <span>TIN THỊ TRƯỜNG</span>
             </button>
 
             <button
               data-tab="CHARTS"
               onClick={() => setActiveTab('CHARTS')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'CHARTS'
                   ? 'bg-purple-600 text-white font-bold shadow-md shadow-purple-500/20'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <PieChart className="h-4 w-4" />
-              <span>PHÂN BỔ TÀI SẢN & NAV</span>
+              <span>PHÂN BỔ VỐN</span>
             </button>
 
             <button
               data-tab="ANALYTICS"
               onClick={() => setActiveTab('ANALYTICS')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'ANALYTICS'
                   ? 'bg-rose-500 text-white font-bold shadow-md shadow-rose-500/20'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <Award className="h-4 w-4" />
-              <span>HIỆU SUẤT & EXCEL</span>
+              <span>HIỆU SUẤT EXCEL</span>
             </button>
           </div>
         </div>

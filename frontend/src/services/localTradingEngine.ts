@@ -5,27 +5,27 @@ const PORTFOLIO_KEY = 'ckv_local_portfolio';
 const POSITIONS_KEY = 'ckv_local_positions';
 const TRANSACTIONS_KEY = 'ckv_local_transactions';
 const DATA_VERSION_KEY = 'ckv_data_version_lock';
-export const CURRENT_DATA_VERSION = '2026-08-26-1045-v5';
+export const CURRENT_DATA_VERSION = '2026-08-26-1353-v6';
 
-/* ═══ KHỞI TẠO CHÍNH XÁC DANH MỤC & NGUỒN VỐN CỦA ANH HẢI (VIP Trader) THEO DNSE 26/08/2026 ═══
+/* ═══ KHỞI TẠO CHÍNH XÁC DANH MỤC & NGUỒN VỐN CỦA ANH HẢI (VIP Trader) THEO DNSE 26/08/2026 (13h53) ═══
    • Tiền mặt khả dụng: 171đ
-   • Cổ phiếu: 1,000 TPB @ 14,450đ (14.45) -> Giá trị: 14,450,000đ
-   • Giá vốn mua bình quân gia quyền ban đầu (từ 5 lệnh mua): 15.790 (15,790đ/CP)
+   • Cổ phiếu: 1,000 TPB @ 14,600đ (14.60) -> Giá trị: 14,600,000đ
+   • Giá vốn mua bình quân ban đầu (từ 5 lệnh mua): 15.790 (15,790đ/CP)
    • Giá hòa vốn Deal thực tế (gồm lãi vay + thuế phí): 15.920 (15,920đ/CP)
    • Vốn vay Margin Deal gốc: 6,898,107đ
    • Lãi vay Margin lũy kế: 103,944đ (Lãi suất thực tế 11.50%/năm ~ 2,173đ/ngày)
    • Tổng Nợ vay Margin DNSE: 7,002,051đ
-   • Tài sản ròng thực có (NAV): 7,448,120đ (Tổng tài sản 14,450,171đ - Nợ 7,002,051đ)
-   • Lãi/Lỗ chưa chốt Deal TPB: -1,468,116đ (-9.30%)
-   • Tỷ lệ ký quỹ Deal: 51.38%
+   • Tài sản ròng thực có (NAV): 14,600,171 - 7,002,051 = 7,598,120đ
+   • Lãi/Lỗ chưa chốt Deal TPB: -1,418,116đ (-8.98%)
+   • Tỷ lệ tự có thực tế: 52.04%
 ═══════════════════════════════════════════════════════════════════════════════════ */
 
 const initialPortfolio: Portfolio = {
   cash: 171, // Tiền mặt thực tế trên app DNSE
   receiving_cash: 0,
   margin_debt: 7002051, // Tổng nợ Margin DNSE (gốc 6.898tr + lãi vay tích luỹ 103.9kđ)
-  total_equity: 7448120, // NAV thực có = 14,450,171 - 7,002,051 = 7,448,120đ
-  total_profit_loss: -1468116, // Lỗ chưa chốt Deal -9.30%
+  total_equity: 7598120, // NAV thực có = 14,600,171 - 7,002,051 = 7,598,120đ
+  total_profit_loss: -1418116, // Lỗ chưa chốt Deal
   current_simulated_date: new Date().toISOString().slice(0, 10),
   updated_at: new Date().toISOString()
 };
@@ -39,10 +39,10 @@ const initialPositions: Position[] = [
     t2_quantity: 0,
     avg_price: 15790, // Giá vốn mua bình quân ban đầu 15.790
     breakeven_price: 15920, // Giá hòa vốn Deal thực tế 15.920
-    market_price: 14450, // Thị giá 14.45
-    market_value: 14450000,
-    unrealized_pnl: -1468116,
-    unrealized_pnl_pct: -9.30,
+    market_price: 14600, // Thị giá 14.60 (13h53)
+    market_value: 14600000,
+    unrealized_pnl: -1418116,
+    unrealized_pnl_pct: -8.98,
     target_price: 16500, // Mục tiêu kỳ vọng
     stop_loss: 13800, // Ngưỡng cắt lỗ bảo vệ
     updated_at: new Date().toISOString()

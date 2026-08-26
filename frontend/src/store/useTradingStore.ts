@@ -85,7 +85,7 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   },
 
   selectedSymbol: 'TPB',
-  selectedPrice: 14450,
+  selectedPrice: 14600,
   selectedAction: 'BUY',
 
   isCashModalOpen: false,
