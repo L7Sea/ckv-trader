@@ -17,6 +17,34 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
 
   if (!isOpen) return null;
 
+  if (positions.length === 0) {
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 shadow-2xl relative text-center space-y-4">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 inline-block">
+            <Gift className="h-6 w-6" />
+          </div>
+          <h3 className="text-lg font-bold text-white">Chưa Có Cổ Phiếu Nắm Giữ</h3>
+          <p className="text-xs text-slate-400">
+            Tài khoản của bạn hiện tại chưa nắm giữ cổ phiếu nào để nhận quyền cổ tức tiền mặt hoặc cổ phiếu thưởng. Vui lòng khớp lệnh mua cổ phiếu trước!
+          </p>
+          <button
+            onClick={onClose}
+            className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition"
+          >
+            Đã Hiểu
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const currentPos = positions.find((p) => p.symbol === symbol) || positions[0];
   const totalQty = currentPos?.total_quantity || 0;
 

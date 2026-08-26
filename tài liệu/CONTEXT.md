@@ -136,11 +136,25 @@
 4. **Chuẩn Hóa Hệ Số Giá Hòa Vốn Tối Thiểu**: Nâng hệ số ước tính hòa vốn tối thiểu từ `1.0025` lên `1.004016` (bù đủ 0.15% phí mua + 0.15% phí bán + 0.1% thuế bán).
 5. **Cảnh Báo An Toàn Tỷ Lệ Tự Có (Margin Risk Alert)**: Tự động phát hiện và hiển thị cảnh báo nhấp nháy `(⚠️ Force Sell)` khi tỷ lệ tự có < 30% và `(⚠️ Call Margin)` khi < 35%.
 6. **Bảo Lưu Tùy Chọn Ẩn/Hiện Số Dư**: Ghi nhớ trạng thái `isBalanceHidden` vào `localStorage` của trình duyệt.
-7. **Đồng Bộ Điều Hướng Chéo Chuẩn Xác**: Sửa `navigateToStock` mặc định chuyển sang tab `'CHARTS'` khi phân tích biểu đồ kỹ thuật.
-8. **Chặn Số Âm & NaN Trong Simulator**: Bổ sung validation `min=0` cho ô nhập số tiền gửi máy tính lãi suất.
-9. **Bổ Sung Ghi Chú Thuế TNCN 5% FinTech**: Làm rõ quy định miễn thuế 100% cho tiền gửi ngân hàng và thuế 5% cho hợp đồng đầu tư FinTech.
-10. **Tự Động Giới Hạn Vùng Nảy Capy**: Bổ sung cơ chế clamp tọa độ Capy Gunny khi thay đổi kích thước cửa sổ trình duyệt (Window Resize).
-11. **Kiểm Thử Toàn Diện**: 20/20 Test Formulas Đạt 100% Pass, 17/17 Test SQL Schema Đạt 100% Pass, Build sạch 0 lỗi TypeScript.
+11. **Popup Chọn 4 Phong Cách Trợ Lý Capy Ngay Khi Vào App (`CapyStylePickerModal`)**:
+    - Khi người dùng mới vào app lần đầu tiên, hệ thống hiển thị ngay modal tương tác cho phép chọn 1 trong 4 phong cách:
+      1. 😄 **Vui Vẻ & Tích Cực** (`vui`): Khích lệ tinh thần, đón sắc tím rực rỡ.
+      2. 😈 **Troll & Cà Khịa** (`troll`): Kháy đểu fomo đu đỉnh, thức khuya ngắm NAV.
+      3. 💼 **Chuyên Nghiệp & Kỷ Luật** (`pro`): Chuẩn corporate, kiểm soát chặt chẽ rủi ro T+2.5.
+      4. ⚡ **Gen Z & Bắt Trend** (`gen_z`): Trendy, slay, no cap, chill chill như Capy.
+    - Lưu cấu hình vào `localStorage` và áp dụng ngay lập tức cho toàn bộ câu chào & thoại của Capy Mascot.
+12. **Nguyên Tắc Tối Thượng Mascot Capy Nằm Trên Tất Cả (`z-index: 2147483000`)**:
+    - Capy luôn nằm trên mọi lớp thành phần (Modals, Bottom Navigation, Header Bar), di chuyển tự do, không bị che khuất.
+13. **Nâng Cấp Trải Nghiệm UI/UX Toàn Diện**:
+    - **Header**: Thêm click-outside backdrop tự động đóng menu avatar khi bấm ra ngoài.
+    - **Sổ Lệnh (OrderForm)**: Hiệu ứng viền sáng nhấp nháy (Pulse ring animation) phản hồi khi chọn nhanh mã từ bảng giá/danh mục.
+    - **Cập Nhật Giá (PriceUpdateModal)**: Thêm các nút biến động nhanh ±7% (Trần/Sàn), ±3%, ±1% và xử lý viết hoa mã cổ phiếu tự động.
+    - **Quản Lý Vốn (CashModal)**: Thêm dòng quy đổi tiền tệ trực tiếp (`100.000.000 đ`) và các nút nạp nhanh (+10Tr, +20Tr, +50Tr, +100Tr, Tất toán nợ).
+    - **Bảng Giá 300 Mã (MarketBoard)**: Tích hợp phân trang mượt mà (50 mã/trang), triệt tiêu lag giật DOM trên điện thoại.
+    - **Cổ Tức (DividendModal)**: Thêm Empty State khi chưa có cổ phiếu và bảng bóc tách 5% Thuế TNCN minh bạch.
+    - **Quản Trị Admin (AdminPanelModal)**: Thêm Empty State minh họa khi chưa có thành viên phụ đăng ký.
+14. **Bộ Test Bắt Buộc 100% Pass**: 20/20 Test Định lượng & Vĩ mô PASS, 17/17 Test SQL Schema PASS, Vite 6 Production Build Sạch 100%.
+
 
 
 

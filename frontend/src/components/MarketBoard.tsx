@@ -43,6 +43,14 @@ export const MarketBoard: React.FC = () => {
       return matchExchange && matchSector && matchSearch;
     });
   }, [activeExchange, selectedSector, searchTerm]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 50;
+
+  const totalPages = Math.ceil(filteredStocks.length / pageSize) || 1;
+  const paginatedStocks = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredStocks.slice(start, start + pageSize);
+  }, [filteredStocks, currentPage, pageSize]);
 
   const formatNumber = (num: number) => (num || 0).toLocaleString('vi-VN');
 
@@ -144,7 +152,7 @@ export const MarketBoard: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-[#212636]/40 bg-[#0e1117]">
-            {filteredStocks.map((stock) => {
+            {paginatedStocks.map((stock) => {
               const isUp = stock.change > 0;
               const isDown = stock.change < 0;
               const priceColor = isUp ? 'text-[#0ecb81]' : isDown ? 'text-[#f6465d]' : 'text-[#f59e0b]';
@@ -226,6 +234,34 @@ export const MarketBoard: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-[#212636] text-xs font-mono text-slate-400">
+          <div>
+            Hiển thị {Math.min(filteredStocks.length, (currentPage - 1) * pageSize + 1)} - {Math.min(filteredStocks.length, currentPage * pageSize)} trên tổng số <b className="text-emerald-400">{filteredStocks.length}</b> mã
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 rounded-lg bg-[#181d29] hover:bg-[#222838] text-slate-300 disabled:opacity-40 transition font-sans font-semibold"
+            >
+              Trang trước
+            </button>
+            <span className="px-2 py-1 bg-[#121620] rounded border border-[#212636] text-white font-bold">
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1.5 rounded-lg bg-[#181d29] hover:bg-[#222838] text-slate-300 disabled:opacity-40 transition font-sans font-semibold"
+            >
+              Trang sau
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -79,19 +79,26 @@ export const AdminPanelModal: React.FC = () => {
 
         {/* Bảng Danh Sách Người Dùng */}
         <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/80 text-slate-400 font-semibold uppercase tracking-wider sticky top-0">
-              <tr>
-                <th className="py-2.5 px-3 rounded-l-xl">Thành Viên</th>
-                <th className="py-2.5 px-3">Tên App (Nickname)</th>
-                <th className="py-2.5 px-3">Tuổi / Giới Tính</th>
-                <th className="py-2.5 px-3">Email / Mã TK</th>
-                <th className="py-2.5 px-3">Vai Trò</th>
-                <th className="py-2.5 px-3">Ngày Đăng Ký</th>
-                <th className="py-2.5 px-3 text-right rounded-r-xl">Thao Tác</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono">
+          {allUsers.length === 0 ? (
+            <div className="py-12 text-center text-slate-500 space-y-2">
+              <Users className="h-10 w-10 mx-auto stroke-1 opacity-40" />
+              <p className="text-sm font-semibold text-slate-400">Chưa có tài khoản thành viên phụ nào trong cơ sở dữ liệu.</p>
+              <p className="text-xs text-slate-500">Mã PIN hôm nay ({todayPin}) luôn sẵn sàng để gửi cho khách đăng ký.</p>
+            </div>
+          ) : (
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-950/80 text-slate-400 font-semibold uppercase tracking-wider sticky top-0">
+                <tr>
+                  <th className="py-2.5 px-3 rounded-l-xl">Thành Viên</th>
+                  <th className="py-2.5 px-3">Tên App (Nickname)</th>
+                  <th className="py-2.5 px-3">Tuổi / Giới Tính</th>
+                  <th className="py-2.5 px-3">Email / Mã TK</th>
+                  <th className="py-2.5 px-3">Vai Trò</th>
+                  <th className="py-2.5 px-3">Ngày Đăng Ký</th>
+                  <th className="py-2.5 px-3 text-right rounded-r-xl">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60 font-mono">
               {allUsers.map((u: UserProfile) => {
                 const isCurrent = u.id === user.id;
                 return (
@@ -173,7 +180,8 @@ export const AdminPanelModal: React.FC = () => {
               })}
             </tbody>
           </table>
-        </div>
+        )}
+      </div>
       </div>
     </div>
   );

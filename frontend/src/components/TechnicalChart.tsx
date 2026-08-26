@@ -51,20 +51,24 @@ export const TechnicalChart: React.FC = () => {
   // SỔ LỆNH BƯỚC GIÁ 3 CẤP (DNSE ENTRADE X STYLE)
   const orderBook = useMemo(() => {
     const p = currentPrice;
+    const rawBuy = [
+      { price: p - 50, volume: 158600 },
+      { price: p - 100, volume: 244500 },
+      { price: p - 150, volume: 326700 }
+    ];
+    const rawSell = [
+      { price: p + 50, volume: 84600 },
+      { price: p + 100, volume: 161200 },
+      { price: p + 150, volume: 218100 }
+    ];
+    const maxVol = Math.max(...rawBuy.map((b) => b.volume), ...rawSell.map((s) => s.volume), 1);
+
     return {
-      buyLevels: [
-        { price: p - 50, volume: 158600, pct: 65 },
-        { price: p - 100, volume: 244500, pct: 85 },
-        { price: p - 150, volume: 326700, pct: 95 }
-      ],
+      buyLevels: rawBuy.map((b) => ({ ...b, pct: Math.min(100, Math.round((b.volume / maxVol) * 100)) })),
       currentTrade: { price: p, volume: 25000, change: changePct },
-      sellLevels: [
-        { price: p + 50, volume: 84600, pct: 35 },
-        { price: p + 100, volume: 161200, pct: 55 },
-        { price: p + 150, volume: 218100, pct: 75 }
-      ],
-      totalBuyOrder: 729800,
-      totalSellOrder: 463900
+      sellLevels: rawSell.map((s) => ({ ...s, pct: Math.min(100, Math.round((s.volume / maxVol) * 100)) })),
+      totalBuyOrder: rawBuy.reduce((sum, b) => sum + b.volume, 0),
+      totalSellOrder: rawSell.reduce((sum, s) => sum + s.volume, 0)
     };
   }, [currentPrice, changePct]);
 

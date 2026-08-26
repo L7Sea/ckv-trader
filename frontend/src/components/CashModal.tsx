@@ -146,25 +146,29 @@ export const CashModal: React.FC = () => {
                 <input
                   type="number"
                   value={amount || ''}
-                  onChange={(e) => setAmount(Number(e.target.value))}
+                  onChange={(e) => setAmount(Math.max(0, Number(e.target.value) || 0))}
                   placeholder="VD: 10000000"
                   step="1000000"
-                  min="1000"
+                  min="0"
                   className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-4 py-2.5 text-base font-bold font-mono text-white focus:outline-none focus:border-emerald-500"
                   required
                 />
+                <div className="mt-1 flex items-center justify-between text-xs text-slate-400 font-mono">
+                  <span>Quy đổi:</span>
+                  <b className="text-emerald-400 font-bold">{formatVND(amount || 0)}</b>
+                </div>
               </div>
 
               {/* Nút chọn nhanh */}
-              <div className="flex gap-2">
-                {[5000000, 10000000, 50000000, currentMarginDebt].map((quick, idx) => (
+              <div className="flex flex-wrap gap-1.5 font-mono text-xs">
+                {[10000000, 20000000, 50000000, 100000000, currentMarginDebt].map((quick, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => setAmount(quick)}
-                    className="flex-1 py-1 text-xs font-mono rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+                    className="flex-1 py-1.5 px-2 text-xs font-mono rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 transition"
                   >
-                    {idx === 3 ? 'Tất toán' : `+${quick / 1000000}Tr`}
+                    {idx === 4 ? 'Tất toán nợ' : `+${quick / 1000000}Tr`}
                   </button>
                 ))}
               </div>

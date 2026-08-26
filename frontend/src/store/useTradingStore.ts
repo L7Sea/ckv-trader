@@ -72,7 +72,7 @@ export const useTradingStore = create<TradingState>((set, get) => ({
 
   activeTab: 'TRADE',
   setActiveTab: (tab: TabType) => set({ activeTab: tab }),
-  navigateToStock: (symbol: string, targetTab: TabType = 'CHARTS', action: 'BUY' | 'SELL' = 'BUY', targetPrice?: number) => {
+  navigateToStock: (symbol: string, targetTab: TabType = 'MARKET', action: 'BUY' | 'SELL' = 'BUY', targetPrice?: number) => {
     const s = get().watchlist.find((w) => w.symbol === symbol) || marketDataService.generateCompleteInfo(symbol);
     const price = targetPrice || s.price;
     set({

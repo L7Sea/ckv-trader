@@ -13,6 +13,7 @@ import { PerformanceAnalyticsPage } from './pages/PerformanceAnalyticsPage';
 import { CashModal } from './components/CashModal';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
 import { PinLockScreen } from './components/PinLockScreen';
+import { CapyStylePickerModal } from './components/CapyStylePickerModal';
 import Capy from './components/Capy';
 import { BackgroundProvider } from './lib/backgroundContext';
 import { useTradingStore, TabType } from './store/useTradingStore';
@@ -39,6 +40,10 @@ import {
 export const AppContent: React.FC = () => {
   const { activeTab, setActiveTab, fetchData, error, successMessage, clearMessages } = useTradingStore();
   const [isMobileMoreOpen, setIsMobileMoreOpen] = useState(false);
+  const [isStylePickerOpen, setIsStylePickerOpen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !localStorage.getItem('ckv_style_initialized');
+  });
 
   useEffect(() => {
     fetchData();
@@ -353,6 +358,12 @@ export const AppContent: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Capy 4-Style Onboarding Picker Modal */}
+      <CapyStylePickerModal
+        isOpen={isStylePickerOpen}
+        onClose={() => setIsStylePickerOpen(false)}
+      />
 
       {/* Cash Deposit / Withdraw Modal */}
       <CashModal />

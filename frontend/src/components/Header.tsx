@@ -230,10 +230,12 @@ export const Header: React.FC = () => {
                   <ChevronDown className="h-3 w-3 text-slate-500" />
                 </button>
 
-                {/* Dropdown Menu */}
+                {/* Dropdown Menu & Click Outside Backdrop */}
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in">
-                    <div className="p-2 border-b border-slate-800/80 mb-1">
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)} />
+                    <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in">
+                      <div className="p-2 border-b border-slate-800/80 mb-1">
                       <p className="text-xs font-bold text-white truncate">
                         {user?.name} {user?.nickname ? `(@${user.nickname})` : ''}
                       </p>
@@ -279,7 +281,8 @@ export const Header: React.FC = () => {
                     <span>Đăng xuất</span>
                   </button>
                 </div>
-              )}
+              </>
+            )}
               </div>
             )}
           </div>

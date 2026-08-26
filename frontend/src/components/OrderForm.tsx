@@ -35,6 +35,7 @@ export const OrderForm: React.FC = () => {
   const [stopLoss, setStopLoss] = useState<number>(0);
   const [tradeDate, setTradeDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState('');
+  const [isPulsing, setIsPulsing] = useState(false);
 
   // Tự động đồng bộ khi click từ bảng giá hoặc danh mục
   useEffect(() => {
@@ -46,6 +47,9 @@ export const OrderForm: React.FC = () => {
         setStopLoss(Math.round(selectedPrice * 0.93));   // Cutloss mặc định -7%
       }
       if (selectedAction) setType(selectedAction);
+      setIsPulsing(true);
+      const t = setTimeout(() => setIsPulsing(false), 1500);
+      return () => clearTimeout(t);
     }
   }, [selectedSymbol, selectedPrice, selectedAction]);
 
@@ -112,7 +116,11 @@ export const OrderForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800/80 rounded-3xl p-5 shadow-sm space-y-4">
+    <div className={`bg-slate-900/90 border rounded-3xl p-5 shadow-sm space-y-4 transition-all duration-300 ${
+      isPulsing
+        ? 'border-emerald-400 ring-2 ring-emerald-500/40 shadow-xl shadow-emerald-500/20'
+        : 'border-slate-800/80'
+    }`}>
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-slate-800">
         <h2 className="text-base font-bold text-white flex items-center gap-2">
