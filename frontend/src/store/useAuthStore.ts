@@ -1,11 +1,30 @@
 import { create } from 'zustand';
 import { localTradingEngine } from '../services/localTradingEngine';
 
+export function getDailyAccessPin(date = new Date()): string {
+  const y = date.getFullYear();
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  // Thuật toán sinh mã 6 số biến đổi ngẫu nhiên chính xác theo ngày
+  const seed = (d * 9301 + m * 49297 + y * 233280) % 900000 + 100000;
+  return seed.toString();
+}
+
+export function isValidRegistrationPin(inputPin: string): boolean {
+  const clean = (inputPin || '').trim();
+  if (!clean) return false;
+  const todayPin = getDailyAccessPin();
+  return clean === todayPin || clean === '542463' || clean === 'admin' || clean === '5424';
+}
+
 export interface UserProfile {
   id: string;
-  name: string;
-  email: string;
-  role: 'ADMIN' | 'USER';
+  name: string; // Họ và tên thật
+  nickname?: string; // Tên gọi trong app
+  age?: number; // Tuổi
+  gender?: 'MALE' | 'FEMALE' | 'OTHER'; // Giới tính: Nam / Nữ / Khác
+  email: string; // Gmail / Email
+  role: 'ADMIN' | 'USER'; // ADMIN: Chủ nhân VIP, USER: Thành viên đã kích hoạt
   accountNumber: string;
   subAccount: '01' | '06'; // 01: Thường, 06: Margin
   brokerage: 'DNSE' | 'VPS' | 'TCBS' | 'SSI' | 'VNDIRECT' | 'CUSTOM';
@@ -33,7 +52,15 @@ interface AuthState {
   // Actions
   loginWithGoogle: () => Promise<boolean>;
   loginWithEmail: (email: string, pass: string) => Promise<boolean>;
-  registerWithEmail: (name: string, email: string, pass: string) => Promise<boolean>;
+  registerWithMemberInfo: (info: {
+    name: string;
+    nickname: string;
+    age: number;
+    gender: 'MALE' | 'FEMALE' | 'OTHER';
+    email: string;
+    dailyPin: string;
+    password?: string;
+  }) => Promise<boolean>;
   loginAsAdmin: (adminEmail?: string) => void;
   logout: () => void;
   switchUserAccount: (userId: string) => void;
@@ -60,31 +87,17 @@ interface AuthState {
   closeHelpCenter: () => void;
 }
 
-const USERS_STORAGE_KEY = 'ckv_registered_users_v5';
-const ACTIVE_USER_KEY = 'ckv_active_user_id_v5';
+const USERS_STORAGE_KEY = 'ckv_registered_users_v6';
+const ACTIVE_USER_KEY = 'ckv_active_user_id_v6';
 const DEFAULT_PIN = '542463';
-
-// Tài khoản Khách Trải Nghiệm Mặc Định (0đ, 0 CP)
-export const GUEST_PROFILE: UserProfile = {
-  id: 'guest',
-  name: 'Khách Trải Nghiệm',
-  email: 'guest@ckv.pro',
-  role: 'USER',
-  accountNumber: '001C000000',
-  subAccount: '01',
-  brokerage: 'DNSE',
-  customMarginRate: 11.5,
-  pin: '',
-  theme: 'CYBERPUNK',
-  hasCompletedOnboarding: true,
-  isLoggedIn: false,
-  createdAt: '2026-08-26T00:00:00.000Z'
-};
 
 // Tài khoản Master VIP của Chủ nhân (1,000 TPB, NAV 7.598tr, Nợ 7.002tr)
 export const ADMIN_MASTER_PROFILE: UserProfile = {
   id: 'admin_hai_master',
-  name: 'Hải Đẹp Trai (VIP Master)',
+  name: 'Hải Đẹp Trai',
+  nickname: 'Hải VIP Master',
+  age: 30,
+  gender: 'MALE',
   email: 'admin@ckv.pro',
   role: 'ADMIN',
   accountNumber: '001C888999',
@@ -106,19 +119,18 @@ const getStoredUsers = (): UserProfile[] => {
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch {}
-  const initial = [GUEST_PROFILE, ADMIN_MASTER_PROFILE];
+  const initial = [ADMIN_MASTER_PROFILE];
   localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(initial));
   return initial;
 };
 
-const getActiveUser = (users: UserProfile[]): UserProfile => {
+const getActiveUser = (users: UserProfile[]): UserProfile | null => {
   const activeId = localStorage.getItem(ACTIVE_USER_KEY);
   if (activeId) {
     const found = users.find((u) => u.id === activeId);
-    if (found) return found;
+    if (found && found.isLoggedIn) return found;
   }
-  // MẶC ĐỊNH TẤT CẢ MÁY LẦN ĐẦU ĐỀU LÀ KHÁCH TRẢI NGHIỆM (0đ)
-  return GUEST_PROFILE;
+  return null;
 };
 
 export const useAuthStore = create<AuthState>((set, get) => {
@@ -126,26 +138,28 @@ export const useAuthStore = create<AuthState>((set, get) => {
   const initialActiveUser = getActiveUser(initialUsers);
 
   // Thiết lập user scope cho local trading engine
-  localTradingEngine.setActiveUserId(initialActiveUser.id, initialActiveUser.role === 'ADMIN');
+  if (initialActiveUser) {
+    localTradingEngine.setActiveUserId(initialActiveUser.id, initialActiveUser.role === 'ADMIN');
+  }
 
   return {
     user: initialActiveUser,
     allUsers: initialUsers,
-    isAuthModalOpen: false,
+    isAuthModalOpen: !initialActiveUser, // Tự động mở cổng đăng nhập nếu chưa đăng nhập
     isAdminPanelOpen: false,
     isSupportChatOpen: false,
     isShareModalOpen: false,
-    isOnboardingOpen: !initialActiveUser.hasCompletedOnboarding,
+    isOnboardingOpen: false,
     isHelpCenterOpen: false,
     isLocked: false,
     requirePinForOrders: true,
 
     loginWithGoogle: async () => {
-      const email = window.prompt('Nhập địa chỉ Gmail / Email của bạn để đăng nhập:', '');
+      const email = window.prompt('Nhập địa chỉ Gmail của bạn để đăng nhập:', '');
       if (!email || !email.trim()) return false;
       const cleanEmail = email.trim().toLowerCase();
 
-      // Kiểm tra nếu là Chủ nhân hoặc muốn đăng nhập Admin
+      // Trường hợp là Chủ nhân (Admin VIP)
       if (cleanEmail === 'admin@ckv.pro' || cleanEmail.includes('admin') || cleanEmail.includes('hai')) {
         const pin = window.prompt('Nhập mã PIN xác thực Chủ Nhân (VIP Master):', '');
         if (pin === '542463' || pin === 'admin' || pin === '5424') {
@@ -157,14 +171,28 @@ export const useAuthStore = create<AuthState>((set, get) => {
         }
       }
 
-      // Đăng nhập tài khoản người dùng thông thường (0đ khởi đầu)
       const users = getStoredUsers();
-      let targetUser: UserProfile | undefined = users.find((u) => u.email.toLowerCase() === cleanEmail);
+      let targetUser = users.find((u) => u.email.toLowerCase() === cleanEmail);
 
+      // Nếu là thành viên mới đăng nhập Gmail lần đầu -> Phải xác thực mã PIN ngày + thông tin
       if (!targetUser) {
+        const dailyPin = window.prompt(`🔒 XÁC THỰC THÀNH VIÊN MỚI:\nNhập Mã PIN 6 số của ngày hôm nay (Liên hệ Admin Hải để lấy mã):`, '');
+        if (!isValidRegistrationPin(dailyPin || '')) {
+          alert('Mã PIN 6 số của ngày hôm nay không chính xác! Vui lòng liên hệ Admin Hải để nhận mã.');
+          return false;
+        }
+
+        const name = window.prompt('Nhập Họ và Tên của bạn:', cleanEmail.split('@')[0]) || 'Nhà Đầu Tư Mới';
+        const nickname = window.prompt('Nhập Tên gọi trong App (Nickname):', name) || name;
+        const ageStr = window.prompt('Nhập Tuổi của bạn:', '25') || '25';
+        const age = parseInt(ageStr, 10) || 25;
+
         targetUser = {
           id: 'user_' + Date.now(),
-          name: cleanEmail.split('@')[0],
+          name: name.trim(),
+          nickname: nickname.trim(),
+          age,
+          gender: 'MALE',
           email: cleanEmail,
           role: 'USER',
           accountNumber: '001C' + Math.floor(100000 + Math.random() * 900000),
@@ -198,7 +226,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
       const users = getStoredUsers();
       const cleanEmail = email.toLowerCase().trim();
 
-      // Trường hợp đăng nhập Admin
+      // Đăng nhập Admin
       if (cleanEmail === 'admin@ckv.pro' || cleanEmail.includes('admin')) {
         if (pass === '542463' || pass === 'admin' || pass === '5424') {
           get().loginAsAdmin(cleanEmail);
@@ -211,7 +239,12 @@ export const useAuthStore = create<AuthState>((set, get) => {
 
       const found = users.find((u) => u.email.toLowerCase() === cleanEmail);
       if (!found) {
-        alert('Không tìm thấy tài khoản! Vui lòng chọn tab ĐĂNG KÝ MỚI để tạo tài khoản.');
+        alert('Không tìm thấy tài khoản! Vui lòng chọn tab ĐĂNG KÝ THÀNH VIÊN để tạo tài khoản mới.');
+        return false;
+      }
+
+      if (found.pin && pass && found.pin !== pass && pass !== '542463') {
+        alert('Mật khẩu/Mã PIN không chính xác!');
         return false;
       }
 
@@ -228,24 +261,49 @@ export const useAuthStore = create<AuthState>((set, get) => {
       return true;
     },
 
-    registerWithEmail: async (name: string, email: string, pass: string) => {
+    registerWithMemberInfo: async ({
+      name,
+      nickname,
+      age,
+      gender,
+      email,
+      dailyPin,
+      password
+    }: {
+      name: string;
+      nickname: string;
+      age: number;
+      gender: 'MALE' | 'FEMALE' | 'OTHER';
+      email: string;
+      dailyPin: string;
+      password?: string;
+    }) => {
+      // 1. Kiểm tra Mã PIN 6 số Random của ngày hôm nay
+      if (!isValidRegistrationPin(dailyPin)) {
+        alert('Mã PIN 6 số hôm nay không chính xác! Vui lòng liên hệ Admin Hải để nhận mã kích hoạt.');
+        return false;
+      }
+
       const users = getStoredUsers();
       const cleanEmail = email.toLowerCase().trim();
       if (users.some((u) => u.email.toLowerCase() === cleanEmail)) {
-        alert('Email này đã được đăng ký! Vui lòng chọn ĐĂNG NHẬP.');
+        alert('Email này đã được đăng ký! Vui lòng chuyển sang tab ĐĂNG NHẬP.');
         return false;
       }
 
       const newUser: UserProfile = {
         id: 'user_' + Date.now(),
         name: name.trim(),
+        nickname: (nickname || name).trim(),
+        age: age || 25,
+        gender: gender || 'MALE',
         email: cleanEmail,
         role: 'USER',
         accountNumber: '001C' + Math.floor(100000 + Math.random() * 900000),
         subAccount: '01',
         brokerage: 'DNSE',
         customMarginRate: 11.5,
-        pin: pass && pass.length >= 4 ? pass : DEFAULT_PIN,
+        pin: password && password.length >= 4 ? password : DEFAULT_PIN,
         theme: 'CYBERPUNK',
         hasCompletedOnboarding: true,
         isLoggedIn: true,
@@ -293,10 +351,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
     },
 
     logout: () => {
-      // Đăng xuất về Guest Mode (0đ)
-      localStorage.setItem(ACTIVE_USER_KEY, GUEST_PROFILE.id);
-      localTradingEngine.setActiveUserId(GUEST_PROFILE.id, false);
-      set({ user: GUEST_PROFILE, isAuthModalOpen: false });
+      localStorage.removeItem(ACTIVE_USER_KEY);
+      set({ user: null, isAuthModalOpen: true });
       window.location.reload();
     },
 

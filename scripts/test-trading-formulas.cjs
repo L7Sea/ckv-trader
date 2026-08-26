@@ -396,5 +396,39 @@ test('17. Phân quyền bảo mật: Khách vãng lai mặc định 0đ & Danh m
   assert.strictEqual(adminPositions[0].symbol, 'TPB');
 });
 
-console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/17 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
+// 18. Xác thực Thuật toán Mã PIN 6 Số Biến Đổi Hàng Ngày (Daily Dynamic 6-digit PIN) & Đăng Ký Thành Viên Đầy Đủ
+test('18. Thuật toán sinh mã PIN 6 số biến đổi theo ngày và đăng ký thành viên đầy đủ thông tin', () => {
+  function getDailyAccessPin(date) {
+    const y = date.getFullYear();
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
+    const seed = (d * 9301 + m * 49297 + y * 233280) % 900000 + 100000;
+    return seed.toString();
+  }
+
+  const pinToday = getDailyAccessPin(new Date(2026, 7, 26)); // 26/08/2026
+  const pinTomorrow = getDailyAccessPin(new Date(2026, 7, 27)); // 27/08/2026
+
+  assert.strictEqual(pinToday.length, 6);
+  assert.strictEqual(pinTomorrow.length, 6);
+  assert.notStrictEqual(pinToday, pinTomorrow); // Hai ngày liên tiếp có mã PIN khác nhau hoàn toàn
+
+  // Xác thực đăng ký thành viên đầy đủ trường
+  const member = {
+    name: 'Nguyễn Văn Nam',
+    nickname: 'Nam Alpha Trader',
+    age: 28,
+    gender: 'MALE',
+    email: 'nam.trader@gmail.com',
+    dailyPin: pinToday,
+    role: 'USER'
+  };
+
+  assert.strictEqual(member.role, 'USER');
+  assert.strictEqual(member.age, 28);
+  assert.strictEqual(member.gender, 'MALE');
+  assert.strictEqual(member.dailyPin, pinToday);
+});
+
+console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/18 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
 

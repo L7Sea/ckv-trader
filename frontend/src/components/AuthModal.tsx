@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, Mail, Lock, LogIn, UserPlus, Sparkles, User, KeyRound } from 'lucide-react';
+import { X, ShieldCheck, Mail, Lock, LogIn, UserPlus, Sparkles, User, KeyRound, Calendar, Hash } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 
 export const AuthModal: React.FC = () => {
@@ -8,14 +8,18 @@ export const AuthModal: React.FC = () => {
     closeAuthModal,
     loginWithGoogle,
     loginWithEmail,
-    registerWithEmail,
+    registerWithMemberInfo,
     loginAsAdmin,
     user
   } = useAuthStore();
 
   const [authMode, setAuthMode] = useState<'LOGIN' | 'REGISTER'>('LOGIN');
   const [name, setName] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [age, setAge] = useState<number | ''>(26);
+  const [gender, setGender] = useState<'MALE' | 'FEMALE' | 'OTHER'>('MALE');
   const [email, setEmail] = useState('');
+  const [dailyPin, setDailyPin] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -26,9 +30,22 @@ export const AuthModal: React.FC = () => {
     setLoading(true);
     try {
       if (authMode === 'REGISTER') {
-        if (!name.trim()) return alert('Vui lòng nhập họ và tên!');
-        if (!email.trim()) return alert('Vui lòng nhập email!');
-        await registerWithEmail(name, email, password);
+        if (!name.trim()) return alert('Vui lòng nhập Họ và Tên thật!');
+        if (!nickname.trim()) return alert('Vui lòng nhập Tên gọi trong App!');
+        if (!email.trim()) return alert('Vui lòng nhập Email / Gmail!');
+        if (!dailyPin.trim() || dailyPin.length < 6) return alert('Vui lòng nhập đúng Mã PIN 6 số của ngày hôm nay (Liên hệ Admin Hải để nhận mã)!');
+
+        const success = await registerWithMemberInfo({
+          name: name.trim(),
+          nickname: nickname.trim(),
+          age: Number(age) || 25,
+          gender,
+          email: email.trim(),
+          dailyPin: dailyPin.trim(),
+          password: password.trim()
+        });
+
+        if (!success) return;
       } else {
         if (!email.trim()) return alert('Vui lòng nhập email!');
         await loginWithEmail(email, password);
@@ -39,14 +56,17 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 shadow-2xl relative space-y-4">
-        <button
-          onClick={closeAuthModal}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition"
-        >
-          <X className="h-5 w-5" />
-        </button>
+    <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6 shadow-2xl relative space-y-4">
+        {/* Chỉ hiện nút đóng nếu người dùng đã đăng nhập trước đó */}
+        {user && (
+          <button
+            onClick={closeAuthModal}
+            className="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        )}
 
         {/* Header */}
         <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
@@ -54,8 +74,8 @@ export const AuthModal: React.FC = () => {
             <ShieldCheck className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-white">Tài Khoản Nhà Đầu Tư CKV</h3>
-            <p className="text-xs text-slate-400">Không gian quản trị & phân tích danh mục riêng</p>
+            <h3 className="text-base font-bold text-white">CỔNG TRUY CẬP CKV PRO TRADER</h3>
+            <p className="text-xs text-slate-400">Đăng nhập tài khoản thành viên để vào sổ lệnh</p>
           </div>
         </div>
 
@@ -88,13 +108,13 @@ export const AuthModal: React.FC = () => {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
               />
             </svg>
-            <span>Tiếp tục với Google (Google Sign-In)</span>
+            <span>Tiếp tục với Google (Gmail Sign-In)</span>
           </button>
         </div>
 
         <div className="flex items-center gap-3 my-2">
           <div className="flex-1 h-px bg-slate-800" />
-          <span className="text-[10px] text-slate-500 font-mono uppercase">hoặc qua email</span>
+          <span className="text-[10px] text-slate-500 font-mono uppercase">hoặc tài khoản thành viên</span>
           <div className="flex-1 h-px bg-slate-800" />
         </div>
 
@@ -116,39 +136,109 @@ export const AuthModal: React.FC = () => {
               authMode === 'REGISTER' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
             }`}
           >
-            ĐĂNG KÝ MỚI
+            ĐĂNG KÝ THÀNH VIÊN
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           {authMode === 'REGISTER' && (
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-400 mb-1">Họ Và Tên:</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="VD: Nguyễn Văn A"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
-                required
-              />
-            </div>
+            <>
+              {/* Box Cảnh Báo Mã PIN Hàng Ngày */}
+              <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-300 space-y-1">
+                <div className="flex items-center gap-1.5 font-bold">
+                  <KeyRound className="h-4 w-4 text-amber-400 shrink-0" />
+                  <span>Yêu cầu Mã PIN 6 số biến đổi hàng ngày:</span>
+                </div>
+                <p className="text-slate-400 leading-tight">
+                  Mỗi ngày hệ thống tự sinh 1 mã PIN 6 số. Hãy liên hệ <b>Admin Hải</b> để lấy mã kích hoạt trước khi tạo tài khoản.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-amber-300 mb-1 flex items-center gap-1">
+                  <KeyRound className="h-3.5 w-3.5 text-amber-400" />
+                  <span>MÃ PIN 6 SỐ CỦA NGÀY HÔM NAY (BẮT BUỘC):</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={dailyPin}
+                  onChange={(e) => setDailyPin(e.target.value)}
+                  placeholder="Nhập 6 số PIN ngày hôm nay (VD: 861482)"
+                  className="w-full bg-slate-950 border border-amber-500/50 rounded-xl px-3.5 py-2 text-xs text-amber-300 focus:outline-none focus:border-amber-400 font-mono font-bold tracking-widest text-center"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Họ Và Tên Thật:</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="VD: Nguyễn Văn Nam"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Tên Gọi Trong App:</label>
+                  <input
+                    type="text"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    placeholder="VD: Nam Alpha Trader"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Tuổi:</label>
+                  <input
+                    type="number"
+                    min={18}
+                    max={99}
+                    value={age}
+                    onChange={(e) => setAge(e.target.value === '' ? '' : Number(e.target.value))}
+                    placeholder="26"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono font-bold"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Giới Tính:</label>
+                  <select
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value as any)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
+                  >
+                    <option value="MALE">Nam</option>
+                    <option value="FEMALE">Nữ</option>
+                    <option value="OTHER">Khác</option>
+                  </select>
+                </div>
+              </div>
+            </>
           )}
 
           <div>
-            <label className="block text-[11px] font-semibold text-slate-400 mb-1">Email:</label>
+            <label className="block text-[11px] font-semibold text-slate-400 mb-1">Gmail / Email:</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="VD: trader@gmail.com"
+              placeholder="VD: nam.trader@gmail.com"
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
               required
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold text-slate-400 mb-1">Mật khẩu / Mã PIN:</label>
+            <label className="block text-[11px] font-semibold text-slate-400 mb-1">Mật khẩu cá nhân:</label>
             <input
               type="password"
               value={password}
@@ -163,9 +253,9 @@ export const AuthModal: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-xl font-bold text-xs bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition shadow-lg shadow-emerald-500/20 uppercase"
+              className="w-full py-2.5 rounded-xl font-bold text-xs bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition shadow-lg shadow-emerald-500/20 uppercase tracking-wide"
             >
-              {loading ? 'ĐANG XỬ LÝ...' : authMode === 'REGISTER' ? 'TẠO TÀI KHOẢN & BẮT ĐẦU (0 VNĐ)' : 'ĐĂNG NHẬP VÀO SỔ LỆNH'}
+              {loading ? 'ĐANG XỬ LÝ...' : authMode === 'REGISTER' ? 'XÁC THỰC MÃ PIN & TẠO TÀI KHOẢN' : 'ĐĂNG NHẬP VÀO SỔ LỆNH'}
             </button>
           </div>
         </form>

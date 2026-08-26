@@ -84,15 +84,18 @@
 
 ---
 
-## 7. 🛡️ MÔ HÌNH BẢO MẬT & PHÂN QUYỀN (GUEST 0Đ VS ADMIN MASTER VIP)
-- **Mặc định khi mở link (`https://ckv-trader.pages.dev`) trên bất kỳ máy/trình duyệt mới**:
-  - Hệ thống tự động gán là **Khách Trải Nghiệm (Guest Trader)**.
-  - Số dư tiền mặt: **0 đ**, Nợ Margin: **0 đ**, NAV: **0 đ**, Danh mục cổ phiếu: **Trống (0 CP)**.
-  - Tuyệt đối không nhìn thấy tên hay số dư 1,000 TPB của Chủ nhân.
+## 7. 🛡️ MÔ HÌNH BẢO MẬT & PHÂN QUYỀN (THÀNH VIÊN ĐĂNG KÝ + PIN 6 SỐ DAILY RANDOM VS ADMIN MASTER)
+- **Bỏ Chế độ Khách (Guest) tự do**: Mọi người dùng khi mở link `https://ckv-trader.pages.dev` đều phải qua Cổng Đăng Nhập / Đăng Ký Thành Viên (Registration Gate).
+- **Mã PIN 6 Số Biến Đổi Tự Động Hàng Ngày (`getDailyAccessPin()`)**:
+  - Dựa trên thuật toán ngày tháng duy nhất mỗi ngày (VD: Ngày 26/08/2026 là `861482`).
+  - Thành viên đăng ký lần đầu (dù qua Form đăng ký hay qua Gmail Sign-In) **bắt buộc phải nhập đúng Mã PIN 6 số của ngày hôm nay** do Admin Hải cung cấp.
+- **Biểu Mẫu Đăng Ký Thành Viên Đầy Đủ**:
+  - Yêu cầu: Họ tên thật, Tên gọi trong App (Nickname), Tuổi, Giới tính (Nam/Nữ/Khác), Gmail/Email, Mật khẩu cá nhân, Mã PIN 6 số ngày hôm nay.
+- **Cô Lập Kênh Chat 1-1 Tuyệt Đối**:
+  - **Thành viên**: Chỉ có 1 luồng chat duy nhất gửi trực tiếp tới Admin Hải (không thể nhắn tin hay thấy nhau).
+  - **Admin VIP (Chủ nhân)**: Master Console với danh sách chọn từng thành viên để trả lời riêng tư 1-1.
 - **Tài khoản Admin Master của Chủ nhân**:
-  - Đăng nhập riêng bằng **Gmail / Google Account** hoặc mã PIN bảo mật `542463`.
-  - Khi xác thực thành công, toàn bộ danh mục thực tế của Chủ nhân (**1,000 TPB @ 14.60, NAV 7,598,120 đ, Nợ Margin 7,002,051 đ, Tiền mặt 171 đ**) được kích hoạt trên phiên làm việc của Chủ nhân.
-- **Cơ chế Kích Phiên Cũ (Session Reset Lock)**:
-  - Nâng cấp key lưu trữ lên `v5` (`ckv_registered_users_v5`, `ckv_active_user_id_v5`), tự động đăng xuất tất cả thiết bị lạ về chế độ Khách 0đ.
+  - Đăng nhập riêng bằng **Gmail / Google Account** hoặc mã PIN Master bí mật `542463`.
+  - Toàn bộ danh mục thực tế của Chủ nhân (**1,000 TPB @ 14.60, NAV 7,598,120 đ, Nợ Margin 7,002,051 đ, Tiền mặt 171 đ**) được bảo vệ độc quyền.
 
 
