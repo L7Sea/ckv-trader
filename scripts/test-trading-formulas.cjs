@@ -430,11 +430,11 @@ test('18. Thuật toán sinh mã PIN 6 số biến đổi theo ngày và đăng 
   assert.strictEqual(member.dailyPin, pinToday);
 });
 
-// 19. Xác thực Mã Tài Khoản Độc Quyền Admin (026A00000) & Quy Luật Năm Động (026, 027, 028...) + Chữ Cái Đầu Tên Chính (Lê Hải -> H, Lê Nguyễn Minh Thiên Bá -> B)
-test('19. Quy luật năm động (026/027/028) và chữ cái Tên Chính cho mã tài khoản thành viên', () => {
+// 19. Xác thực Mã Tài Khoản Độc Quyền Admin (026A00000) & Quy Luật 3 Số Cuối Của Năm (2026->026, 2123->123) + Chữ Cái Đầu Tên Chính (Minh -> M, Lê Hải -> H, Lê Nguyễn Minh Thiên Bá -> B)
+test('19. Quy luật 3 số cuối của năm (026/027/123) và chữ cái Tên Chính cho mã tài khoản thành viên', () => {
   function generateMemberAccountNumber(fullNameOrLastName, date = new Date()) {
-    const yearSuffix = (date.getFullYear() % 100).toString().padStart(2, '0');
-    const yearPrefix = `0${yearSuffix}`;
+    const fullYearStr = date.getFullYear().toString();
+    const yearPrefix = fullYearStr.length >= 3 ? fullYearStr.slice(-3) : fullYearStr.padStart(3, '0');
 
     const clean = (fullNameOrLastName || '').trim();
     const parts = clean.split(/\s+/).filter(Boolean);
@@ -477,6 +477,16 @@ test('19. Quy luật năm động (026/027/028) và chữ cái Tên Chính cho m
   const accDat2028 = generateMemberAccountNumber('Võ Đạt', new Date(2028, 5, 20));
   assert.strictEqual(accDat2028.startsWith('028D'), true);
   assert.strictEqual(accDat2028.length, 9);
+
+  // Test 5: Năm 2123, Chỉ có 1 chữ "Minh" -> Tên chính "Minh" -> 123M*****
+  const accMinh2123 = generateMemberAccountNumber('Minh', new Date(2123, 3, 10));
+  assert.strictEqual(accMinh2123.startsWith('123M'), true);
+  assert.strictEqual(accMinh2123.length, 9);
+
+  // Test 6: Năm 2026, Chỉ có 1 chữ "Minh" -> Tên chính "Minh" -> 026M*****
+  const accMinh2026 = generateMemberAccountNumber('Minh', new Date(2026, 7, 26));
+  assert.strictEqual(accMinh2026.startsWith('026M'), true);
+  assert.strictEqual(accMinh2026.length, 9);
 });
 
 console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/19 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);

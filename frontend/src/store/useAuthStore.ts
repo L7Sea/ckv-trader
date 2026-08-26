@@ -88,17 +88,17 @@ interface AuthState {
 }
 
 export function generateMemberAccountNumber(fullNameOrLastName: string, date = new Date()): string {
-  // 1. Tiền tố năm: Năm 2026 -> '026', Năm 2027 -> '027', Năm 2028 -> '028'...
-  const yearSuffix = (date.getFullYear() % 100).toString().padStart(2, '0');
-  const yearPrefix = `0${yearSuffix}`;
+  // 1. Tiền tố năm: Lấy chính xác 3 chữ số cuối của Năm (Năm 2026 -> '026', Năm 2027 -> '027', Năm 2099 -> '099', Năm 2123 -> '123'...)
+  const fullYearStr = date.getFullYear().toString();
+  const yearPrefix = fullYearStr.length >= 3 ? fullYearStr.slice(-3) : fullYearStr.padStart(3, '0');
 
-  // 2. Tách TÊN CHÍNH (từ cuối cùng trong tên người Việt)
-  // Ví dụ: "Lê Hải" -> "Hải" (H), "Lê Nguyễn Minh Thiên Bá" -> "Bá" (B)
+  // 2. Tách TÊN CHÍNH (từ cuối cùng trong họ tên, hoặc từ duy nhất nếu chỉ có 1 chữ như "Minh")
+  // Ví dụ: "Minh" -> "Minh" (M), "Lê Hải" -> "Hải" (H), "Lê Nguyễn Minh Thiên Bá" -> "Bá" (B)
   const clean = (fullNameOrLastName || '').trim();
   const parts = clean.split(/\s+/).filter(Boolean);
   const firstName = parts.length > 0 ? parts[parts.length - 1] : 'M';
 
-  // Khử dấu tiếng Việt chuẩn: Hải -> H, Bá -> B, Đạt -> D, Ân -> A
+  // Khử dấu tiếng Việt chuẩn: Minh -> M, Hải -> H, Bá -> B, Đạt -> D, Ân -> A
   const normalized = firstName
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')

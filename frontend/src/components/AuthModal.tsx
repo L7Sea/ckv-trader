@@ -27,7 +27,8 @@ export const AuthModal: React.FC = () => {
 
   if (!isAuthModalOpen) return null;
 
-  const currentYearPrefix = `0${new Date().getFullYear().toString().slice(-2)}`;
+  const fullYearStr = new Date().getFullYear().toString();
+  const currentYearPrefix = fullYearStr.length >= 3 ? fullYearStr.slice(-3) : fullYearStr.padStart(3, '0');
   const cleanFirstName = (firstName || '').trim();
   const normalizedFirstNameChar = cleanFirstName
     ? cleanFirstName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D')[0].toUpperCase()
@@ -38,13 +39,12 @@ export const AuthModal: React.FC = () => {
     setLoading(true);
     try {
       if (authMode === 'REGISTER') {
-        if (!lastName.trim()) return alert('Vui lòng nhập Họ của bạn (VD: Lê, Nguyễn)!');
-        if (!firstName.trim()) return alert('Vui lòng nhập Tên chính của bạn (VD: Hải, Bá, Nam)!');
+        if (!firstName.trim()) return alert('Vui lòng nhập Tên của bạn (VD: Minh, Hải, Bá, Nam)!');
         if (!nickname.trim()) return alert('Vui lòng nhập Tên gọi trong App (Nickname)!');
         if (!email.trim()) return alert('Vui lòng nhập Email / Gmail!');
         if (!dailyPin.trim() || dailyPin.length < 6) return alert('Vui lòng nhập đúng Mã PIN 6 số của ngày hôm nay (Liên hệ Admin Hải để nhận mã)!');
 
-        const fullName = [lastName.trim(), middleName.trim(), firstName.trim()].filter(Boolean).join(' ');
+        const fullName = [lastName.trim(), middleName.trim(), firstName.trim()].filter(Boolean).join(' ') || firstName.trim();
 
         const success = await registerWithMemberInfo({
           name: fullName,
@@ -185,7 +185,7 @@ export const AuthModal: React.FC = () => {
               <div className="grid grid-cols-3 gap-2">
                 <div>
                   <label className="block text-[11px] font-semibold text-slate-400 mb-1">
-                    Họ <span className="text-rose-400">*</span>:
+                    Họ:
                   </label>
                   <input
                     type="text"
@@ -193,7 +193,6 @@ export const AuthModal: React.FC = () => {
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="VD: Lê"
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
-                    required
                   />
                 </div>
                 <div>
