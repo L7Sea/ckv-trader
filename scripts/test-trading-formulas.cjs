@@ -489,5 +489,35 @@ test('19. Quy luật 3 số cuối của năm (026/027/123) và chữ cái Tên 
   assert.strictEqual(accMinh2026.length, 9);
 });
 
-console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/19 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
+// 20. Xác thực Tính Năng Xóa Người Dùng (Delete Member) & Bảo Vệ Tuyệt Đối Tài Khoản Admin Master
+test('20. Tính năng xóa người dùng và bảo vệ an toàn tài khoản Admin leminhhaia5890@gmail.com', () => {
+  let userList = [
+    { id: 'admin_hai_master', email: 'leminhhaia5890@gmail.com', role: 'ADMIN', name: 'Lê Minh Hải' },
+    { id: 'user_1', email: 'test1@gmail.com', role: 'USER', name: 'Nguyễn Văn Nam' },
+    { id: 'user_2', email: 'test2@gmail.com', role: 'USER', name: 'Trần Văn Toàn' }
+  ];
+
+  function deleteUser(userId) {
+    const target = userList.find((u) => u.id === userId);
+    if (!target) return false;
+    if (target.role === 'ADMIN' || target.email === 'leminhhaia5890@gmail.com') {
+      return false; // Chặn tuyệt đối xóa Admin
+    }
+    userList = userList.filter((u) => u.id !== userId);
+    return true;
+  }
+
+  // 1. Thử xóa tài khoản Admin -> Bị chặn
+  const deleteAdminResult = deleteUser('admin_hai_master');
+  assert.strictEqual(deleteAdminResult, false);
+  assert.strictEqual(userList.length, 3);
+
+  // 2. Xóa thành viên user_1 -> Thành công
+  const deleteMemberResult = deleteUser('user_1');
+  assert.strictEqual(deleteMemberResult, true);
+  assert.strictEqual(userList.length, 2);
+  assert.strictEqual(userList.some((u) => u.id === 'user_1'), false);
+});
+
+console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/20 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
 

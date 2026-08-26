@@ -41,6 +41,7 @@ interface AuthState {
   user: UserProfile | null;
   allUsers: UserProfile[];
   isAuthModalOpen: boolean;
+  isGooglePickerOpen: boolean;
   isAdminPanelOpen: boolean;
   isSupportChatOpen: boolean;
   isShareModalOpen: boolean;
@@ -63,6 +64,7 @@ interface AuthState {
   }) => Promise<boolean>;
   loginAsAdmin: (adminEmail?: string) => void;
   logout: () => void;
+  deleteUser: (userId: string) => boolean;
   switchUserAccount: (userId: string) => void;
   switchSubAccount: (sub: '01' | '06') => void;
   updateBrokerage: (brokerage: 'DNSE' | 'VPS' | 'TCBS' | 'SSI' | 'VNDIRECT' | 'CUSTOM', rate: number) => void;
@@ -75,6 +77,8 @@ interface AuthState {
   
   openAuthModal: () => void;
   closeAuthModal: () => void;
+  openGooglePicker: () => void;
+  closeGooglePicker: () => void;
   openAdminPanel: () => void;
   closeAdminPanel: () => void;
   openSupportChat: () => void;
@@ -172,6 +176,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     user: initialActiveUser,
     allUsers: initialUsers,
     isAuthModalOpen: !initialActiveUser, // Tự động mở cổng đăng nhập nếu chưa đăng nhập
+    isGooglePickerOpen: false,
     isAdminPanelOpen: false,
     isSupportChatOpen: false,
     isShareModalOpen: false,
@@ -181,70 +186,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
     requirePinForOrders: true,
 
     loginWithGoogle: async () => {
-      const email = window.prompt('Nhập địa chỉ Gmail của bạn để đăng nhập:', '');
-      if (!email || !email.trim()) return false;
-      const cleanEmail = email.trim().toLowerCase();
-
-      // TỰ ĐỘNG NHẬN DIỆN CHỦ NHÂN ADMIN VIP (leminhhaia5890@gmail.com)
-      if (cleanEmail === 'leminhhaia5890@gmail.com' || cleanEmail === 'admin@ckv.pro') {
-        const pin = window.prompt('Xác thực Chủ Nhân (Lê Minh Hải): Nhập mật khẩu / mã PIN bảo mật Admin:', '');
-        if (pin === '542463' || pin === 'admin' || pin === '5424') {
-          get().loginAsAdmin(cleanEmail);
-          return true;
-        } else {
-          alert('Mật khẩu / Mã PIN Admin không chính xác!');
-          return false;
-        }
-      }
-
-      const users = getStoredUsers();
-      let targetUser = users.find((u) => u.email.toLowerCase() === cleanEmail);
-
-      // Nếu là thành viên mới đăng nhập Gmail lần đầu -> Phải xác thực mã PIN ngày + thông tin
-      if (!targetUser) {
-        const dailyPin = window.prompt(`🔒 XÁC THỰC THÀNH VIÊN MỚI:\nNhập Mã PIN 6 số của ngày hôm nay (Liên hệ Admin Hải để lấy mã):`, '');
-        if (!isValidRegistrationPin(dailyPin || '')) {
-          alert('Mã PIN 6 số của ngày hôm nay không chính xác! Vui lòng liên hệ Admin Hải để nhận mã.');
-          return false;
-        }
-
-        const name = window.prompt('Nhập Họ và Tên của bạn:', cleanEmail.split('@')[0]) || 'Nhà Đầu Tư Mới';
-        const nickname = window.prompt('Nhập Tên gọi trong App (Nickname):', name) || name;
-        const ageStr = window.prompt('Nhập Tuổi của bạn:', '25') || '25';
-        const age = parseInt(ageStr, 10) || 25;
-
-        targetUser = {
-          id: 'user_' + Date.now(),
-          name: name.trim(),
-          nickname: nickname.trim(),
-          age,
-          gender: 'MALE',
-          email: cleanEmail,
-          role: 'USER',
-          accountNumber: generateMemberAccountNumber(name),
-          subAccount: '01',
-          brokerage: 'DNSE',
-          customMarginRate: 11.5,
-          pin: DEFAULT_PIN,
-          theme: 'CYBERPUNK',
-          hasCompletedOnboarding: true,
-          isLoggedIn: true,
-          createdAt: new Date().toISOString()
-        };
-        users.push(targetUser);
-        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-      }
-
-      localStorage.setItem(ACTIVE_USER_KEY, targetUser.id);
-      localTradingEngine.setActiveUserId(targetUser.id, false);
-
-      set({
-        user: targetUser,
-        allUsers: users,
-        isAuthModalOpen: false
-      });
-
-      window.location.reload();
+      // Mở Modal chọn tài khoản Google chuẩn phong cách Google Sign-In
+      set({ isGooglePickerOpen: true });
       return true;
     },
 
@@ -385,6 +328,31 @@ export const useAuthStore = create<AuthState>((set, get) => {
       window.location.reload();
     },
 
+    deleteUser: (userId: string) => {
+      const users = getStoredUsers();
+      const target = users.find((u) => u.id === userId);
+      if (!target) return false;
+      if (target.role === 'ADMIN' || target.email === 'leminhhaia5890@gmail.com') {
+        alert('Không thể xóa tài khoản Admin Master của Chủ nhân!');
+        return false;
+      }
+
+      const updatedUsers = users.filter((u) => u.id !== userId);
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedUsers));
+      
+      // Xóa dữ liệu storage riêng của user đó
+      try {
+        localStorage.removeItem(`ckv_positions_v1_${userId}`);
+        localStorage.removeItem(`ckv_orders_v1_${userId}`);
+        localStorage.removeItem(`ckv_portfolio_v1_${userId}`);
+      } catch {}
+
+      set({
+        allUsers: updatedUsers
+      });
+      return true;
+    },
+
     switchUserAccount: (userId: string) => {
       const users = getStoredUsers();
       const target = users.find((u) => u.id === userId);
@@ -445,6 +413,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
 
     openAuthModal: () => set({ isAuthModalOpen: true }),
     closeAuthModal: () => set({ isAuthModalOpen: false }),
+    openGooglePicker: () => set({ isGooglePickerOpen: true }),
+    closeGooglePicker: () => set({ isGooglePickerOpen: false }),
     openAdminPanel: () => set({ isAdminPanelOpen: true }),
     closeAdminPanel: () => set({ isAdminPanelOpen: false }),
     openSupportChat: () => set({ isSupportChatOpen: true }),

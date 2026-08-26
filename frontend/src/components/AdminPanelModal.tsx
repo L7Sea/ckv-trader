@@ -4,7 +4,7 @@ import { useAuthStore, getDailyAccessPin, UserProfile } from '../store/useAuthSt
 import { localTradingEngine } from '../services/localTradingEngine';
 
 export const AdminPanelModal: React.FC = () => {
-  const { isAdminPanelOpen, closeAdminPanel, allUsers, user, switchUserAccount, openSupportChat } = useAuthStore();
+  const { isAdminPanelOpen, closeAdminPanel, allUsers, user, switchUserAccount, deleteUser, openSupportChat } = useAuthStore();
   const [copiedPin, setCopiedPin] = useState(false);
 
   if (!isAdminPanelOpen || user?.role !== 'ADMIN') return null;
@@ -138,19 +138,35 @@ export const AdminPanelModal: React.FC = () => {
                       {new Date(u.createdAt).toLocaleDateString('vi-VN')}
                     </td>
                     <td className="py-3 px-3 text-right font-sans">
-                      {!isCurrent && (
-                        <button
-                          onClick={() => {
-                            if (window.confirm(`Chuyển sang kiểm tra góc nhìn của thành viên "${u.name}"?`)) {
-                              switchUserAccount(u.id);
-                            }
-                          }}
-                          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition inline-flex items-center gap-1"
-                        >
-                          <LogIn className="h-3.5 w-3.5 text-emerald-400" />
-                          <span>Xem góc nhìn</span>
-                        </button>
-                      )}
+                      <div className="flex items-center justify-end gap-1.5">
+                        {!isCurrent && (
+                          <button
+                            onClick={() => {
+                              if (window.confirm(`Chuyển sang kiểm tra góc nhìn của thành viên "${u.name}"?`)) {
+                                switchUserAccount(u.id);
+                              }
+                            }}
+                            className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition inline-flex items-center gap-1"
+                            title="Xem thử giao diện của thành viên này"
+                          >
+                            <LogIn className="h-3.5 w-3.5 text-emerald-400" />
+                            <span className="hidden sm:inline">Góc nhìn</span>
+                          </button>
+                        )}
+                        {u.role !== 'ADMIN' && u.email !== 'leminhhaia5890@gmail.com' && (
+                          <button
+                            onClick={() => {
+                              if (window.confirm(`⚠️ CẢNH BÁO ADMIN:\nChủ nhân có chắc chắn muốn XÓA VĨNH VIỄN tài khoản "${u.name}" (${u.email}) khỏi hệ thống?\nToàn bộ dữ liệu của thành viên này sẽ bị xóa sạch.`)) {
+                                deleteUser(u.id);
+                              }
+                            }}
+                            className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 hover:text-rose-300 transition"
+                            title="Xóa vĩnh viễn tài khoản thành viên này"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );

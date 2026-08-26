@@ -32,6 +32,7 @@ import { SupportChatModal } from './SupportChatModal';
 import { ShareAppModal } from './ShareAppModal';
 import { OnboardingTourModal } from './OnboardingTourModal';
 import { HelpCenterModal } from './HelpCenterModal';
+import { GoogleAuthPickerModal } from './GoogleAuthPickerModal';
 
 export const Header: React.FC = () => {
   const { fetchData, settleDay, resetCleanSlate, isLoading, syncLiveMarketData, isLiveSyncing } = useTradingStore();
@@ -333,6 +334,7 @@ export const Header: React.FC = () => {
       <MobileAccessModal isOpen={isMobileModalOpen} onClose={() => setIsMobileModalOpen(false)} />
       <DividendModal isOpen={isDividendModalOpen} onClose={() => setIsDividendModalOpen(false)} />
       <AuthModal />
+      <GoogleAuthPickerModal />
       <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
       <AdminPanelModal />
       <SupportChatModal />
