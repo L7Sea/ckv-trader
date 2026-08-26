@@ -23,17 +23,18 @@
 3. **Mạng Lưới Điều Hướng Chéo (Cross-Navigation Engine)**:
    - `navigateToStock(symbol, targetTab, action, targetPrice)` kết nối tức thì giữa Tin tức / Gợi ý AI / Radar / Danh mục / Vĩ mô sang Bảng Giá & Nến Kỹ Thuật hoặc Sổ Lệnh / Hòa Vốn.
 
-4. **Dữ Liệu Tài Sản Thực Tế & Lãi Suất Vay Margin Deal (DNSE 26/08/2026)**:
+4. **Dữ Liệu Tài Sản Thực Tế & Lãi Suất Vay Margin Deal (DNSE 26/08/2026 - 9h42)**:
    - **Vị thế**: 1,000 cổ phiếu TPB (Khả dụng: 1,000 CP).
-   - **Thị giá**: 14.45 (14,450 đ/CP) $\rightarrow$ Giá trị CP: **14,450,000 đ**.
+   - **Thị giá**: 14.50 (14,500 đ/CP - Tăng +0.05 / +0.35% so với tham chiếu 14.45) $\rightarrow$ Giá trị CP: **14,500,000 đ**.
    - **Tiền mặt**: **171 đ**.
    - **Gốc vay Deal ban đầu**: **6,898,107 đ**.
    - **Lãi suất vay Margin Deal thực tế**: **11.50% / năm** ($\approx \mathbf{2,173 \text{ đ/ngày}}$).
    - **Lãi vay tích luỹ qua các ngày**: **103,944 đ**.
    - **Tổng Nợ Margin thực tế**: $6,898,107 + 103,944 = \mathbf{7,002,051 \text{ đ}}$.
-   - **Tài Sản Ròng Thực Có (NAV)**: $14,450,171 - 7,002,051 = \mathbf{7,448,120 \text{ đ}}$.
+   - **Tài Sản Ròng Thực Có (NAV)**: $14,500,171 - 7,002,051 = \mathbf{7,498,120 \text{ đ}}$.
    - **Giá hòa vốn Deal**: **15.920 (15,920 đ)**.
-   - **Lãi/Lỗ chưa chốt Deal**: **-1,468,116 đ (-9.30%)**.
+   - **Lãi/Lỗ chưa chốt Deal**: **-1,418,116 đ (-8.99%)**.
+   - **Tỷ lệ ký quỹ Deal**: **51.55%**.
 
 ---
 

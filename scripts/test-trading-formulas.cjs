@@ -97,28 +97,33 @@ test('5. Cổ tức tiền mặt: Tự động trừ 5% thuế TNCN theo quy đ�
   assert.strictEqual(netCash, 950000);
 });
 
-// 6. Công thức Tính Cơ Cấu Nguồn Vốn DNSE & Lãi Vay Margin Deal 11.5%/năm (25/8 vs 26/8)
-test('6. Cơ cấu nguồn vốn DNSE: Xác thực chuẩn xác Lãi Margin thực tế 11.5%/năm (+2,173đ/ngày) và NAV (7,448,120đ)', () => {
-  const stockValue = 14450000; // 1000 TPB giá 14.450
+// 6. Công thức Tính Cơ Cấu Nguồn Vốn DNSE & Biến Động Thị Giá Realtime (9h42 26/8/2026)
+test('6. Cơ cấu nguồn vốn DNSE: Xác thực chuẩn xác Lãi Margin 11.5%, biến động giá TPB 14.50 (+50đ), NAV (7,498,120đ) và Lỗ Deal (-1,418,116đ)', () => {
+  const stockValue = 14500000; // 1000 TPB giá 14.50 (14,500đ)
   const cash = 171;            // Tiền mặt thực tế DNSE
   const receivingCash = 0;
   const initialLoan = 6898107; // Gốc vay Margin ban đầu
   const accruedInterest = 103944; // Lãi vay tích luỹ đến 26/8/2026
   const marginDebt = initialLoan + accruedInterest; // 7,002,051đ
 
-  const totalAssets = cash + receivingCash + stockValue; // 14,450,171
-  const totalEquity = totalAssets - marginDebt; // 7,448,120
+  const totalAssets = cash + receivingCash + stockValue; // 14,500,171
+  const totalEquity = totalAssets - marginDebt; // 7,498,120đ (Khớp 100% ảnh Tab Tài sản 9h43)
 
   // Kiểm chứng lãi suất thực tế 11.5%/năm:
-  const dailyInterest = Math.round((initialLoan * 0.115) / 365); // Đúng 2,173đ
+  const dailyInterest = Math.round((initialLoan * 0.115) / 365); // Đúng 2,173đ/ngày
   const pnl25Aug = -1465943;
-  const pnl26Aug = -1468116;
-  const actualDailyLossIncrease = Math.abs(pnl26Aug) - Math.abs(pnl25Aug); // 2,173đ
+  const pnl26AugRef = -1468116; // Khi TPB ở 14.45
+  const actualDailyLossIncrease = Math.abs(pnl26AugRef) - Math.abs(pnl25Aug); // 2,173đ
 
-  assert.strictEqual(totalEquity, 7448120);
+  // Khi TPB tăng +50đ lên 14.50:
+  const priceGain = (14500 - 14450) * 1000; // +50,000đ
+  const pnlLive = pnl26AugRef + priceGain;   // -1,418,116đ (Khớp 100% ảnh Tab Deal 9h42)
+
+  assert.strictEqual(totalEquity, 7498120);
   assert.strictEqual(marginDebt, 7002051);
   assert.strictEqual(dailyInterest, 2173);
   assert.strictEqual(actualDailyLossIncrease, 2173);
+  assert.strictEqual(pnlLive, -1418116);
 });
 
 // 7. Kiểm thử Hệ số Đồng thuận Đa lớp (Consensus Scoring Formula)

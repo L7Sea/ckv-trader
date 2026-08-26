@@ -27,8 +27,8 @@ export const api = {
             cash: Number(p.cash !== undefined ? p.cash : 171),
             receiving_cash: Number(p.receiving_cash || 0),
             margin_debt: Number(p.margin_debt || 7002051),
-            total_equity: Number(p.total_equity || 7448120),
-            total_profit_loss: Number(p.total_profit_loss || -1468116),
+            total_equity: Number(p.total_equity || 7498120),
+            total_profit_loss: Number(p.total_profit_loss || -1418116),
             updated_at: p.updated_at
           };
         }
