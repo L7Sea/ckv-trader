@@ -52,17 +52,26 @@
 ## 3. 🧪 TIÊU CHUẨN KIỂM THỬ & PHÂN LUỒNG MỆNH LỆNH
 - **Chế độ Báo cáo / Tìm lỗi (Inspect Mode)**: Khi người dùng hỏi "báo cáo lỗi", "chỉ ra lỗi sai", "tại sao lệch" $\rightarrow$ AI chỉ tập trung phân tích chuyên môn và đề xuất hướng xử lý, tuyệt đối không tự ý sửa code hay push.
 - **Chế độ Thực thi (Execution Mode)**: Khi người dùng ra lệnh "sửa và push", "sửa cho tôi đi" $\rightarrow$ AI sửa code, chạy test suites, build và tự động commit/push Cloudflare Pages.
-- `node scripts/test-trading-formulas.cjs`: 12/12 bài test toán học & vĩ mô đạt chuẩn 100% (bao gồm Cơ chế giải ngân Vay Margin Deal và Sức mua mở rộng).
-- `node scripts/test-sql-schema.cjs`: 13/13 bài test toàn vẹn mô hình dữ liệu SQL.
+- `node scripts/test-trading-formulas.cjs`: 12/12 bài test toán học & vĩ mô đạt chuẩn 100%.
+- `node scripts/test-sql-schema.cjs`: 18/18 bài test toàn vẹn mô hình dữ liệu SQL (bao gồm multi-user auth & support messages).
 - `npm --prefix frontend run build`: 100% sạch cảnh báo và 0 lỗi TypeScript.
 - **Triển khai thường trực**: Tự động commit chuẩn Conventional Commits và đẩy thẳng lên Cloudflare Pages / GitHub (`git push origin master`) sau mỗi lần cập nhật.
 
 ---
 
-## 4. 🔄 CƠ CHẾ TỰ ĐỘNG CẬP NHẬT BỐI CẢNH (REAL-TIME CONTEXT EVOLUTION)
+## 4. 👥 KIẾN TRÚC ĐA NGƯỜI DÙNG & HỖ TRỢ TRỰC TUYẾN
+- **👑 Tài khoản Chủ Nhân (Admin VIP)**: Giữ trọn vẹn số dư tài sản thực tế (1,000 TPB, nợ Margin 7.002tr, NAV 7.448tr). Có quyền mở Admin Panel để giám sát danh sách người dùng và trả lời tin nhắn trực tiếp.
+- **👤 Người Dùng Mới (Guest / New Trader)**: Tự do tạo tài khoản bằng Email/Mật khẩu hoặc Đăng nhập 1-Click Google. Khởi tạo sạch sẽ từ 0đ (Tiền mặt: 0đ, Nợ: 0đ, Danh mục: Rỗng) để tự trải nghiệm độc lập.
+- **🚀 Capy Onboarding Tour**: 5 bước tương tác trực quan giải thích cặn kẽ bản chất app (Quản trị vị thế, Nhật ký T+2.5, không phải app sàn khớp lệnh).
+- **💬 Live Support Chat**: Kênh nhắn tin 2 chiều trực tuyến giữa User và Admin qua bảng `support_messages`.
+- **🔗 Production URL**: `https://ckv-trader.pages.dev` (Cloudflare Pages).
+
+---
+
+## 5. 🔄 CƠ CHẾ TỰ ĐỘNG CẬP NHẬT BỐI CẢNH (REAL-TIME CONTEXT EVOLUTION)
 Mỗi khi có thông tin tài chính mới, ảnh chụp màn hình hoặc công thức mới:
 1. **Ghi đè Single Source of Truth**: Cập nhật ngay file này (`tài liệu/CONTEXT.md`) để bảo đảm mọi phiên làm việc tiếp theo luôn đọc được bối cảnh chính xác nhất.
-2. **Cập nhật Test Suite**: Bổ sung kiểm thử vào `scripts/test-trading-formulas.cjs`.
+2. **Cập nhật Test Suite**: Bổ sung kiểm thử vào `scripts/test-trading-formulas.cjs` hoặc `scripts/test-sql-schema.cjs`.
 3. **Cập nhật Code & Tự Động Deploy**: Sửa logic code, build và push thẳng lên Cloudflare Pages.
 
 

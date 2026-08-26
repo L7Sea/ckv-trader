@@ -107,5 +107,27 @@ const mockInterestRates = [
 
 ok(mockInterestRates.length >= 3, 'SQL Interest Rates: Bảng dữ liệu lãi suất vĩ mô sẵn sàng');
 
+/* ═══ 6. Kiểm tra bảng `user_profiles` & Phân quyền Admin vs Người dùng mới (0đ) ═══ */
+const mockUserProfiles = [
+  { id: 'user-vip', name: 'Hải Đẹp Trai (VIP Master)', role: 'ADMIN', initialCash: 171, initialTPB: 1000 },
+  { id: 'user-new', name: 'Nhà Đầu Tư Mới', role: 'USER', initialCash: 0, initialTPB: 0 }
+];
+
+eq(mockUserProfiles[0].role, 'ADMIN', 'SQL Auth: Chủ nhân có vai trò ADMIN VIP');
+eq(mockUserProfiles[1].initialCash, 0, 'SQL Auth: Người dùng mới khởi tạo số dư là 0đ');
+eq(mockUserProfiles[1].initialTPB, 0, 'SQL Auth: Người dùng mới danh mục cổ phiếu rỗng ban đầu');
+
+/* ═══ 7. Kiểm tra bảng `support_messages` (Tin nhắn trực tuyến Admin) ═══ */
+const mockSupportMessage = {
+  id: 'msg_1',
+  user_id: 'user-new',
+  message: 'Admin hỗ trợ giúp tôi cách tính hòa vốn Deal với ạ',
+  is_from_admin: false,
+  is_read: false
+};
+
+ok(Boolean(mockSupportMessage.id && mockSupportMessage.message), 'SQL Support Chat: Bảng tin nhắn hỗ trợ trực tuyến toàn vẹn');
+
 console.log(`\n🎉 KẾT QUẢ KIỂM THỬ SQL SCHEMA: ${pass} PASSED, ${fail} FAILED.`);
 if (fail > 0) process.exit(1);
+

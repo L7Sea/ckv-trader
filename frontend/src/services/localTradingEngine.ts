@@ -136,80 +136,135 @@ const initialTransactions: Transaction[] = [
   }
 ];
 
+let activeUserId = 'user-vip';
+let isActiveUserAdmin = true;
+
+const emptyUserPortfolio: Portfolio = {
+  cash: 0,
+  receiving_cash: 0,
+  margin_debt: 0,
+  total_equity: 0,
+  total_profit_loss: 0,
+  current_simulated_date: new Date().toISOString().slice(0, 10),
+  updated_at: new Date().toISOString()
+};
+
 export const localTradingEngine = {
+  setActiveUserId(userId: string, isAdmin: boolean) {
+    activeUserId = userId;
+    isActiveUserAdmin = isAdmin;
+  },
+
+  getStorageKeys() {
+    if (isActiveUserAdmin || activeUserId === 'user-vip') {
+      return {
+        portfolio: PORTFOLIO_KEY,
+        positions: POSITIONS_KEY,
+        transactions: TRANSACTIONS_KEY
+      };
+    }
+    return {
+      portfolio: `${PORTFOLIO_KEY}_${activeUserId}`,
+      positions: `${POSITIONS_KEY}_${activeUserId}`,
+      transactions: `${TRANSACTIONS_KEY}_${activeUserId}`
+    };
+  },
+
   ensureDataFreshness() {
     try {
-      const savedVer = localStorage.getItem(DATA_VERSION_KEY);
-      if (savedVer !== CURRENT_DATA_VERSION) {
-        this.resetToUserExactData();
-        localStorage.setItem(DATA_VERSION_KEY, CURRENT_DATA_VERSION);
+      if (isActiveUserAdmin) {
+        const savedVer = localStorage.getItem(DATA_VERSION_KEY);
+        if (savedVer !== CURRENT_DATA_VERSION) {
+          this.resetToUserExactData();
+          localStorage.setItem(DATA_VERSION_KEY, CURRENT_DATA_VERSION);
+        }
       }
     } catch {}
   },
 
   getPortfolio(): Portfolio {
     this.ensureDataFreshness();
-    const data = localStorage.getItem(PORTFOLIO_KEY);
+    const keys = this.getStorageKeys();
+    const data = localStorage.getItem(keys.portfolio);
     if (!data) {
-      this.savePortfolio(initialPortfolio);
-      return initialPortfolio;
+      const initial = isActiveUserAdmin ? initialPortfolio : emptyUserPortfolio;
+      this.savePortfolio(initial);
+      return initial;
     }
     try {
       return JSON.parse(data);
     } catch {
-      return initialPortfolio;
+      return isActiveUserAdmin ? initialPortfolio : emptyUserPortfolio;
     }
   },
 
   savePortfolio(p: Portfolio) {
-    localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(p));
+    const keys = this.getStorageKeys();
+    localStorage.setItem(keys.portfolio, JSON.stringify(p));
   },
 
   getPositions(): Position[] {
     this.ensureDataFreshness();
-    const data = localStorage.getItem(POSITIONS_KEY);
+    const keys = this.getStorageKeys();
+    const data = localStorage.getItem(keys.positions);
     if (!data) {
-      this.savePositions(initialPositions);
-      return initialPositions;
+      const initial = isActiveUserAdmin ? initialPositions : [];
+      this.savePositions(initial);
+      return initial;
     }
     try {
       return JSON.parse(data);
     } catch {
-      return initialPositions;
+      return isActiveUserAdmin ? initialPositions : [];
     }
   },
 
   savePositions(positions: Position[]) {
-    localStorage.setItem(POSITIONS_KEY, JSON.stringify(positions));
+    const keys = this.getStorageKeys();
+    localStorage.setItem(keys.positions, JSON.stringify(positions));
   },
 
   getTransactions(): Transaction[] {
     this.ensureDataFreshness();
-    const data = localStorage.getItem(TRANSACTIONS_KEY);
+    const keys = this.getStorageKeys();
+    const data = localStorage.getItem(keys.transactions);
     if (!data) {
-      this.saveTransactions(initialTransactions);
-      return initialTransactions;
+      const initial = isActiveUserAdmin ? initialTransactions : [];
+      this.saveTransactions(initial);
+      return initial;
     }
     try {
       return JSON.parse(data);
     } catch {
-      return initialTransactions;
+      return isActiveUserAdmin ? initialTransactions : [];
     }
   },
 
   saveTransactions(txs: Transaction[]) {
-    localStorage.setItem(TRANSACTIONS_KEY, JSON.stringify(txs));
+    const keys = this.getStorageKeys();
+    localStorage.setItem(keys.transactions, JSON.stringify(txs));
   },
 
   resetToUserExactData(): { portfolio: Portfolio; positions: Position[]; transactions: Transaction[] } {
-    this.savePortfolio(initialPortfolio);
-    this.savePositions(initialPositions);
-    this.saveTransactions(initialTransactions);
-    return {
-      portfolio: initialPortfolio,
-      positions: initialPositions,
-      transactions: initialTransactions
-    };
+    if (isActiveUserAdmin) {
+      this.savePortfolio(initialPortfolio);
+      this.savePositions(initialPositions);
+      this.saveTransactions(initialTransactions);
+      return {
+        portfolio: initialPortfolio,
+        positions: initialPositions,
+        transactions: initialTransactions
+      };
+    } else {
+      this.savePortfolio(emptyUserPortfolio);
+      this.savePositions([]);
+      this.saveTransactions([]);
+      return {
+        portfolio: emptyUserPortfolio,
+        positions: [],
+        transactions: []
+      };
+    }
   },
 
   placeOrder(payload: OrderRequestPayload): { transaction: Transaction; position: Position; portfolio: Portfolio } {

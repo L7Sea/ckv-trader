@@ -13,23 +13,45 @@ import {
   ShieldCheck,
   Settings,
   Sparkles,
-  RotateCcw
+  RotateCcw,
+  Share2,
+  MessageSquare,
+  Users,
+  HelpCircle
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 import { useAuthStore } from '../store/useAuthStore';
+import { supportService } from '../services/supportService';
 import { MobileAccessModal } from './MobileAccessModal';
 import { DividendModal } from './DividendModal';
 import { AuthModal } from './AuthModal';
 import { SettingsModal } from './SettingsModal';
+import { AdminPanelModal } from './AdminPanelModal';
+import { SupportChatModal } from './SupportChatModal';
+import { ShareAppModal } from './ShareAppModal';
+import { OnboardingTourModal } from './OnboardingTourModal';
 
 export const Header: React.FC = () => {
   const { fetchData, settleDay, resetCleanSlate, isLoading, syncLiveMarketData, isLiveSyncing } = useTradingStore();
-  const { user, openAuthModal, logout, switchSubAccount, lockApp } = useAuthStore();
+  const {
+    user,
+    openAuthModal,
+    openAdminPanel,
+    openSupportChat,
+    openShareModal,
+    openOnboarding,
+    logout,
+    switchSubAccount,
+    lockApp
+  } = useAuthStore();
 
   const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
   const [isDividendModalOpen, setIsDividendModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+  const isAdmin = user?.role === 'ADMIN';
+  const unreadCount = isAdmin ? supportService.getUnreadCountForAdmin() : (user ? supportService.getUnreadCountForUser(user.id) : 0);
 
   const handleSettle = async () => {
     if (
@@ -68,6 +90,11 @@ export const Header: React.FC = () => {
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                   T+2.5
                 </span>
+                {isAdmin && (
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">
+                    👑 ADMIN VIP
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-1.5 text-xs text-slate-400">
                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
@@ -116,24 +143,50 @@ export const Header: React.FC = () => {
               <span className="font-sans">{isLiveSyncing ? 'Đang đồng bộ...' : 'Đồng Bộ Toàn Diện'}</span>
             </button>
 
-            {/* Nút Cổ Tức */}
+            {/* Nút Nhắn Tin Cho Admin / Khách Hàng (Support Chat) */}
             <button
-              onClick={() => setIsDividendModalOpen(true)}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold transition active:scale-95"
-              title="Ghi nhận cổ tức tiền mặt hoặc cổ tức cổ phiếu"
+              onClick={openSupportChat}
+              className="relative p-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 transition active:scale-95 flex items-center gap-1 text-xs font-bold"
+              title={isAdmin ? 'Mở kênh chat với khách hàng' : 'Nhắn tin trực tiếp cho Admin (anh Hải)'}
             >
-              <Gift className="h-3.5 w-3.5 text-amber-400" />
-              <span>Cổ Tức</span>
+              <MessageSquare className="h-4 w-4 text-indigo-400" />
+              <span className="hidden sm:inline">{isAdmin ? 'Chat Khách' : 'Hỗ Trợ Admin'}</span>
+              {unreadCount > 0 && (
+                <span className="h-4 w-4 rounded-full bg-rose-500 text-white text-[10px] font-mono font-bold flex items-center justify-center animate-pulse">
+                  {unreadCount}
+                </span>
+              )}
             </button>
 
-            {/* Nút Điện Thoại */}
+            {/* Nút Chia Sẻ App (Share) */}
             <button
-              onClick={() => setIsMobileModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition active:scale-95"
-              title="Quét mã QR để mở ứng dụng trên điện thoại"
+              onClick={openShareModal}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition active:scale-95"
+              title="Chia sẻ link ứng dụng cho bạn bè"
             >
-              <Smartphone className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Mobile</span>
+              <Share2 className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Chia Sẻ Link</span>
+            </button>
+
+            {/* Nút Quản Trị User (Dành riêng cho Admin) */}
+            {isAdmin && (
+              <button
+                onClick={openAdminPanel}
+                className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold transition active:scale-95"
+                title="Quản trị danh sách người dùng & số dư"
+              >
+                <Users className="h-3.5 w-3.5 text-amber-400" />
+                <span>Quản Trị User</span>
+              </button>
+            )}
+
+            {/* Nút Hướng Dẫn (Tour) */}
+            <button
+              onClick={openOnboarding}
+              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition active:scale-95"
+              title="Xem lại hướng dẫn sử dụng (Capy Onboarding)"
+            >
+              <HelpCircle className="h-4 w-4 text-emerald-400" />
             </button>
 
             {/* Nút Cài Đặt (Settings) */}
@@ -143,15 +196,6 @@ export const Header: React.FC = () => {
               title="Tùy biến hình nền & giao diện"
             >
               <Settings className="h-4 w-4 text-indigo-400" />
-            </button>
-
-            {/* Nút Khóa Ứng Dụng (Lock App) */}
-            <button
-              onClick={lockApp}
-              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 transition active:scale-95"
-              title="Khóa ứng dụng ngay lập tức"
-            >
-              <Lock className="h-4 w-4" />
             </button>
 
             {/* User Profile Dropdown */}
@@ -173,26 +217,55 @@ export const Header: React.FC = () => {
                   <div className="p-2 border-b border-slate-800/80 mb-1">
                     <p className="text-xs font-bold text-white truncate">{user?.name || 'VIP Trader'}</p>
                     <p className="text-[11px] font-mono text-emerald-400">STK: {user?.accountNumber || '001C888999'}</p>
+                    <span className="text-[10px] font-bold text-slate-400">Vai trò: <b className="text-amber-400">{user?.role}</b></span>
                   </div>
                   
+                  {isAdmin && (
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        openAdminPanel();
+                      }}
+                      className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-amber-300 hover:bg-amber-500/10 rounded-xl transition font-semibold"
+                    >
+                      <Users className="h-4 w-4 text-amber-400" />
+                      <span>Quản trị người dùng</span>
+                    </button>
+                  )}
+
                   <button
-                    onClick={handleResetSlate}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 rounded-xl transition font-semibold"
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
+                      openSupportChat();
+                    }}
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-indigo-300 hover:bg-indigo-500/10 rounded-xl transition"
                   >
-                    <RotateCcw className="h-4 w-4 text-rose-400" />
-                    <span>Làm sạch & Thiết lập vốn thật</span>
+                    <MessageSquare className="h-4 w-4 text-indigo-400" />
+                    <span>Hộp thư nhắn tin Admin</span>
                   </button>
 
                   <button
                     onClick={() => {
                       setIsUserMenuOpen(false);
-                      setIsSettingsModalOpen(true);
+                      openShareModal();
                     }}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition"
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-cyan-300 hover:bg-cyan-500/10 rounded-xl transition"
                   >
-                    <Sparkles className="h-4 w-4 text-amber-400" />
-                    <span>Tùy biến hình nền & Linh vật</span>
+                    <Share2 className="h-4 w-4 text-cyan-400" />
+                    <span>Lấy link chia sẻ bạn bè</span>
                   </button>
+
+                  <button
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
+                      openOnboarding();
+                    }}
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-emerald-300 hover:bg-emerald-500/10 rounded-xl transition"
+                  >
+                    <HelpCircle className="h-4 w-4 text-emerald-400" />
+                    <span>Hướng dẫn Capy Onboarding</span>
+                  </button>
+
                   <button
                     onClick={() => {
                       setIsUserMenuOpen(false);
@@ -201,33 +274,14 @@ export const Header: React.FC = () => {
                     className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition"
                   >
                     <User className="h-4 w-4 text-slate-400" />
-                    <span>Hồ sơ & Đổi PIN</span>
+                    <span>Đổi tài khoản / Đăng ký</span>
                   </button>
-                  <button
-                    onClick={() => {
-                      setIsUserMenuOpen(false);
-                      lockApp();
-                    }}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-amber-300 hover:bg-amber-500/10 rounded-xl transition"
-                  >
-                    <Lock className="h-4 w-4 text-amber-400" />
-                    <span>Khóa bảo vệ bằng PIN</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsUserMenuOpen(false);
-                      fetchData();
-                    }}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition"
-                  >
-                    <RefreshCw className="h-4 w-4 text-slate-400" />
-                    <span>Đồng bộ dữ liệu</span>
-                  </button>
+
                   <div className="border-t border-slate-800/80 my-1"></div>
                   <button
                     onClick={() => {
                       setIsUserMenuOpen(false);
-                      logout();
+                      openAuthModal();
                     }}
                     className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 rounded-xl transition"
                   >
@@ -246,6 +300,11 @@ export const Header: React.FC = () => {
       <DividendModal isOpen={isDividendModalOpen} onClose={() => setIsDividendModalOpen(false)} />
       <AuthModal />
       <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
+      <AdminPanelModal />
+      <SupportChatModal />
+      <ShareAppModal />
+      <OnboardingTourModal />
     </>
   );
 };
+
