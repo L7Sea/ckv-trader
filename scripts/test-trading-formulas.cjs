@@ -430,36 +430,53 @@ test('18. Thuật toán sinh mã PIN 6 số biến đổi theo ngày và đăng 
   assert.strictEqual(member.dailyPin, pinToday);
 });
 
-// 19. Xác thực Mã Tài Khoản Độc Quyền Admin (026A00000) & Quy Luật Tạo Mã TK Thành Viên 026 + Chữ Cái Đầu + 5 Số
-test('19. Quy luật mã số tài khoản 026A00000 cho Admin và 026[Letter][5 số] ngẫu nhiên cho thành viên', () => {
-  function generateMemberAccountNumber(name) {
-    const clean = (name || '').trim();
-    const normalized = clean.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+// 19. Xác thực Mã Tài Khoản Độc Quyền Admin (026A00000) & Quy Luật Năm Động (026, 027, 028...) + Chữ Cái Đầu Tên Chính (Lê Hải -> H, Lê Nguyễn Minh Thiên Bá -> B)
+test('19. Quy luật năm động (026/027/028) và chữ cái Tên Chính cho mã tài khoản thành viên', () => {
+  function generateMemberAccountNumber(fullNameOrLastName, date = new Date()) {
+    const yearSuffix = (date.getFullYear() % 100).toString().padStart(2, '0');
+    const yearPrefix = `0${yearSuffix}`;
+
+    const clean = (fullNameOrLastName || '').trim();
+    const parts = clean.split(/\s+/).filter(Boolean);
+    const firstName = parts.length > 0 ? parts[parts.length - 1] : 'M';
+
+    const normalized = firstName
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D');
+
     const firstChar = normalized.length > 0 ? normalized[0].toUpperCase() : 'M';
     const validChar = (firstChar >= 'A' && firstChar <= 'Z') ? firstChar : 'M';
     const random5 = Math.floor(10001 + Math.random() * 89998);
-    return `026${validChar}${random5}`;
+    return `${yearPrefix}${validChar}${random5}`;
   }
 
   const adminAcc = '026A00000';
   const adminEmail = 'leminhhaia5890@gmail.com';
-
-  const memberNam = generateMemberAccountNumber('Nguyễn Văn Nam');
-  const memberTrang = generateMemberAccountNumber('Trần Thu Trang');
-  const memberHung = generateMemberAccountNumber('Hoàng Mạnh Hùng');
-
   assert.strictEqual(adminAcc, '026A00000');
   assert.strictEqual(adminEmail, 'leminhhaia5890@gmail.com');
 
-  assert.strictEqual(memberNam.startsWith('026N'), true);
-  assert.strictEqual(memberNam.length, 9);
-  assert.notStrictEqual(memberNam, adminAcc);
+  // Test 1: Năm 2026, Lê Hải -> Tên chính "Hải" -> 026H*****
+  const accHai = generateMemberAccountNumber('Lê Hải', new Date(2026, 7, 26));
+  assert.strictEqual(accHai.startsWith('026H'), true);
+  assert.strictEqual(accHai.length, 9);
+  assert.notStrictEqual(accHai, adminAcc);
 
-  assert.strictEqual(memberTrang.startsWith('026T'), true);
-  assert.strictEqual(memberTrang.length, 9);
+  // Test 2: Năm 2026, Lê Nguyễn Minh Thiên Bá -> Tên chính "Bá" -> 026B*****
+  const accBa = generateMemberAccountNumber('Lê Nguyễn Minh Thiên Bá', new Date(2026, 7, 26));
+  assert.strictEqual(accBa.startsWith('026B'), true);
+  assert.strictEqual(accBa.length, 9);
 
-  assert.strictEqual(memberHung.startsWith('026H'), true);
-  assert.strictEqual(memberHung.length, 9);
+  // Test 3: Năm 2027, Trần Thu Trang -> Tên chính "Trang" -> 027T*****
+  const accTrang2027 = generateMemberAccountNumber('Trần Thu Trang', new Date(2027, 0, 15));
+  assert.strictEqual(accTrang2027.startsWith('027T'), true);
+  assert.strictEqual(accTrang2027.length, 9);
+
+  // Test 4: Năm 2028, Võ Đạt -> Tên chính "Đạt" -> 028D*****
+  const accDat2028 = generateMemberAccountNumber('Võ Đạt', new Date(2028, 5, 20));
+  assert.strictEqual(accDat2028.startsWith('028D'), true);
+  assert.strictEqual(accDat2028.length, 9);
 });
 
 console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/19 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);

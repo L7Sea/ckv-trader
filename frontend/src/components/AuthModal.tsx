@@ -14,7 +14,9 @@ export const AuthModal: React.FC = () => {
   } = useAuthStore();
 
   const [authMode, setAuthMode] = useState<'LOGIN' | 'REGISTER'>('LOGIN');
-  const [name, setName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [middleName, setMiddleName] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [nickname, setNickname] = useState('');
   const [age, setAge] = useState<number | ''>(26);
   const [gender, setGender] = useState<'MALE' | 'FEMALE' | 'OTHER'>('MALE');
@@ -25,18 +27,27 @@ export const AuthModal: React.FC = () => {
 
   if (!isAuthModalOpen) return null;
 
+  const currentYearPrefix = `0${new Date().getFullYear().toString().slice(-2)}`;
+  const cleanFirstName = (firstName || '').trim();
+  const normalizedFirstNameChar = cleanFirstName
+    ? cleanFirstName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D')[0].toUpperCase()
+    : 'M';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       if (authMode === 'REGISTER') {
-        if (!name.trim()) return alert('Vui lòng nhập Họ và Tên thật!');
-        if (!nickname.trim()) return alert('Vui lòng nhập Tên gọi trong App!');
+        if (!lastName.trim()) return alert('Vui lòng nhập Họ của bạn (VD: Lê, Nguyễn)!');
+        if (!firstName.trim()) return alert('Vui lòng nhập Tên chính của bạn (VD: Hải, Bá, Nam)!');
+        if (!nickname.trim()) return alert('Vui lòng nhập Tên gọi trong App (Nickname)!');
         if (!email.trim()) return alert('Vui lòng nhập Email / Gmail!');
         if (!dailyPin.trim() || dailyPin.length < 6) return alert('Vui lòng nhập đúng Mã PIN 6 số của ngày hôm nay (Liên hệ Admin Hải để nhận mã)!');
 
+        const fullName = [lastName.trim(), middleName.trim(), firstName.trim()].filter(Boolean).join(' ');
+
         const success = await registerWithMemberInfo({
-          name: name.trim(),
+          name: fullName,
           nickname: nickname.trim(),
           age: Number(age) || 25,
           gender,
@@ -170,32 +181,76 @@ export const AuthModal: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              {/* Họ, Tên Đệm, Tên Chính (Tách rõ ràng theo quy tắc) */}
+              <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Họ Và Tên Thật:</label>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                    Họ <span className="text-rose-400">*</span>:
+                  </label>
                   <input
                     type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="VD: Nguyễn Văn Nam"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="VD: Lê"
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Tên Gọi Trong App:</label>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                    Tên Đệm:
+                  </label>
                   <input
                     type="text"
-                    value={nickname}
-                    onChange={(e) => setNickname(e.target.value)}
-                    placeholder="VD: Nam Alpha Trader"
+                    value={middleName}
+                    onChange={(e) => setMiddleName(e.target.value)}
+                    placeholder="Minh Thiên"
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-emerald-400 mb-1">
+                    Tên Chính <span className="text-rose-400">*</span>:
+                  </label>
+                  <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="VD: Bá"
+                    className="w-full bg-slate-950 border border-emerald-500/50 rounded-xl px-3 py-2 text-xs text-emerald-300 focus:outline-none focus:border-emerald-400 font-bold"
                     required
                   />
                 </div>
               </div>
 
+              {/* Preview Mã Số Tài Khoản Thế Hệ Mới */}
+              <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs font-mono">
+                <div>
+                  <span className="text-[10px] text-slate-500 block font-sans">Tên đầy đủ:</span>
+                  <b className="text-white truncate max-w-[170px] block">
+                    {[lastName, middleName, firstName].filter(Boolean).join(' ') || 'Chưa nhập họ tên'}
+                  </b>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-slate-500 block font-sans">Mã TK dự kiến:</span>
+                  <b className="text-emerald-400 tracking-wider">
+                    {firstName ? `${currentYearPrefix}${normalizedFirstNameChar}•••••` : `${currentYearPrefix}••••••`}
+                  </b>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Tên Gọi Trong App (Nickname):</label>
+                  <input
+                    type="text"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    placeholder="VD: Bá Alpha Trader"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
+                    required
+                  />
+                </div>
                 <div>
                   <label className="block text-[11px] font-semibold text-slate-400 mb-1">Tuổi:</label>
                   <input
@@ -209,18 +264,19 @@ export const AuthModal: React.FC = () => {
                     required
                   />
                 </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Giới Tính:</label>
-                  <select
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value as any)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
-                  >
-                    <option value="MALE">Nam</option>
-                    <option value="FEMALE">Nữ</option>
-                    <option value="OTHER">Khác</option>
-                  </select>
-                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-400 mb-1">Giới Tính:</label>
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value as any)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold"
+                >
+                  <option value="MALE">Nam</option>
+                  <option value="FEMALE">Nữ</option>
+                  <option value="OTHER">Khác</option>
+                </select>
               </div>
             </>
           )}

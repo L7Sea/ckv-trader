@@ -91,10 +91,14 @@
   - Khi email này đăng nhập (qua Form hoặc Google Sign-In) $\rightarrow$ Hệ thống tự động nhận diện Chủ nhân và yêu cầu mã PIN/mật khẩu Master (`542463`) để mở tài khoản Admin.
   - Mã tài khoản độc quyền của Admin: **`026A00000`**.
   - Toàn bộ danh mục thực tế của Chủ nhân (**1,000 TPB @ 14.60, NAV 7,598,120 đ, Nợ Margin 7,002,051 đ, Tiền mặt 171 đ**) được bảo vệ độc quyền 100%.
-- **Quy luật tạo Mã Số Tài Khoản Thành Viên**:
-  - Định dạng: **`026` + `[Chữ cái in hoa đầu tiên của Tên]` + `[5 số ngẫu nhiên 10001 - 99999]`**.
-  - Ví dụ: Nguyễn Văn Nam $\rightarrow$ `026N54892`, Trần Thu Trang $\rightarrow$ `026T38192`.
-  - Tuyệt đối không trùng mã `026A00000` của Admin.
+- **Quy luật tạo Mã Số Tài Khoản Thành Viên (Năm Động + Chữ Cái Đầu Tên Chính + 5 Số Ngẫu Nhiên)**:
+  - **Tiền tố năm**: `0` + 2 số cuối của năm đăng ký (Năm 2026 là `026`, Năm 2027 là `027`, Năm 2028 là `028`...).
+  - **Chữ cái Tên Chính**: Lấy chữ cái in hoa đầu tiên của **Tên Chính** (từ cuối cùng trong họ tên, khử dấu tiếng Việt):
+    - *Lê Hải* (2026) $\rightarrow$ Tên chính "Hải" $\rightarrow$ `026H` + 5 số ngẫu nhiên (VD: `026H58291`).
+    - *Lê Nguyễn Minh Thiên Bá* (2026) $\rightarrow$ Tên chính "Bá" $\rightarrow$ `026B` + 5 số ngẫu nhiên (VD: `026B74819`).
+    - *Trần Thu Trang* (2027) $\rightarrow$ Tên chính "Trang" $\rightarrow$ `027T` + 5 số ngẫu nhiên (VD: `027T38192`).
+  - 5 số ngẫu nhiên nằm trong dải $10001 - 99999$, tuyệt đối không bao giờ trùng `00000` của Admin.
+- **Biểu Mẫu Đăng Ký Thành Viên**: Tách rõ ràng 3 ô: **Họ**, **Tên Đệm**, **Tên Chính** kèm xem trước Mã TK dự kiến theo thời gian thực.
 - **Mã PIN 6 Số Biến Đổi Tự Động Hàng Ngày (`getDailyAccessPin()`)**:
   - Biến đổi mỗi ngày 1 mã duy nhất (VD: Ngày 26/08/2026 là `861482`). Thành viên mới đăng ký bắt buộc phải có mã PIN ngày do Admin cung cấp.
 - **Cô Lập Kênh Chat 1-1 Tuyệt Đối**:

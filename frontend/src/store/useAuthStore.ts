@@ -87,15 +87,30 @@ interface AuthState {
   closeHelpCenter: () => void;
 }
 
-export function generateMemberAccountNumber(name: string): string {
-  const clean = (name || '').trim();
-  // Lấy chữ cái in hoa đầu tiên của tên (khử dấu tiếng Việt)
-  const normalized = clean.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+export function generateMemberAccountNumber(fullNameOrLastName: string, date = new Date()): string {
+  // 1. Tiền tố năm: Năm 2026 -> '026', Năm 2027 -> '027', Năm 2028 -> '028'...
+  const yearSuffix = (date.getFullYear() % 100).toString().padStart(2, '0');
+  const yearPrefix = `0${yearSuffix}`;
+
+  // 2. Tách TÊN CHÍNH (từ cuối cùng trong tên người Việt)
+  // Ví dụ: "Lê Hải" -> "Hải" (H), "Lê Nguyễn Minh Thiên Bá" -> "Bá" (B)
+  const clean = (fullNameOrLastName || '').trim();
+  const parts = clean.split(/\s+/).filter(Boolean);
+  const firstName = parts.length > 0 ? parts[parts.length - 1] : 'M';
+
+  // Khử dấu tiếng Việt chuẩn: Hải -> H, Bá -> B, Đạt -> D, Ân -> A
+  const normalized = firstName
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D');
+
   const firstChar = normalized.length > 0 ? normalized[0].toUpperCase() : 'M';
   const validChar = (firstChar >= 'A' && firstChar <= 'Z') ? firstChar : 'M';
-  // 5 số ngẫu nhiên từ 10001 đến 99999 (tuyệt đối không trùng 00000 của Admin)
+
+  // 3. 5 số ngẫu nhiên từ 10001 đến 99999 (tuyệt đối không trùng 00000 của Admin)
   const random5 = Math.floor(10001 + Math.random() * 89998);
-  return `026${validChar}${random5}`;
+  return `${yearPrefix}${validChar}${random5}`;
 }
 
 const USERS_STORAGE_KEY = 'ckv_registered_users_v7';
