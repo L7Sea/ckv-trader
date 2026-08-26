@@ -277,6 +277,8 @@ test('12. Giải ngân Margin Deal: Kiểm chứng mua bằng Vốn tự có, Va
   assert.strictEqual(newMarginDebt, 10256926);
   assert.strictEqual(newNAV, 11418245);
   assert.strictEqual(newEquityRatio, '52.68'); // Vẫn duy trì trên ngưỡng an toàn 50%
+});
+
 // 13. Tùy Biến CTCK & Lãi Suất Margin (VPS 13.5%, TCBS 10.5%, SSI 12%) vs Giao Dịch Thuần Tiền Mặt (TK 01)
 test('13. Tùy biến CTCK & Lãi Suất Margin: Kiểm chứng VPS (13.5%), TCBS (10.5%), DNSE (11.5%) & Chế độ Thuần Tiền Mặt (0% Lãi)', () => {
   const marginDebt = 7002051;

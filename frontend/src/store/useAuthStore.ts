@@ -117,6 +117,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     isSupportChatOpen: false,
     isShareModalOpen: false,
     isOnboardingOpen: !initialActiveUser.hasCompletedOnboarding,
+    isHelpCenterOpen: false,
     isLocked: false,
     requirePinForOrders: true,
 
@@ -126,34 +127,36 @@ export const useAuthStore = create<AuthState>((set, get) => {
       const googleEmail = window.prompt('Nhập Email Google:', `${googleName.toLowerCase().replace(/\s+/g, '')}@gmail.com`) || 'user@gmail.com';
 
       const users = getStoredUsers();
-      let existingUser = users.find((u) => u.email.toLowerCase() === googleEmail.toLowerCase());
+      let targetUser: UserProfile | undefined = users.find((u) => u.email.toLowerCase() === googleEmail.toLowerCase());
 
-      if (!existingUser) {
-        existingUser = {
+      if (!targetUser) {
+        targetUser = {
           id: 'user_' + Date.now(),
           name: googleName,
           email: googleEmail,
           role: 'USER',
           accountNumber: '001C' + Math.floor(100000 + Math.random() * 900000),
           subAccount: '01',
+          brokerage: 'DNSE',
+          customMarginRate: 11.5,
           pin: DEFAULT_PIN,
           theme: 'CYBERPUNK',
           hasCompletedOnboarding: false,
           isLoggedIn: true,
           createdAt: new Date().toISOString()
         };
-        users.push(existingUser);
+        users.push(targetUser);
         localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
       }
 
-      localStorage.setItem(ACTIVE_USER_KEY, existingUser.id);
-      localTradingEngine.setActiveUserId(existingUser.id, existingUser.role === 'ADMIN');
+      localStorage.setItem(ACTIVE_USER_KEY, targetUser.id);
+      localTradingEngine.setActiveUserId(targetUser.id, targetUser.role === 'ADMIN');
 
       set({
-        user: existingUser,
+        user: targetUser,
         allUsers: users,
         isAuthModalOpen: false,
-        isOnboardingOpen: !existingUser.hasCompletedOnboarding
+        isOnboardingOpen: !targetUser.hasCompletedOnboarding
       });
 
       // Kích hoạt reload store dữ liệu
@@ -197,6 +200,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
         role: 'USER',
         accountNumber: '001C' + Math.floor(100000 + Math.random() * 900000),
         subAccount: '01',
+        brokerage: 'DNSE',
+        customMarginRate: 11.5,
         pin: pass && pass.length >= 4 ? pass : DEFAULT_PIN,
         theme: 'CYBERPUNK',
         hasCompletedOnboarding: false,
