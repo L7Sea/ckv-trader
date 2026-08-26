@@ -166,14 +166,14 @@ export const QuickRadarSearch: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-base font-black text-white uppercase tracking-wider font-sans">
-                RADAR THÔNG MINH & TỰ ĐỘNG QUÉT MÃ (150 ALGOS)
+                RADAR THÔNG MINH & QUÉT TÍN HIỆU ĐỊNH LƯỢNG
               </h2>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono font-bold animate-pulse">
-                LIVE
+                REALTIME
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Nhập bất kỳ mã chứng khoán (HOSE, HNX, UPCoM) $\rightarrow$ Tự động tải dữ liệu & chạy 150 công thức
+              Nhập bất kỳ mã chứng khoán (HOSE, HNX, UPCoM) $\rightarrow$ Tự động phân tích dòng tiền & tổng hợp tín hiệu đa khung thời gian
             </p>
           </div>
         </div>

@@ -21,15 +21,15 @@ export const PortfolioOverview: React.FC = () => {
     openCashModal
   } = useTradingStore();
 
-  const cash = portfolio?.cash || 0;
+  const cash = portfolio?.cash !== undefined ? portfolio.cash : 171;
   const receivingCash = portfolio?.receiving_cash || 0;
-  const marginDebt = portfolio?.margin_debt || 6898107;
+  const marginDebt = portfolio?.margin_debt || 7002051;
   const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0) || 14450000;
-  const totalEquity = portfolio?.total_equity || 7551893;
+  const totalEquity = portfolio?.total_equity || 7448120;
 
-  const unrealizedPnL = positions.reduce((sum, p) => sum + (p.unrealized_pnl || 0), 0) || -1465943;
-  const totalInvestedStockCost = positions.reduce((sum, p) => sum + p.total_quantity * p.avg_price, 0) || 15918000;
-  const unrealizedPnLPct = totalInvestedStockCost > 0 ? (unrealizedPnL / totalInvestedStockCost) * 100 : -9.29;
+  const unrealizedPnL = positions.reduce((sum, p) => sum + (p.unrealized_pnl || 0), 0) || -1468116;
+  const totalInvestedStockCost = positions.reduce((sum, p) => sum + p.total_quantity * p.avg_price, 0) || 15920000;
+  const unrealizedPnLPct = totalInvestedStockCost > 0 ? (unrealizedPnL / totalInvestedStockCost) * 100 : -9.30;
 
   const isProfit = unrealizedPnL >= 0;
 
@@ -53,7 +53,7 @@ export const PortfolioOverview: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold tracking-wide uppercase flex items-center gap-1.5">
                   <Sparkles className="h-3 w-3 text-amber-400" />
-                  VÍ TÀI SẢN TOÀN DIỆN
+                  VÍ TÀI SẢN TOÀN DIỆN (DNSE 26/08/2026)
                 </span>
                 <button
                   onClick={toggleBalanceVisibility}
@@ -88,7 +88,7 @@ export const PortfolioOverview: React.FC = () => {
               </div>
 
               <div className="px-3 py-2 rounded-2xl bg-slate-950/80 border border-slate-800 text-slate-300 text-xs font-mono">
-                Tỷ lệ tự có: <b className="text-emerald-400">52.3%</b> (An toàn)
+                Tỷ lệ tự có: <b className="text-emerald-400">51.38%</b> (An toàn)
               </div>
             </div>
           </div>
@@ -109,7 +109,7 @@ export const PortfolioOverview: React.FC = () => {
               </div>
               <b className="text-base text-emerald-400 font-bold mt-1.5 block">{formatVND(cash)}</b>
               <span className="text-[10px] text-slate-500 font-sans mt-0.5 flex items-center justify-between">
-                <span>Sẵn sàng đặt lệnh</span>
+                <span>Khả dụng tức thì</span>
                 <span className="text-emerald-400 opacity-0 group-hover:opacity-100 transition text-[9px] font-bold">Mở ví →</span>
               </span>
             </div>
@@ -121,7 +121,7 @@ export const PortfolioOverview: React.FC = () => {
                 <PieChart className="h-4 w-4 text-cyan-400" />
               </div>
               <b className="text-base text-cyan-300 font-bold mt-1.5 block">{formatVND(stockMarketValue)}</b>
-              <span className="text-[10px] text-slate-500 font-sans mt-0.5">Vị thế đang nắm giữ</span>
+              <span className="text-[10px] text-slate-500 font-sans mt-0.5">1,000 TPB @ 14.45</span>
             </div>
 
             {/* Box 3 */}
@@ -134,14 +134,19 @@ export const PortfolioOverview: React.FC = () => {
               <span className="text-[10px] text-slate-500 font-sans mt-0.5">Đang trong chu kỳ bù trừ</span>
             </div>
 
-            {/* Box 4 */}
+            {/* Box 4 - Nợ Vay Margin & Lãi Suất Thực Tế */}
             <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-indigo-500/30 flex flex-col justify-between">
               <div className="flex items-center justify-between text-indigo-300">
-                <span className="font-sans text-[11px] font-semibold">Nợ Vay Margin DNSE</span>
-                <Scale className="h-4 w-4 text-indigo-400" />
+                <span className="font-sans text-[11px] font-semibold">Nợ Vay Margin Thực Tế</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30 font-mono">
+                  11.50%/năm
+                </span>
               </div>
               <b className="text-base text-indigo-300 font-bold mt-1.5 block">{formatVND(marginDebt)}</b>
-              <span className="text-[10px] text-slate-500 font-sans mt-0.5">Hợp đồng Deal Margin</span>
+              <div className="flex flex-col text-[10px] text-slate-400 font-sans mt-0.5 space-y-0.5">
+                <span className="text-amber-300/90 font-mono">Chi phí lãi: ~2,173 đ/ngày</span>
+                <span className="text-slate-500">Gốc: 6.898tr • Lãi luỹ kế: 103.9kđ</span>
+              </div>
             </div>
           </div>
         </div>

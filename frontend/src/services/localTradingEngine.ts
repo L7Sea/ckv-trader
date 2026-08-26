@@ -4,19 +4,23 @@ const PORTFOLIO_KEY = 'ckv_local_portfolio';
 const POSITIONS_KEY = 'ckv_local_positions';
 const TRANSACTIONS_KEY = 'ckv_local_transactions';
 
-/* ═══ KHỞI TẠO CHÍNH XÁC DANH MỤC & NGUỒN VỐN CỦA ANH HẢI (VIP Trader) THEO ẢNH 1 ═══
-   • Vốn thực có ban đầu: 8,891,893đ
-   • Vốn vay Margin (Deal): 6,898,107đ
-   • Vị thế: 1,000 TPB (Giá vốn: 15,918đ, Thị giá: 14,450đ, Lỗ: -1,465,943đ / -9.29%)
-   • Tài sản ròng (NAV): 7,551,893đ
+/* ═══ KHỞI TẠO CHÍNH XÁC DANH MỤC & NGUỒN VỐN CỦA ANH HẢI (VIP Trader) THEO DNSE 26/08/2026 ═══
+   • Tiền mặt khả dụng: 171đ
+   • Giá trị Cổ phiếu (1,000 TPB @ 14,450): 14,450,000đ
+   • Vốn vay Margin Deal gốc: 6,898,107đ
+   • Lãi vay Margin lũy kế: 103,944đ (Chi phí lãi ~1,888đ - 1,918đ/ngày)
+   • Tổng Nợ vay Margin DNSE: 7,002,051đ
+   • Tài sản ròng thực có (NAV): 7,448,120đ (Tổng tài sản 14,450,171đ - Nợ 7,002,051đ)
+   • Lãi/Lỗ chưa chốt Deal TPB: -1,468,116đ (-9.30%)
+   • Giá hòa vốn thực tế trên Deal DNSE: 15.920 (15,920đ/CP)
 ═══════════════════════════════════════════════════════════════════════════════════ */
 
 const initialPortfolio: Portfolio = {
-  cash: 0, // Tiền mặt đã giải ngân hết vào TPB
+  cash: 171, // Tiền mặt thực tế trên app DNSE
   receiving_cash: 0,
-  margin_debt: 6898107, // Vốn vay Deal Margin
-  total_equity: 7551893, // NAV = 14,450,000 - 6,898,107
-  total_profit_loss: -1465943, // Lỗ chưa chốt -9.29%
+  margin_debt: 7002051, // Tổng nợ Margin DNSE (gốc 6.898tr + lãi vay tích luỹ 103.9kđ)
+  total_equity: 7448120, // NAV thực có = 14,450,171 - 7,002,051 = 7,448,120đ
+  total_profit_loss: -1468116, // Lỗ chưa chốt Deal -9.30%
   current_simulated_date: new Date().toISOString().slice(0, 10),
   updated_at: new Date().toISOString()
 };
@@ -28,11 +32,11 @@ const initialPositions: Position[] = [
     available_quantity: 1000,
     t1_quantity: 0,
     t2_quantity: 0,
-    avg_price: 15918, // Giá hòa vốn 15.918
-    market_price: 14450, // Thị giá 14.45 (-1.03%)
+    avg_price: 15920, // Giá hòa vốn thực tế 15.920
+    market_price: 14450, // Thị giá 14.45 (0.00%)
     market_value: 14450000,
-    unrealized_pnl: -1465943,
-    unrealized_pnl_pct: -9.29,
+    unrealized_pnl: -1468116,
+    unrealized_pnl_pct: -9.30,
     target_price: 16500, // Mục tiêu kỳ vọng
     stop_loss: 13800, // Ngưỡng cắt lỗ bảo vệ
     updated_at: new Date().toISOString()
@@ -44,16 +48,16 @@ const initialTransactions: Transaction[] = [
     id: 'tx_tpb_init',
     type: 'BUY',
     symbol: 'TPB',
-    price: 15918,
+    price: 15920,
     quantity: 1000,
     fee: 23877,
     tax: 0,
-    total_amount: 15918000,
-    net_amount: 15941877,
+    total_amount: 15920000,
+    net_amount: 15943877,
     strategy: 'PULLBACK_MA20',
     target_price: 16500,
     stop_loss: 13800,
-    notes: 'Giải ngân 1,000 TPB (Vốn thực có 8.89tr + Vay margin Deal 6.89tr)',
+    notes: 'Vị thế 1,000 TPB (Vốn tự có ban đầu 8.89tr + Vay Margin Deal 6.89tr + Lãi vay tích luỹ)',
     timestamp: new Date(Date.now() - 86400000 * 5).toISOString(),
     trade_date: new Date(Date.now() - 86400000 * 5).toISOString().slice(0, 10)
   }
@@ -272,12 +276,33 @@ export const localTradingEngine = {
     const cashReceived = portfolio.receiving_cash;
     portfolio.cash += cashReceived;
     portfolio.receiving_cash = 0;
+
+    // Tính lãi vay Margin lũy kế theo ngày thực tế DNSE Deal (11.5%/năm ~ 2,173đ/ngày)
+    let marginInterestToday = 0;
+    if (portfolio.margin_debt > 0) {
+      marginInterestToday = Math.round((6898107 * 0.115) / 365); // Đúng 2,173đ/ngày
+      portfolio.margin_debt += marginInterestToday;
+      
+      // Cập nhật giá hòa vốn tương ứng cho vị thế nắm giữ
+      const tpbPos = positions.find((p) => p.symbol === 'TPB');
+      if (tpbPos && tpbPos.total_quantity > 0) {
+        tpbPos.avg_price = Math.round(tpbPos.avg_price + marginInterestToday / tpbPos.total_quantity);
+        tpbPos.unrealized_pnl = tpbPos.market_value - (14450000 + 1468116 + marginInterestToday);
+        tpbPos.unrealized_pnl_pct = (tpbPos.unrealized_pnl / (tpbPos.total_quantity * tpbPos.avg_price)) * 100;
+        tpbPos.updated_at = new Date().toISOString();
+      }
+    }
+
+    const stockValuation = positions.reduce((sum, p) => sum + p.market_value, 0);
+    const totalProfit = positions.reduce((sum, p) => sum + p.unrealized_pnl, 0);
+    portfolio.total_profit_loss = totalProfit;
+    portfolio.total_equity = portfolio.cash + portfolio.receiving_cash + stockValuation - portfolio.margin_debt;
     portfolio.updated_at = new Date().toISOString();
 
     this.savePositions(positions);
     this.savePortfolio(portfolio);
 
-    return `Đã chốt ngày T+2.5 thành công! +${cashReceived.toLocaleString()}đ tiền mặt khả dụng, +${movedShares.toLocaleString()} cổ phiếu khả dụng sẵn sàng bán.`;
+    return `Đã chốt ngày T+2.5 thành công! +${cashReceived.toLocaleString()}đ tiền mặt, +${movedShares.toLocaleString()} CP khả dụng. ${marginInterestToday > 0 ? `(Lãi vay Margin phát sinh: +${marginInterestToday.toLocaleString()}đ/ngày)` : ''}`;
   },
 
   adjustCash(amount: number, action: 'DEPOSIT' | 'WITHDRAW'): Portfolio {

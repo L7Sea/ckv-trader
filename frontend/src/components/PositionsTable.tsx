@@ -114,7 +114,7 @@ export const PositionsTable: React.FC = () => {
                         <button
                           onClick={() => setSelectedStock(pos.symbol, pos.market_price, 'BUY')}
                           className="px-2 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-[11px] font-sans font-semibold border border-emerald-500/20 transition"
-                          title="Mua thêm"
+                          title="Mua thêm vào form đặt lệnh"
                         >
                           Mua
                         </button>
@@ -122,9 +122,23 @@ export const PositionsTable: React.FC = () => {
                           onClick={() => setSelectedStock(pos.symbol, pos.market_price, 'SELL')}
                           disabled={pos.available_quantity <= 0}
                           className="px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-[11px] font-sans font-semibold border border-rose-500/20 transition disabled:opacity-30 disabled:cursor-not-allowed"
-                          title="Bán nhanh"
+                          title="Bán nhanh vào form đặt lệnh"
                         >
                           Bán
+                        </button>
+                        <button
+                          onClick={() => useTradingStore.getState().navigateToStock(pos.symbol, 'DECISION')}
+                          className="px-2 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-[11px] font-sans font-semibold border border-amber-500/20 transition"
+                          title="Chuyển sang Quản trị vị thế & Hòa vốn"
+                        >
+                          Hòa Vốn
+                        </button>
+                        <button
+                          onClick={() => useTradingStore.getState().navigateToStock(pos.symbol, 'MARKET')}
+                          className="px-2 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 text-[11px] font-sans font-semibold border border-cyan-500/20 transition"
+                          title="Chuyển sang Bảng giá & Biểu đồ nến"
+                        >
+                          Nến
                         </button>
                       </div>
                     </td>

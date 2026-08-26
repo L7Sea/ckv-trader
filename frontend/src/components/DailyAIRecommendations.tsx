@@ -19,7 +19,7 @@ import { useTradingStore } from '../store/useTradingStore';
 import { TOP_300_STOCKS, getDailyAIPicks, MarketStock300 } from '../services/top300Stocks';
 
 export const DailyAIRecommendations: React.FC = () => {
-  const { positions, setSelectedStock } = useTradingStore();
+  const { positions, setSelectedStock, navigateToStock } = useTradingStore();
   const [activeTab, setActiveTab] = useState<'DAILY_PICKS' | 'HEATMAP' | 'BREADTH'>('DAILY_PICKS');
 
   const { topHosePicks, portfolioDcaPicks } = getDailyAIPicks(positions);
@@ -156,13 +156,23 @@ export const DailyAIRecommendations: React.FC = () => {
                     <span className="text-slate-400 font-sans text-[11px]">
                       Dự kiến về bờ: <b className="text-white font-mono">{estDays} - {estDays + 2} phiên</b>
                     </span>
-                    <button
-                      onClick={() => setSelectedStock(stock.symbol, stock.price, 'BUY')}
-                      className="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold hover:bg-amber-400 transition flex items-center gap-1 font-sans"
-                    >
-                      <span>Soi Lệnh Gom</span>
-                      <ArrowUpRight className="h-3.5 w-3.5" />
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => navigateToStock(stock.symbol, 'DECISION')}
+                        className="px-2.5 py-1.5 rounded-xl bg-amber-500/10 text-amber-300 font-bold hover:bg-amber-500/20 border border-amber-500/30 transition text-xs font-sans"
+                        title="Xem kịch bản hòa vốn chi tiết"
+                      >
+                        Hòa Vốn
+                      </button>
+                      <button
+                        onClick={() => navigateToStock(stock.symbol, 'TRADE', 'BUY', dcaPrice)}
+                        className="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold hover:bg-amber-400 transition flex items-center gap-1 font-sans shadow"
+                        title="Chuyển sang form đặt lệnh mua gom"
+                      >
+                        <span>Đặt Lệnh Gom</span>
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -185,8 +195,9 @@ export const DailyAIRecommendations: React.FC = () => {
               {topHosePicks.map((stock) => (
                 <div
                   key={stock.symbol}
-                  onClick={() => setSelectedStock(stock.symbol, stock.price, 'BUY')}
+                  onClick={() => navigateToStock(stock.symbol, 'MARKET')}
                   className="p-3.5 rounded-2xl bg-[#121620] border border-[#212636] hover:border-emerald-500/40 transition cursor-pointer flex flex-col justify-between space-y-2 group shadow"
+                  title="Nhấn để xem Bảng giá & Biểu đồ nến kỹ thuật"
                 >
                   <div>
                     <div className="flex items-center justify-between">
@@ -217,10 +228,16 @@ export const DailyAIRecommendations: React.FC = () => {
                   </div>
 
                   <div className="flex items-center justify-between pt-1">
-                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
-                      {stock.aiSignal}
-                    </span>
-                    <span className="text-[11px] text-slate-400 group-hover:text-white flex items-center gap-0.5">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigateToStock(stock.symbol, 'TRADE', 'BUY');
+                      }}
+                      className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500 hover:text-slate-950 px-2 py-1 rounded transition font-sans"
+                    >
+                      Đặt Lệnh
+                    </button>
+                    <span className="text-[11px] text-slate-400 group-hover:text-cyan-300 flex items-center gap-0.5">
                       Soi nến <ArrowUpRight className="h-3 w-3" />
                     </span>
                   </div>

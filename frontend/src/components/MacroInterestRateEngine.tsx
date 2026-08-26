@@ -24,7 +24,10 @@ import {
   Clock,
 } from 'lucide-react';
 
+import { useTradingStore } from '@/store/useTradingStore';
+
 export default function MacroInterestRateEngine() {
+  const { syncAllUnifiedData, isLiveSyncing } = useTradingStore();
   const [activeTab, setActiveTab] = useState<'BANKS' | 'FINTECH' | 'VALUATION' | 'MARGIN_OPTIMIZER'>('BANKS');
   const [bankFilter, setBankFilter] = useState<'ALL' | 'BIG4' | 'TMCP_TOP1' | 'TMCP_MID'>('ALL');
   const [bankSubTab, setBankSubTab] = useState<'DEPOSIT' | 'LENDING' | 'SIMULATOR'>('DEPOSIT');
@@ -36,15 +39,11 @@ export default function MacroInterestRateEngine() {
     const now = new Date();
     return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} - ${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`;
   });
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const handleRefreshRates = () => {
-    setIsRefreshing(true);
-    setTimeout(() => {
-      const now = new Date();
-      setLastUpdated(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')} - ${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`);
-      setIsRefreshing(false);
-    }, 500);
+  const handleRefreshRates = async () => {
+    await syncAllUnifiedData();
+    const now = new Date();
+    setLastUpdated(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')} - ${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`);
   };
 
   const formatVND = (num: number) => {
@@ -159,11 +158,11 @@ export default function MacroInterestRateEngine() {
 
         <button
           onClick={handleRefreshRates}
-          disabled={isRefreshing}
+          disabled={isLiveSyncing}
           className="flex items-center justify-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition active:scale-95 disabled:opacity-50"
         >
-          <RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
-          <span>{isRefreshing ? 'Đang cập nhật...' : 'Cập Nhật Lãi Suất Tức Thì'}</span>
+          <RefreshCw size={12} className={isLiveSyncing ? 'animate-spin' : ''} />
+          <span>{isLiveSyncing ? 'Đang đồng bộ toàn diện...' : 'Đồng Bộ Toàn Diện'}</span>
         </button>
       </div>
 
@@ -640,8 +639,13 @@ export default function MacroInterestRateEngine() {
                     {sampleStocks.map((s) => {
                       const v = calculateMacroStockValuation(s);
                       return (
-                        <tr key={s.symbol} className="hover:bg-[#182236]/60 transition-colors">
-                          <td className="py-2 px-3 font-sans font-bold text-cyan-300 flex items-center gap-1.5">
+                        <tr
+                          key={s.symbol}
+                          onClick={() => useTradingStore.getState().navigateToStock(s.symbol, 'MARKET')}
+                          className="hover:bg-[#182236]/80 transition-colors cursor-pointer group"
+                          title="Nhấn để xem Bảng giá & Biểu đồ nến kỹ thuật"
+                        >
+                          <td className="py-2 px-3 font-sans font-bold text-cyan-300 group-hover:text-emerald-400 flex items-center gap-1.5">
                             {s.symbol}
                             <span className="text-[10px] px-1.5 py-0.2 bg-[#222c40] text-slate-300 rounded font-mono">{s.roe}% ROE</span>
                           </td>

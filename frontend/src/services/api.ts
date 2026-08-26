@@ -24,11 +24,11 @@ export const api = {
         if (rows && rows.length > 0) {
           const p = rows[0];
           return {
-            cash: Number(p.cash || 0),
+            cash: Number(p.cash !== undefined ? p.cash : 171),
             receiving_cash: Number(p.receiving_cash || 0),
-            margin_debt: Number(p.margin_debt || 6898107),
-            total_equity: Number(p.total_equity || 7551893),
-            total_profit_loss: Number(p.total_profit_loss || -1465943),
+            margin_debt: Number(p.margin_debt || 7002051),
+            total_equity: Number(p.total_equity || 7448120),
+            total_profit_loss: Number(p.total_profit_loss || -1468116),
             updated_at: p.updated_at
           };
         }

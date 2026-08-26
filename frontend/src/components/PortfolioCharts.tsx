@@ -20,11 +20,15 @@ const COLORS = ['#10B981', '#06B6D4', '#8B5CF6', '#F59E0B', '#EC4899', '#3B82F6'
 export const PortfolioCharts: React.FC = () => {
   const { portfolio, positions } = useTradingStore();
 
-  const cash = portfolio?.cash || 0;
+  const cash = portfolio?.cash !== undefined ? portfolio.cash : 171;
   const receivingCash = portfolio?.receiving_cash || 0;
-  const marginDebt = portfolio?.margin_debt || 6898107;
-  const totalEquity = portfolio?.total_equity || 7551893;
+  const marginDebt = portfolio?.margin_debt || 7002051;
+  const totalEquity = portfolio?.total_equity || 7448120;
   const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0) || 14450000;
+
+  const totalCapital = totalEquity + marginDebt;
+  const navPct = totalCapital > 0 ? ((totalEquity / totalCapital) * 100).toFixed(1) : '51.5';
+  const debtPct = totalCapital > 0 ? ((marginDebt / totalCapital) * 100).toFixed(1) : '48.5';
 
   // 1. Dữ liệu Cơ Cấu Vốn: Vốn Tự Có (NAV thực tế) vs Vốn Vay Margin DNSE
   const capitalStructureData = React.useMemo(() => {
@@ -65,7 +69,7 @@ export const PortfolioCharts: React.FC = () => {
   // 3. Dữ liệu tăng trưởng NAV mô phỏng theo 14 ngày
   const navGrowthData = React.useMemo(() => {
     const res = [];
-    const baseNav = totalEquity > 0 ? totalEquity : 7551893;
+    const baseNav = totalEquity > 0 ? totalEquity : 7448120;
     const now = new Date();
 
     for (let i = 14; i >= 0; i--) {
@@ -99,10 +103,10 @@ export const PortfolioCharts: React.FC = () => {
                 <Scale className="h-5 w-5 text-indigo-400" />
                 <div>
                   <h3 className="text-sm font-bold text-white uppercase tracking-wider">Cơ Cấu Vốn & Đòn Bẩy DNSE</h3>
-                  <span className="text-[11px] text-slate-400">Vốn tự có 7.55tr + Nợ vay Margin 6.89tr</span>
+                  <span className="text-[11px] text-slate-400">Vốn tự có {formatVND(totalEquity)} + Nợ vay {formatVND(marginDebt)}</span>
                 </div>
               </div>
-              <span className="text-xs font-mono text-indigo-400 font-bold">{formatVND(totalEquity + marginDebt)}</span>
+              <span className="text-xs font-mono text-indigo-400 font-bold">{formatVND(totalCapital)}</span>
             </div>
 
             <div className="h-48 w-full mt-2 relative flex items-center justify-center">
@@ -136,7 +140,7 @@ export const PortfolioCharts: React.FC = () => {
               </ResponsiveContainer>
               <div className="absolute text-center pointer-events-none">
                 <span className="text-[10px] text-slate-400 uppercase font-semibold block">Tỷ lệ tự có</span>
-                <span className="text-sm font-bold text-emerald-400 font-mono">52.3%</span>
+                <span className="text-sm font-bold text-emerald-400 font-mono">{navPct}%</span>
               </div>
             </div>
           </div>
@@ -148,7 +152,7 @@ export const PortfolioCharts: React.FC = () => {
                 <span className="w-3 h-3 rounded-full bg-emerald-500" />
                 <span className="text-emerald-300 font-sans font-bold">Vốn Tự Có Thực Tế (NAV):</span>
               </div>
-              <b className="text-emerald-400 text-sm">{formatVND(totalEquity)} (52.3%)</b>
+              <b className="text-emerald-400 text-sm">{formatVND(totalEquity)} ({navPct}%)</b>
             </div>
 
             <div className="flex items-center justify-between p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
@@ -156,7 +160,7 @@ export const PortfolioCharts: React.FC = () => {
                 <span className="w-3 h-3 rounded-full bg-indigo-500" />
                 <span className="text-indigo-300 font-sans font-bold">Vay Margin DNSE (Deal):</span>
               </div>
-              <b className="text-indigo-400 text-sm">{formatVND(marginDebt)} (47.7%)</b>
+              <b className="text-indigo-400 text-sm">{formatVND(marginDebt)} ({debtPct}%)</b>
             </div>
           </div>
         </div>

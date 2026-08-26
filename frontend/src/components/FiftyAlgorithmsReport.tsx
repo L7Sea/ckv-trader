@@ -110,10 +110,10 @@ export const FiftyAlgorithmsReport: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-wider font-sans">
-                HỆ THỐNG 150 THUẬT TOÁN & MÔ HÌNH ĐỊNH LƯỢNG
+                HỆ THỐNG THUẬT TOÁN & MÔ HÌNH ĐỊNH LƯỢNG
               </h2>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-mono font-bold">
-                150 MODELS
+                {prediction.algorithms.length} ALGOS
               </span>
             </div>
             <p className="text-xs text-slate-400">

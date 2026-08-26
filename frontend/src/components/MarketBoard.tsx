@@ -22,7 +22,7 @@ export const VN50_WATCHLIST = TOP_300_STOCKS;
 export type WatchlistStock = MarketStock300;
 
 export const MarketBoard: React.FC = () => {
-  const { setSelectedStock } = useTradingStore();
+  const { setSelectedStock, selectedSymbol } = useTradingStore();
   const [activeExchange, setActiveExchange] = useState<'ALL' | 'HOSE' | 'HNX' | 'UPCOM'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSector, setSelectedSector] = useState<string>('ALL');
@@ -48,7 +48,7 @@ export const MarketBoard: React.FC = () => {
 
   return (
     <div className="bg-[#0e1117] border border-[#212636] rounded-2xl shadow-xl overflow-hidden text-slate-200 space-y-4 p-4 sm:p-5">
-      {/* ══ HEADER: BẢNG GIÁ 300 CỔ PHIẾU ĐẦU NGÀNH ══ */}
+      {/* ══ HEADER: BẢNG GIÁ THỰC TẾ 300 CỔ PHIẾU ĐẦU NGÀNH ══ */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-4 border-b border-[#212636]">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -57,14 +57,14 @@ export const MarketBoard: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-base font-bold text-white font-sans uppercase">
-                BẢNG GIÁ 300 CỔ PHIẾU ĐẦU NGÀNH (100 HOSE • 100 HNX • 100 UPCOM)
+                BẢNG GIÁ THỰC TẾ 300 CỔ PHIẾU ĐẦU NGÀNH (HOSE • HNX • UPCOM)
               </h2>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono font-bold">
                 {filteredStocks.length} MÃ
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Chọn lọc cổ phiếu có thanh khoản, vốn hóa và chỉ số cơ bản dẫn đầu toàn thị trường
+              Dữ liệu giá khớp, khối lượng giao dịch và chỉ số cơ bản P/E, P/B, ROE. Nhấp dòng để soi nến kỹ thuật & sổ lệnh 3 cấp.
             </p>
           </div>
         </div>
@@ -148,11 +148,21 @@ export const MarketBoard: React.FC = () => {
               const isUp = stock.change > 0;
               const isDown = stock.change < 0;
               const priceColor = isUp ? 'text-[#0ecb81]' : isDown ? 'text-[#f6465d]' : 'text-[#f59e0b]';
+              const isSelected = selectedSymbol === stock.symbol;
 
               return (
-                <tr key={stock.symbol} className="hover:bg-[#181d29] transition group">
+                <tr
+                  key={stock.symbol}
+                  onClick={() => setSelectedStock(stock.symbol, stock.price, 'BUY')}
+                  className={`transition group cursor-pointer ${
+                    isSelected ? 'bg-emerald-500/10 border-l-2 border-emerald-400' : 'hover:bg-[#181d29]'
+                  }`}
+                >
                   <td className="py-2.5 px-3 font-black text-white text-sm">
-                    {stock.symbol}
+                    <div className="flex items-center gap-1.5">
+                      <span>{stock.symbol}</span>
+                      {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
+                    </div>
                   </td>
                   <td className="py-2.5 px-2 text-slate-300 font-sans max-w-[150px] truncate">
                     {stock.name}
@@ -201,7 +211,10 @@ export const MarketBoard: React.FC = () => {
                   </td>
                   <td className="py-2.5 px-3 text-center">
                     <button
-                      onClick={() => setSelectedStock(stock.symbol, stock.price, 'BUY')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedStock(stock.symbol, stock.price, 'BUY');
+                      }}
                       className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 font-sans font-bold transition text-[11px]"
                     >
                       Soi Nến

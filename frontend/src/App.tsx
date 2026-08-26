@@ -1,25 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { PortfolioOverview } from './components/PortfolioOverview';
-import { OrderForm } from './components/OrderForm';
-import { PositionsTable } from './components/PositionsTable';
-import { TransactionHistory } from './components/TransactionHistory';
-import { TechnicalChart } from './components/TechnicalChart';
-import { MarketBoard } from './components/MarketBoard';
-import { PortfolioCharts } from './components/PortfolioCharts';
-import { AnalyticsReport } from './components/AnalyticsReport';
-import { PositionDecisionEngine } from './components/PositionDecisionEngine';
-import { FiftyAlgorithmsReport } from './components/FiftyAlgorithmsReport';
-import { QuickRadarSearch } from './components/QuickRadarSearch';
-import { MarketIntelligenceDashboard } from './components/MarketIntelligenceDashboard';
-import { DailyAIRecommendations } from './components/DailyAIRecommendations';
-import MacroInterestRateEngine from './components/MacroInterestRateEngine';
+import { TradePositionsPage } from './pages/TradePositionsPage';
+import { PositionRiskPage } from './pages/PositionRiskPage';
+import { RadarAlgorithmsPage } from './pages/RadarAlgorithmsPage';
+import { MarketBoardChartPage } from './pages/MarketBoardChartPage';
+import { MacroRatesPage } from './pages/MacroRatesPage';
+import { MarketIntelligencePage } from './pages/MarketIntelligencePage';
+import { PortfolioAllocationPage } from './pages/PortfolioAllocationPage';
+import { PerformanceAnalyticsPage } from './pages/PerformanceAnalyticsPage';
+
 import { CashModal } from './components/CashModal';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
 import { PinLockScreen } from './components/PinLockScreen';
 import Capy from './components/Capy';
 import { BackgroundProvider } from './lib/backgroundContext';
-import { useTradingStore } from './store/useTradingStore';
+import { useTradingStore, TabType } from './store/useTradingStore';
 import {
   TrendingUp,
   LayoutGrid,
@@ -40,11 +36,8 @@ import {
   Landmark
 } from 'lucide-react';
 
-type TabType = 'TRADE' | 'DECISION' | 'ALGORITHMS' | 'MARKET' | 'MACRO' | 'INTELLIGENCE' | 'CHARTS' | 'ANALYTICS';
-
 export const AppContent: React.FC = () => {
-  const { fetchData, error, successMessage, clearMessages } = useTradingStore();
-  const [activeTab, setActiveTab] = useState<TabType>('TRADE');
+  const { activeTab, setActiveTab, fetchData, error, successMessage, clearMessages } = useTradingStore();
 
   useEffect(() => {
     fetchData();
@@ -85,107 +78,107 @@ export const AppContent: React.FC = () => {
         {/* 1. Tổng quan tài sản Super-App (Portfolio Master Card) */}
         <PortfolioOverview />
 
-        {/* Navigation Tabs Bar (Desktop & Tablet Pill Bar) */}
-        <div className="hidden md:flex items-center justify-between border-b border-[#212636] pb-2 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-1.5 p-1 bg-[#121620] rounded-2xl border border-[#212636] text-xs font-semibold backdrop-blur-md">
+        {/* Navigation Tabs Bar (Desktop & Tablet Pill Bar - Chống chồng chéo, cuộn ngang mượt mà) */}
+        <div className="hidden md:flex items-center justify-start border-b border-[#212636] pb-2 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1.5 p-1.5 bg-[#121620] rounded-2xl border border-[#212636] text-xs font-semibold backdrop-blur-md shrink-0">
             <button
               data-tab="TRADE"
               onClick={() => setActiveTab('TRADE')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'TRADE'
                   ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <TrendingUp className="h-4 w-4" />
-              <span>GIAO DỊCH & RADAR</span>
+              <span>SỔ LỆNH & VỊ THẾ</span>
             </button>
 
             <button
               data-tab="DECISION"
               onClick={() => setActiveTab('DECISION')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'DECISION'
                   ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <Scale className="h-4 w-4" />
-              <span>CHIẾN LƯỢC HÒA VỐN</span>
+              <span>QUẢN TRỊ VỊ THẾ & HÒA VỐN</span>
             </button>
 
             <button
               data-tab="ALGORITHMS"
               onClick={() => setActiveTab('ALGORITHMS')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'ALGORITHMS'
                   ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-500/20'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <Cpu className="h-4 w-4" />
-              <span>150 THUẬT TOÁN DỰ ĐOÁN</span>
+              <span>RADAR & THUẬT TOÁN ĐỊNH LƯỢNG</span>
             </button>
 
             <button
               data-tab="MARKET"
               onClick={() => setActiveTab('MARKET')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'MARKET'
                   ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/20'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
-              <span>BẢNG GIÁ 300 MÃ</span>
+              <span>BẢNG GIÁ THỰC TẾ & CHART</span>
             </button>
 
             <button
               data-tab="MACRO"
               onClick={() => setActiveTab('MACRO')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'MACRO'
                   ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/30'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
-              <Landmark className="h-4 w-4 text-emerald-400" />
-              <span>LÃI SUẤT & VĨ MÔ</span>
+              <Landmark className="h-4 w-4 text-emerald-300" />
+              <span>LÃI SUẤT VĨ MÔ & CHI PHÍ VỐN</span>
             </button>
 
             <button
               data-tab="INTELLIGENCE"
               onClick={() => setActiveTab('INTELLIGENCE')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'INTELLIGENCE'
                   ? 'bg-teal-500 text-slate-950 font-bold shadow-md shadow-teal-500/20'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <Newspaper className="h-4 w-4" />
-              <span>TIN TỨC & BCTC</span>
+              <span>PHÂN TÍCH THỊ TRƯỜNG & TIN TỨC</span>
             </button>
 
             <button
               data-tab="CHARTS"
               onClick={() => setActiveTab('CHARTS')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'CHARTS'
                   ? 'bg-purple-600 text-white font-bold shadow-md shadow-purple-500/20'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <PieChart className="h-4 w-4" />
-              <span>PHÂN BỔ NAV</span>
+              <span>PHÂN BỔ TÀI SẢN & NAV</span>
             </button>
 
             <button
               data-tab="ANALYTICS"
               onClick={() => setActiveTab('ANALYTICS')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'ANALYTICS'
                   ? 'bg-rose-500 text-white font-bold shadow-md shadow-rose-500/20'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
               }`}
             >
               <Award className="h-4 w-4" />
@@ -194,80 +187,15 @@ export const AppContent: React.FC = () => {
           </div>
         </div>
 
-        {/* TAB 1: GIAO DỊCH & VỊ THẾ & GỢI Ý HÀNG NGÀY */}
-        {activeTab === 'TRADE' && (
-          <div className="space-y-6">
-            {/* Gợi Ý Hàng Ngày & Bản Đồ Nhiệt Toàn Thị Trường */}
-            <DailyAIRecommendations />
-            <QuickRadarSearch />
-            <PositionDecisionEngine />
-            <TechnicalChart />
-            <div id="order-form-container" className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              <div className="lg:col-span-4 sticky top-20">
-                <OrderForm />
-              </div>
-              <div className="lg:col-span-8 space-y-6">
-                <PositionsTable />
-              </div>
-            </div>
-            <TransactionHistory />
-          </div>
-        )}
-
-        {/* TAB 2: THUẬT TOÁN HÒA VỐN TPB & DCA */}
-        {activeTab === 'DECISION' && (
-          <div className="space-y-6">
-            <PositionDecisionEngine />
-            <TechnicalChart />
-          </div>
-        )}
-
-        {/* TAB 3: HỆ THỐNG 150 THUẬT TOÁN DỰ ĐOÁN */}
-        {activeTab === 'ALGORITHMS' && (
-          <div className="space-y-6">
-            <QuickRadarSearch />
-            <FiftyAlgorithmsReport />
-          </div>
-        )}
-
-        {/* TAB 4: BẢNG GIÁ 300 CỔ PHIẾU ĐẦU NGÀNH (HOSE, HNX, UPCOM) */}
-        {activeTab === 'MARKET' && (
-          <div className="space-y-6">
-            <DailyAIRecommendations />
-            <MarketBoard />
-            <TechnicalChart />
-          </div>
-        )}
-
-        {/* TAB 5: HỆ THỐNG LÃI SUẤT VĨ MÔ & ĐỊNH GIÁ ERP CHI PHÍ VỐN */}
-        {activeTab === 'MACRO' && (
-          <div className="space-y-6">
-            <MacroInterestRateEngine />
-          </div>
-        )}
-
-        {/* TAB 6: TIN TỨC & BÁO CÁO TÀI CHÍNH BCTC DOANH NGHIỆP */}
-        {activeTab === 'INTELLIGENCE' && (
-          <div className="space-y-6">
-            <MacroInterestRateEngine />
-            <MarketIntelligenceDashboard />
-          </div>
-        )}
-
-        {/* TAB 6: PHÂN BỔ TÀI SẢN & BIỂU ĐỒ NAV */}
-        {activeTab === 'CHARTS' && (
-          <div className="space-y-6">
-            <PortfolioCharts />
-            <PositionsTable />
-          </div>
-        )}
-
-        {/* TAB 7: HIỆU SUẤT & XUẤT BÁO CÁO EXCEL */}
-        {activeTab === 'ANALYTICS' && (
-          <div className="space-y-6">
-            <AnalyticsReport />
-          </div>
-        )}
+        {/* 8 TRANG ĐỘC LẬP TƯƠNG ỨNG TỪNG FILE TRONG /src/pages/ */}
+        {activeTab === 'TRADE' && <TradePositionsPage />}
+        {activeTab === 'DECISION' && <PositionRiskPage />}
+        {activeTab === 'ALGORITHMS' && <RadarAlgorithmsPage />}
+        {activeTab === 'MARKET' && <MarketBoardChartPage />}
+        {activeTab === 'MACRO' && <MacroRatesPage />}
+        {activeTab === 'INTELLIGENCE' && <MarketIntelligencePage />}
+        {activeTab === 'CHARTS' && <PortfolioAllocationPage />}
+        {activeTab === 'ANALYTICS' && <PerformanceAnalyticsPage />}
       </main>
 
       {/* Floating Mascot Capy */}
@@ -283,7 +211,7 @@ export const AppContent: React.FC = () => {
             }`}
           >
             <TrendingUp className="h-4 w-4" />
-            <span className="text-[9px]">Lệnh</span>
+            <span className="text-[9px]">Sổ Lệnh</span>
           </button>
 
           <button
@@ -303,7 +231,7 @@ export const AppContent: React.FC = () => {
             }`}
           >
             <Cpu className="h-4 w-4" />
-            <span className="text-[9px]">150 Algos</span>
+            <span className="text-[9px]">Thuật Toán</span>
           </button>
 
           <button

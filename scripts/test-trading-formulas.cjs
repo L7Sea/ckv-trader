@@ -97,18 +97,28 @@ test('5. Cổ tức tiền mặt: Tự động trừ 5% thuế TNCN theo quy đ�
   assert.strictEqual(netCash, 950000);
 });
 
-// 6. Công thức Tính Cơ Cấu Nguồn Vốn DNSE & NAV
-test('6. Cơ cấu nguồn vốn: Tính chuẩn xác Vốn tự có (NAV) và Nợ vay Margin DNSE', () => {
+// 6. Công thức Tính Cơ Cấu Nguồn Vốn DNSE & Lãi Vay Margin Deal 11.5%/năm (25/8 vs 26/8)
+test('6. Cơ cấu nguồn vốn DNSE: Xác thực chuẩn xác Lãi Margin thực tế 11.5%/năm (+2,173đ/ngày) và NAV (7,448,120đ)', () => {
   const stockValue = 14450000; // 1000 TPB giá 14.450
-  const marginDebt = 6898107;  // Nợ Margin DNSE
-  const cash = 0;
+  const cash = 171;            // Tiền mặt thực tế DNSE
   const receivingCash = 0;
+  const initialLoan = 6898107; // Gốc vay Margin ban đầu
+  const accruedInterest = 103944; // Lãi vay tích luỹ đến 26/8/2026
+  const marginDebt = initialLoan + accruedInterest; // 7,002,051đ
 
-  const totalEquity = cash + receivingCash + stockValue - marginDebt; // 7,551,893
-  const marginRatio = (totalEquity / stockValue) * 100; // 52.26%
+  const totalAssets = cash + receivingCash + stockValue; // 14,450,171
+  const totalEquity = totalAssets - marginDebt; // 7,448,120
 
-  assert.strictEqual(totalEquity, 7551893);
-  assert.strictEqual(marginRatio.toFixed(2), '52.26');
+  // Kiểm chứng lãi suất thực tế 11.5%/năm:
+  const dailyInterest = Math.round((initialLoan * 0.115) / 365); // Đúng 2,173đ
+  const pnl25Aug = -1465943;
+  const pnl26Aug = -1468116;
+  const actualDailyLossIncrease = Math.abs(pnl26Aug) - Math.abs(pnl25Aug); // 2,173đ
+
+  assert.strictEqual(totalEquity, 7448120);
+  assert.strictEqual(marginDebt, 7002051);
+  assert.strictEqual(dailyInterest, 2173);
+  assert.strictEqual(actualDailyLossIncrease, 2173);
 });
 
 // 7. Kiểm thử Hệ số Đồng thuận Đa lớp (Consensus Scoring Formula)

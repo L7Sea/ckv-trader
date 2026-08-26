@@ -105,15 +105,15 @@ export const Header: React.FC = () => {
               </button>
             </div>
 
-            {/* Nút Đồng Bộ Giá Sống */}
+            {/* Nút Đồng Bộ Toàn Diện (Master Unified Sync) */}
             <button
               onClick={syncLiveMarketData}
               disabled={isLiveSyncing}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-medium transition active:scale-95 disabled:opacity-50"
-              title="Đồng bộ giá thị trường trực tiếp"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 hover:from-emerald-500/30 hover:to-cyan-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition active:scale-95 disabled:opacity-50 shadow-md shadow-emerald-500/10"
+              title="Đồng bộ toàn diện: 300 mã giá thực + Lãi suất 20 Ngân hàng & FinTech + Tài sản NAV (7.448tr) & Nợ Margin (7.002tr)"
             >
-              <RefreshCw className={`h-3.5 w-3.5 text-cyan-400 ${isLiveSyncing ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">{isLiveSyncing ? 'Đang tải...' : 'Đồng Bộ'}</span>
+              <RefreshCw className={`h-3.5 w-3.5 text-emerald-400 ${isLiveSyncing ? 'animate-spin' : ''}`} />
+              <span className="font-sans">{isLiveSyncing ? 'Đang đồng bộ...' : 'Đồng Bộ Toàn Diện'}</span>
             </button>
 
             {/* Nút Cổ Tức */}

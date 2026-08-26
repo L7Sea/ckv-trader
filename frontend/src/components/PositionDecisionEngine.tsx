@@ -6,6 +6,7 @@ import {
   ShieldCheck,
   Zap,
   ArrowRight,
+  ArrowUpRight,
   TrendingDown,
   Clock,
   DollarSign,
@@ -30,7 +31,7 @@ export const PositionDecisionEngine: React.FC = () => {
   const totalQuantity = heldPos?.total_quantity || 1000;
   const unrealizedPnL = heldPos ? heldPos.unrealized_pnl : (marketPrice - avgCostPrice) * totalQuantity;
   const unrealizedPnLPct = heldPos ? heldPos.unrealized_pnl_pct : ((marketPrice - avgCostPrice) / avgCostPrice) * 100;
-  const marginDebt = portfolio?.margin_debt || 6898107;
+  const marginDebt = portfolio?.margin_debt || 7002051;
 
   // State kịch bản mua thêm bình quân giá
   const [extraQty, setExtraQty] = useState<number>(1000);
@@ -130,8 +131,14 @@ export const PositionDecisionEngine: React.FC = () => {
         </div>
 
         <div className="p-3.5 bg-slate-950/80 rounded-2xl border border-indigo-500/30 flex flex-col justify-center">
-          <span className="text-[11px] text-indigo-300 font-sans font-semibold">Nợ vay Margin DNSE</span>
+          <div className="flex items-center justify-between text-indigo-300 font-sans text-[11px]">
+            <span className="font-semibold">Nợ Margin Thực Tế</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30 font-mono">
+              11.50%/năm
+            </span>
+          </div>
           <p className="text-base font-bold text-indigo-300 mt-1">{formatNumber(marginDebt)} đ</p>
+          <span className="text-[10px] text-amber-300/90 font-mono mt-0.5">Lãi vay: ~2,173 đ/ngày</span>
         </div>
       </div>
 
@@ -201,6 +208,14 @@ export const PositionDecisionEngine: React.FC = () => {
           <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-400 leading-relaxed font-sans min-h-[44px] flex items-center">
             💡 <b>Đánh giá:</b> Phù hợp khi VN-Index giữ vững hỗ trợ và bạn không muốn nạp thêm tiền.
           </div>
+
+          <button
+            onClick={() => useTradingStore.getState().navigateToStock(activeTicker, 'MARKET')}
+            className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 font-sans border border-slate-700"
+          >
+            <span>Soi Biểu Đồ & Sổ Lệnh</span>
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </button>
         </div>
 
         {/* KỊCH BẢN 2: MUA BÌNH QUÂN (DCA) */}
@@ -234,6 +249,14 @@ export const PositionDecisionEngine: React.FC = () => {
           <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300 leading-relaxed font-sans min-h-[44px] flex items-center relative z-10">
             ⭐ <b>Khuyến nghị AI:</b> Giảm một nửa thời gian về bờ khi mua gom ở vùng giá hỗ trợ.
           </div>
+
+          <button
+            onClick={() => useTradingStore.getState().navigateToStock(activeTicker, 'TRADE', 'BUY', extraPrice)}
+            className="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-bold text-xs rounded-xl hover:opacity-95 transition flex items-center justify-center gap-1.5 font-sans shadow-md shadow-emerald-500/20"
+          >
+            <span>Thực Hiện Mua Gom (DCA)</span>
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </button>
         </div>
 
         {/* KỊCH BẢN 3: CẮT LỖ KỶ LUẬT (HẠ MARGIN) */}
@@ -267,6 +290,14 @@ export const PositionDecisionEngine: React.FC = () => {
           <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-400 leading-relaxed font-sans min-h-[44px] flex items-center">
             🛡️ <b>Kỷ luật:</b> Giải phóng nợ vay DNSE để tránh chịu lãi vay ngày khi gãy hỗ trợ.
           </div>
+
+          <button
+            onClick={() => useTradingStore.getState().navigateToStock(activeTicker, 'TRADE', 'SELL')}
+            className="w-full py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 font-sans border border-rose-500/40"
+          >
+            <span>Đặt Lệnh Cắt Lỗ Hạ Margin</span>
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
     </div>

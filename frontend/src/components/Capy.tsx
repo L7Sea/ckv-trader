@@ -401,8 +401,8 @@ export default function Capy() {
 
     const pick = danhSachTop[Math.floor(Math.random() * danhSachTop.length)]!;
 
-    // 2. ĐỒNG BỘ TOÀN ỨNG DỤNG: Cập nhật mã được chọn trong TradingStore (TradingView, Sổ lệnh, Khung đặt lệnh)
-    useTradingStore.getState().setSelectedStock(pick.ma, pick.gia, 'BUY');
+    // 2. ĐỒNG BỘ TOÀN ỨNG DỤNG: Cập nhật mã & chuyển trực tiếp sang Tab Bảng Giá & Nến Kỹ Thuật
+    useTradingStore.getState().navigateToStock(pick.ma, 'MARKET', 'BUY', pick.gia);
 
     // 3. TẠO CÂU THOẠI THEO 4 PHONG CÁCH
     const st = getStyle();
