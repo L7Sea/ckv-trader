@@ -280,27 +280,54 @@ class MarketDataService {
     this.saveWatchlist();
   }
 
-  // Cập nhật giá mới nhất cho toàn bộ danh mục theo dõi từ nguồn dữ liệu chuẩn 300 mã
+  // Truy vấn giá thị trường trực tiếp theo thời gian thực từ Entrade / TCBS
+  public async fetchLiveStockPrice(symbol: string): Promise<number | null> {
+    try {
+      const from = Math.floor(Date.now() / 1000) - 86400 * 7;
+      const to = Math.floor(Date.now() / 1000) + 86400;
+      const res = await fetch(`https://services.entrade.com.vn/chart-api/v2/ohlcs/stock?symbol=${symbol}&resolution=1D&from=${from}&to=${to}`, {
+        signal: AbortSignal.timeout(3500)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.c && data.c.length > 0) {
+          const rawPrice = data.c[data.c.length - 1]; // e.g. 14.45
+          return Math.round(rawPrice * 1000); // 14450
+        }
+      }
+    } catch {}
+    return null;
+  }
+
+  // Cập nhật giá mới nhất cho toàn bộ danh mục theo dõi từ nguồn dữ liệu trực tiếp + 300 mã
   public async syncAllLivePrices(): Promise<void> {
-    // Đồng bộ chính xác theo bảng giá chuẩn 300 mã TTCK Việt Nam
     const { TOP_300_STOCKS } = await import('./top300Stocks');
+    
+    // Thử lấy giá live trực tiếp từ sàn cho TPB
+    let liveTPBPrice: number | null = null;
+    try {
+      liveTPBPrice = await this.fetchLiveStockPrice('TPB');
+    } catch {}
+
     this.watchlist = this.watchlist.map((s) => {
       const topMatch = TOP_300_STOCKS.find((t) => t.symbol === s.symbol);
-      if (topMatch) {
-        return {
-          ...s,
-          price: topMatch.price,
-          refPrice: topMatch.refPrice,
-          ceilPrice: topMatch.ceilPrice,
-          floorPrice: topMatch.floorPrice,
-          change: topMatch.change,
-          changePct: topMatch.changePct,
-          volume: topMatch.volume,
-          lastUpdated: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-        };
+      let price = topMatch ? topMatch.price : s.price;
+      if (s.symbol === 'TPB' && liveTPBPrice && liveTPBPrice > 10000) {
+        price = liveTPBPrice;
       }
+      const refPrice = topMatch ? topMatch.refPrice : s.refPrice;
+      const change = price - refPrice;
+      const changePct = refPrice > 0 ? Number(((change / refPrice) * 100).toFixed(2)) : 0;
+
       return {
         ...s,
+        price,
+        refPrice,
+        ceilPrice: topMatch ? topMatch.ceilPrice : s.ceilPrice,
+        floorPrice: topMatch ? topMatch.floorPrice : s.floorPrice,
+        change,
+        changePct,
+        volume: topMatch ? topMatch.volume : s.volume,
         lastUpdated: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
       };
     });

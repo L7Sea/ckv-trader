@@ -40,7 +40,8 @@ export interface Position {
   t1_quantity: number;        // Cổ phiếu T+1 (mua T-1)
   t2_quantity: number;        // Cổ phiếu T+2 (mua hôm nay T-0)
   total_quantity: number;     // available + t1 + t2
-  avg_price: number;          // Giá vốn bình quân gia quyền
+  avg_price: number;          // Giá vốn mua bình quân gia quyền ban đầu (15.790)
+  breakeven_price?: number;   // Giá hòa vốn Deal thực tế (15.920 - đã gồm lãi vay & phí)
   market_price: number;       // Giá thị trường
   market_value: number;       // total_quantity * market_price
   unrealized_pnl: number;     // Lãi/lỗ chưa thực hiện

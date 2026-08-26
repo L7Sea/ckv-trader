@@ -23,12 +23,12 @@ export const PortfolioCharts: React.FC = () => {
   const cash = portfolio?.cash !== undefined ? portfolio.cash : 171;
   const receivingCash = portfolio?.receiving_cash || 0;
   const marginDebt = portfolio?.margin_debt || 7002051;
-  const totalEquity = portfolio?.total_equity || 7398120;
-  const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0) || 14400000;
+  const totalEquity = portfolio?.total_equity || 7448120;
+  const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0) || 14450000;
 
   const totalCapital = totalEquity + marginDebt;
-  const navPct = totalCapital > 0 ? ((totalEquity / totalCapital) * 100).toFixed(1) : '51.22';
-  const debtPct = totalCapital > 0 ? ((marginDebt / totalCapital) * 100).toFixed(1) : '48.78';
+  const navPct = totalCapital > 0 ? ((totalEquity / totalCapital) * 100).toFixed(1) : '51.38';
+  const debtPct = totalCapital > 0 ? ((marginDebt / totalCapital) * 100).toFixed(1) : '48.62';
 
   // 1. Dữ liệu Cơ Cấu Vốn: Vốn Tự Có (NAV thực tế) vs Vốn Vay Margin DNSE
   const capitalStructureData = React.useMemo(() => {
@@ -69,7 +69,7 @@ export const PortfolioCharts: React.FC = () => {
   // 3. Dữ liệu tăng trưởng NAV mô phỏng theo 14 ngày
   const navGrowthData = React.useMemo(() => {
     const res = [];
-    const baseNav = totalEquity > 0 ? totalEquity : 7398120;
+    const baseNav = totalEquity > 0 ? totalEquity : 7448120;
     const now = new Date();
 
     for (let i = 14; i >= 0; i--) {

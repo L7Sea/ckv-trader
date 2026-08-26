@@ -35,7 +35,8 @@ export const PositionsTable: React.FC = () => {
                 <th className="pb-3 px-2 text-right text-emerald-400">Khả Dụng</th>
                 <th className="pb-3 px-2 text-right text-amber-400">T+1</th>
                 <th className="pb-3 px-2 text-right text-sky-400">T+2</th>
-                <th className="pb-3 px-2 text-right">Giá Vốn</th>
+                <th className="pb-3 px-2 text-right text-slate-300" title="Giá mua bình quân gia quyền ban đầu">Giá Vốn Mua</th>
+                <th className="pb-3 px-2 text-right text-amber-300" title="Giá hòa vốn Deal thực tế (đã bao gồm lãi vay Margin và phí thuế)">Giá Hòa Vốn</th>
                 <th className="pb-3 px-2 text-right">Giá Thị Trường</th>
                 <th className="pb-3 px-2 text-right">Tổng Giá Trị</th>
                 <th className="pb-3 px-2 text-right">Lãi / Lỗ</th>
@@ -45,6 +46,7 @@ export const PositionsTable: React.FC = () => {
             <tbody className="divide-y divide-slate-800/60">
               {positions.map((pos) => {
                 const isProfit = (pos.unrealized_pnl || 0) >= 0;
+                const breakevenVal = pos.breakeven_price || 15920;
                 return (
                   <tr key={pos.symbol} className="hover:bg-slate-800/40 transition group">
                     {/* Mã CP */}
@@ -74,9 +76,16 @@ export const PositionsTable: React.FC = () => {
                       {formatNumber(pos.t2_quantity)}
                     </td>
 
-                    {/* Giá vốn */}
-                    <td className="py-3.5 px-2 text-right text-slate-300">
-                      {formatNumber(pos.avg_price)}
+                    {/* Giá vốn mua ban đầu */}
+                    <td className="py-3.5 px-2 text-right font-semibold text-slate-300">
+                      {formatNumber(pos.avg_price || 15790)}
+                    </td>
+
+                    {/* Giá hòa vốn Deal (bao gồm lãi vay Margin và phí thuế) */}
+                    <td className="py-3.5 px-2 text-right font-bold text-amber-300">
+                      <span className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+                        {formatNumber(breakevenVal)}
+                      </span>
                     </td>
 
                     {/* Giá thị trường & nút sửa */}
