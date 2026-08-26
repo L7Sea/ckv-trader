@@ -270,29 +270,31 @@ export const OrderForm: React.FC = () => {
             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-emerald-500"
           />
           {/* Quick Quantity Shortcuts & 1.5% Risk Rule */}
-          <div className="grid grid-cols-5 gap-1 pt-1">
-            {[100, 500, 1000, 2000].map((q) => (
-              <button
-                key={q}
-                type="button"
-                onClick={() => setQuantity(q)}
-                className="py-1 rounded-lg bg-slate-950 border border-slate-800/80 text-[10px] font-mono text-slate-400 hover:text-white"
-              >
-                +{formatNumber(q)}
-              </button>
-            ))}
+          <div className="space-y-1.5 pt-1">
+            <div className="grid grid-cols-4 gap-1.5">
+              {[100, 500, 1000, 2000].map((q) => (
+                <button
+                  key={q}
+                  type="button"
+                  onClick={() => setQuantity(q)}
+                  className="py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300 hover:text-white font-semibold"
+                >
+                  +{formatNumber(q)}
+                </button>
+              ))}
+            </div>
             <button
               type="button"
               onClick={() => {
                 const nav = portfolio?.total_equity || 7448120;
                 const riskDist = price > stopLoss && stopLoss > 0 ? price - stopLoss : price * 0.07;
-                const safeQty = Math.max(100, Math.floor((nav * 0.015) / riskDist / 100) * 100);
+                const safeQty = Math.max(100, Math.floor((nav * 0.015) / Math.max(50, riskDist) / 100) * 100);
                 setQuantity(safeQty);
               }}
-              title="Tính khối lượng theo quy tắc quản trị rủi ro tối đa 1.5% NAV của Trader 50 năm"
-              className="py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-[10px] font-mono text-indigo-300 hover:bg-indigo-500/20 font-bold"
+              title="Tính khối lượng theo quy tắc quản trị rủi ro tối đa 1.5% NAV"
+              className="w-full py-2 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-mono text-indigo-300 font-bold flex items-center justify-center gap-1.5 transition active:scale-95"
             >
-              🎯 1.5% NAV
+              <span>🎯 Tính Khối Lượng An Toàn (1.5% NAV)</span>
             </button>
           </div>
         </div>
