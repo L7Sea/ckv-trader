@@ -64,6 +64,9 @@ export const OrderForm: React.FC = () => {
   const maxCashBuyQty = price > 0 ? Math.floor(cash / (price * 1.0015)) : 0;
   const maxMarginBuyQty = price > 0 ? Math.floor((cash * 2 + 50000000) / (price * 1.0015)) : 0;
 
+  const isBuyValid = price > 0 && quantity > 0 && (fundingSource !== 'CASH' || cash >= netAmount);
+  const isSellValid = price > 0 && quantity > 0 && availableShares >= quantity;
+
   const formatNumber = (num: number) => num.toLocaleString('vi-VN');
 
   const handleSubmit = async (e: React.FormEvent) => {
