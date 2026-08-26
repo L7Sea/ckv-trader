@@ -51,4 +51,12 @@
 - `npm --prefix frontend run build`: 100% sạch cảnh báo và 0 lỗi TypeScript.
 - **Triển khai thường trực**: Tự động commit chuẩn Conventional Commits và đẩy thẳng lên Cloudflare Pages / GitHub (`git push origin master`) sau mỗi lần cập nhật.
 
+---
+
+## 4. 🔄 CƠ CHẾ TỰ ĐỘNG CẬP NHẬT BỐI CẢNH (REAL-TIME CONTEXT EVOLUTION)
+Mỗi khi có thông tin tài chính mới, ảnh chụp màn hình hoặc công thức mới:
+1. **Ghi đè Single Source of Truth**: Cập nhật ngay file này (`tài liệu/CONTEXT.md`) để bảo đảm mọi phiên làm việc tiếp theo luôn đọc được bối cảnh chính xác nhất.
+2. **Cập nhật Test Suite**: Bổ sung kiểm thử vào `scripts/test-trading-formulas.cjs`.
+3. **Cập nhật Code & Tự Động Deploy**: Sửa logic code, build và push thẳng lên Cloudflare Pages.
+
 

@@ -32,5 +32,15 @@ Bất cứ khi nào khởi động phiên làm việc mới trên máy tính m�
   - Kích hoạt hội đồng tốn token (/akiflow).
   - Tải và thực thi các file binary không rõ nguồn gốc từ Internet.
 
-## 4. 📚 Bộ Kỹ Năng & Quy Tắc
-- Hướng dẫn kỹ năng Aki: [tài liệu/HUONG_DAN_SU_DUNG_SKILLS_VA_RULES_AKIDEVRULE.md](tài liệu/HUONG_DAN_SU_DUNG_SKILLS_VA_RULES_AKIDEVRULE.md).
+## 4. 📂 Phân Định Rạch Ròi Vai Trò 4 Tài Liệu Cốt Lõi (Tránh Trùng Lặp)
+1. **`GEMINI.md`** *(File này)*: Quy định hành vi, SOP khởi động máy mới, phân quyền và ranh giới hành động của AI Agent.
+2. **`tài liệu/CONTEXT.md`**: **Single Source of Truth** — Chứa toàn bộ tri thức nghiệp vụ, số liệu tài sản thực tế thời gian thực, ma trận lãi suất, cấu trúc 8 trang và công thức toán học.
+3. **`tài liệu/HUONG_DAN_SU_DUNG_SKILLS_VA_RULES_AKIDEVRULE.md`**: Cẩm nang kỹ thuật về 10 Skills, 18 Rules và phương pháp luận Aki.
+4. **`README.md`**: Bản giới thiệu dự án, Tech Stack, hướng dẫn khởi chạy 1-Click và luồng nghiệp vụ tổng quan.
+
+## 5. 🔄 Cơ Chế Tự Động Cập Nhật Bối Cảnh & Bộ Test (Continuous Context Evolution)
+Bất cứ khi nào Chủ nhân cung cấp thông tin mới (ảnh chụp số dư thực tế, lãi suất vay mới, công thức mới, thêm trang/mã mới):
+1. **Tự Động Cập Nhật Bối Cảnh**: Cập nhật ngay vào `tài liệu/CONTEXT.md` (và `README.md` nếu là thông số lớn) để tài liệu luôn phản ánh đúng 100% thực tế.
+2. **Tự Động Đồng Bộ Bộ Test**: Bổ sung test case tương ứng vào `scripts/test-trading-formulas.cjs` hoặc `scripts/test-sql-schema.cjs`.
+3. **Sửa Code & Chạy Test 100% Pass**: Đảm bảo code và test luôn đồng bộ với bối cảnh mới nhất.
+4. **Tự Động Đẩy Lên Cloudflare Pages**: Commit và `git push origin master` ngay lập tức.
