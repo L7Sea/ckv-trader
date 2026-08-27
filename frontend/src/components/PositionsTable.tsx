@@ -1,6 +1,7 @@
 import React from 'react';
 import { Layers, Edit3 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
+import { computePositionPnL } from '../services/dealModel';
 
 export const PositionsTable: React.FC = () => {
   const { positions, setSelectedStock, openPriceModal } = useTradingStore();
@@ -46,7 +47,13 @@ export const PositionsTable: React.FC = () => {
             <tbody className="divide-y divide-slate-800/60">
               {positions.map((pos) => {
                 const isProfit = (pos.unrealized_pnl || 0) >= 0;
-                const breakevenVal = pos.breakeven_price ?? Math.round((pos.avg_price || pos.market_price) * 1.004016);
+                /* Giá hòa vốn lấy từ dealModel (nguồn sự thật), không còn ước lượng
+                   bằng hệ số cố định khi thiếu dữ liệu — cách cũ từng khiến app hiện
+                   15.982 trong khi giá hòa vốn thật là 15.925. */
+                const breakevenVal =
+                  pos.breakeven_price ??
+                  computePositionPnL(pos.symbol, pos.total_quantity, pos.avg_price, pos.market_price, new Date())
+                    .breakevenPrice;
                 return (
                   <tr key={pos.symbol} className="hover:bg-slate-800/40 transition group">
                     {/* Mã CP */}

@@ -17,6 +17,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
+import { DEAL_CONFIG } from '../services/dealModel';
 
 export const HelpCenterModal: React.FC = () => {
   const {
@@ -31,12 +32,12 @@ export const HelpCenterModal: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'GUIDE' | 'CAPY_TOUR' | 'BROKERAGE' | 'CUSTOM_STOCKS' | 'FAQ'>('GUIDE');
   const [selectedBroker, setSelectedBroker] = useState<string>(user?.brokerage || 'DNSE');
-  const [customRate, setCustomRate] = useState<number>(user?.customMarginRate || 11.5);
+  const [customRate, setCustomRate] = useState<number>(user?.customMarginRate || DEAL_CONFIG.marginRateAnnual);
 
   if (!isHelpCenterOpen) return null;
 
   const BROKER_PRESETS = [
-    { code: 'DNSE', name: 'DNSE Entrade X', rate: 11.5, desc: 'Gói Deal Margin 11.5%/năm (hoặc gói 9.99%)' },
+    { code: 'DNSE', name: 'DNSE Entrade X', rate: 12.5, desc: 'Gói Deal Margin 12.5%/năm - mức đo được từ dư nợ thực tế' },
     { code: 'VPS', name: 'VPS SmartOne', rate: 13.5, desc: 'Lãi suất Margin phổ thông 13.5%/năm' },
     { code: 'TCBS', name: 'TCBS iCopy', rate: 10.5, desc: 'Gói Margin linh hoạt 10.5%/năm' },
     { code: 'SSI', name: 'SSI iBoard', rate: 12.0, desc: 'Lãi suất Margin tiêu chuẩn 12.0%/năm' },
@@ -213,7 +214,7 @@ export const HelpCenterModal: React.FC = () => {
                     <span>Cấu Hình Công Ty Chứng Khoán & Lãi Suất Margin</span>
                   </h4>
                   <span className="text-[10px] font-mono font-bold text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
-                    Đang chọn: {user?.brokerage || 'DNSE'} ({user?.customMarginRate || 11.5}%/năm)
+                    Đang chọn: {user?.brokerage || 'DNSE'} ({user?.customMarginRate || DEAL_CONFIG.marginRateAnnual}%/năm)
                   </span>
                 </div>
                 <p className="text-slate-300 text-[11px]">

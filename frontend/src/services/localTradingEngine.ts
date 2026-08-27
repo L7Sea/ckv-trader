@@ -1,53 +1,57 @@
 import { OrderRequestPayload, Portfolio, Position, Transaction } from '../types';
 import { wallpaperService } from './wallpaperService';
+import { DEAL_CONFIG, computeDealSnapshot, computePositionPnL, daysSinceOpen, marginDebtAt, vnDateString } from './dealModel';
 
 const PORTFOLIO_KEY = 'ckv_local_portfolio';
 const POSITIONS_KEY = 'ckv_local_positions';
 const TRANSACTIONS_KEY = 'ckv_local_transactions';
 const DATA_VERSION_KEY = 'ckv_data_version_lock';
-export const CURRENT_DATA_VERSION = '2026-08-26-1353-v6';
+export const CURRENT_DATA_VERSION = '2026-08-28-dealmodel-v7';
 
-/* ═══ KHỞI TẠO CHÍNH XÁC DANH MỤC & NGUỒN VỐN CỦA ANH HẢI (VIP Trader) THEO DNSE 26/08/2026 (13h53) ═══
-   • Tiền mặt khả dụng: 171đ
-   • Cổ phiếu: 1,000 TPB @ 14,600đ (14.60) -> Giá trị: 14,600,000đ
-   • Giá vốn mua bình quân ban đầu (từ 5 lệnh mua): 15.790 (15,790đ/CP)
-   • Giá hòa vốn Deal thực tế (gồm lãi vay + thuế phí): 15.920 (15,920đ/CP)
-   • Vốn vay Margin Deal gốc: 6,898,107đ
-   • Lãi vay Margin lũy kế: 103,944đ (Lãi suất thực tế 11.50%/năm ~ 2,173đ/ngày)
-   • Tổng Nợ vay Margin DNSE: 7,002,051đ
-   • Tài sản ròng thực có (NAV): 14,600,171 - 7,002,051 = 7,598,120đ
-   • Lãi/Lỗ chưa chốt Deal TPB: -1,418,116đ (-8.98%)
-   • Tỷ lệ tự có thực tế: 52.04%
-═══════════════════════════════════════════════════════════════════════════════════ */
+/* Giá tham chiếu cuối cùng đã biết của Deal (28/08/2026 06:26). Chỉ là mồi khởi tạo
+   khi chưa đồng bộ được giá thị trường — mọi con số tiền vẫn TÍNH từ dealModel,
+   tuyệt đối không hardcode ảnh chụp số dư như các phiên bản trước. */
+const LAST_KNOWN_DEAL_PRICE = 14700;
 
-const initialPortfolio: Portfolio = {
-  cash: 171, // Tiền mặt thực tế trên app DNSE
-  receiving_cash: 0,
-  margin_debt: 7002051, // Tổng nợ Margin DNSE (gốc 6.898tr + lãi vay tích luỹ 103.9kđ)
-  total_equity: 7598120, // NAV thực có = 14,600,171 - 7,002,051 = 7,598,120đ
-  total_profit_loss: -1418116, // Lỗ chưa chốt Deal
-  current_simulated_date: new Date().toISOString().slice(0, 10),
-  updated_at: new Date().toISOString()
-};
+/** Ngày hôm nay theo giờ Việt Nam — mọi mốc ngày trong app phải dùng hàm này. */
+const todayISO = () => vnDateString(new Date());
 
-const initialPositions: Position[] = [
-  {
-    symbol: 'TPB',
-    total_quantity: 1000,
-    available_quantity: 1000,
-    t1_quantity: 0,
-    t2_quantity: 0,
-    avg_price: 15790, // Giá vốn mua bình quân ban đầu 15.790
-    breakeven_price: 15920, // Giá hòa vốn Deal thực tế 15.920
-    market_price: 14600, // Thị giá 14.60 (13h53)
-    market_value: 14600000,
-    unrealized_pnl: -1418116,
-    unrealized_pnl_pct: -8.98,
-    target_price: 16500, // Mục tiêu kỳ vọng
-    stop_loss: 13800, // Ngưỡng cắt lỗ bảo vệ
+/** Dựng tổng quan tài sản của chủ tài khoản tại hiện tại, suy ra từ dealModel. */
+function buildAdminPortfolio(marketPrice = LAST_KNOWN_DEAL_PRICE): Portfolio {
+  const snap = computeDealSnapshot(marketPrice, new Date());
+  return {
+    cash: snap.cash,
+    receiving_cash: 0,
+    margin_debt: snap.marginDebt,
+    total_equity: snap.netAssetValue,
+    total_profit_loss: snap.unrealizedPnL,
+    current_simulated_date: todayISO(),
     updated_at: new Date().toISOString()
-  }
-];
+  };
+}
+
+/** Dựng vị thế Deal của chủ tài khoản tại hiện tại, suy ra từ dealModel. */
+function buildAdminPositions(marketPrice = LAST_KNOWN_DEAL_PRICE): Position[] {
+  const snap = computeDealSnapshot(marketPrice, new Date());
+  return [
+    {
+      symbol: DEAL_CONFIG.symbol,
+      total_quantity: DEAL_CONFIG.quantity,
+      available_quantity: DEAL_CONFIG.quantity,
+      t1_quantity: 0,
+      t2_quantity: 0,
+      avg_price: Math.round(DEAL_CONFIG.costBasisAtOpen / DEAL_CONFIG.quantity),
+      breakeven_price: snap.breakevenPrice,
+      market_price: marketPrice,
+      market_value: snap.stockValue,
+      unrealized_pnl: snap.unrealizedPnL,
+      unrealized_pnl_pct: snap.unrealizedPnLPct,
+      target_price: 16500,
+      stop_loss: 13800,
+      updated_at: new Date().toISOString()
+    }
+  ];
+}
 
 const initialTransactions: Transaction[] = [
   {
@@ -146,7 +150,7 @@ const emptyUserPortfolio: Portfolio = {
   margin_debt: 0,
   total_equity: 0,
   total_profit_loss: 0,
-  current_simulated_date: new Date().toISOString().slice(0, 10),
+  current_simulated_date: vnDateString(new Date()),
   updated_at: new Date().toISOString()
 };
 
@@ -192,14 +196,14 @@ export const localTradingEngine = {
     const keys = this.getStorageKeys();
     const data = localStorage.getItem(keys.portfolio);
     if (!data) {
-      const initial = isActiveUserAdmin ? initialPortfolio : emptyUserPortfolio;
+      const initial = isActiveUserAdmin ? buildAdminPortfolio() : emptyUserPortfolio;
       this.savePortfolio(initial);
       return initial;
     }
     try {
       return JSON.parse(data);
     } catch {
-      return isActiveUserAdmin ? initialPortfolio : emptyUserPortfolio;
+      return isActiveUserAdmin ? buildAdminPortfolio() : emptyUserPortfolio;
     }
   },
 
@@ -213,14 +217,14 @@ export const localTradingEngine = {
     const keys = this.getStorageKeys();
     const data = localStorage.getItem(keys.positions);
     if (!data) {
-      const initial = isActiveUserAdmin ? initialPositions : [];
+      const initial = isActiveUserAdmin ? buildAdminPositions() : [];
       this.savePositions(initial);
       return initial;
     }
     try {
       return JSON.parse(data);
     } catch {
-      return isActiveUserAdmin ? initialPositions : [];
+      return isActiveUserAdmin ? buildAdminPositions() : [];
     }
   },
 
@@ -252,14 +256,12 @@ export const localTradingEngine = {
 
   resetToUserExactData(): { portfolio: Portfolio; positions: Position[]; transactions: Transaction[] } {
     if (isActiveUserAdmin) {
-      this.savePortfolio(initialPortfolio);
-      this.savePositions(initialPositions);
+      const portfolio = buildAdminPortfolio(LAST_KNOWN_DEAL_PRICE);
+      const positions = buildAdminPositions(LAST_KNOWN_DEAL_PRICE);
+      this.savePortfolio(portfolio);
+      this.savePositions(positions);
       this.saveTransactions(initialTransactions);
-      return {
-        portfolio: initialPortfolio,
-        positions: initialPositions,
-        transactions: initialTransactions
-      };
+      return { portfolio, positions, transactions: initialTransactions };
     } else {
       this.savePortfolio(emptyUserPortfolio);
       this.savePositions([]);
@@ -270,6 +272,21 @@ export const localTradingEngine = {
         transactions: []
       };
     }
+  },
+
+  /** Dọn sạch hoàn toàn danh mục, chỉ giữ lại số tiền mặt khởi tạo do người dùng chọn. */
+  resetCleanSlate(startingCash = 0): { portfolio: Portfolio; positions: Position[]; transactions: Transaction[] } {
+    const portfolio: Portfolio = {
+      ...emptyUserPortfolio,
+      cash: Math.max(0, startingCash),
+      total_equity: Math.max(0, startingCash),
+      current_simulated_date: todayISO(),
+      updated_at: new Date().toISOString()
+    };
+    this.savePortfolio(portfolio);
+    this.savePositions([]);
+    this.saveTransactions([]);
+    return { portfolio, positions: [], transactions: [] };
   },
 
   placeOrder(payload: OrderRequestPayload): { transaction: Transaction; position: Position; portfolio: Portfolio } {
@@ -290,7 +307,7 @@ export const localTradingEngine = {
 
       if (funding === 'CASH') {
         if (portfolio.cash < totalRequired) {
-          throw new Error(`Sức mua tiền mặt không đủ (${portfolio.cash.toLocaleString()}đ)! Anh có thể chọn nguồn vốn 'Vay Margin Deal (11.5%)' hoặc Nạp tiền.`);
+          throw new Error(`Sức mua tiền mặt không đủ (${portfolio.cash.toLocaleString()}đ)! Anh có thể chọn nguồn vốn Vay Margin Deal hoặc Nạp tiền.`);
         }
         portfolio.cash -= totalRequired;
       } else if (funding === 'MARGIN_DEAL') {
@@ -312,7 +329,7 @@ export const localTradingEngine = {
           t1_quantity: 0,
           t2_quantity: quantity,
           avg_price: Math.round((grossAmount + fee) / quantity),
-          breakeven_price: Math.round((grossAmount + fee + (funding !== 'CASH' ? grossAmount * 0.01 : 0)) / quantity),
+          breakeven_price: Math.round((grossAmount + fee) / quantity),
           market_price: price,
           market_value: grossAmount,
           unrealized_pnl: grossAmount - (grossAmount + fee),
@@ -330,7 +347,7 @@ export const localTradingEngine = {
         const newAvg = newCost / newTotal;
 
         // Tính lại giá hòa vốn Deal mới sau khi mua thêm (DCA) - Không hardcode mã TPB
-        const defaultBreakeven = Math.round((existingPos.avg_price || price) * 1.004016);
+        const defaultBreakeven = existingPos.avg_price || price;
         const oldBreakevenCost = oldTotal * (existingPos.breakeven_price || defaultBreakeven);
         const newBreakevenCost = oldBreakevenCost + grossAmount + fee;
         const newBreakevenPrice = Math.round(newBreakevenCost / newTotal);
@@ -416,29 +433,47 @@ export const localTradingEngine = {
     return { transaction, position: activePos, portfolio };
   },
 
+  /**
+   * Đưa dư nợ Margin về đúng mức của NGÀY HÔM NAY theo dealModel.
+   * Trả về phần lãi vay chênh lệch vừa được ghi nhận thêm (có thể là 0).
+   * Chỉ áp dụng cho Deal gốc; nợ phát sinh do mua thêm bằng Margin giữ nguyên.
+   */
+  syncMarginDebtToToday(portfolio: Portfolio): number {
+    const expected = marginDebtAt(daysSinceOpen(new Date()));
+    const extraDebt = portfolio.margin_debt - marginDebtAt(daysSinceOpen(portfolio.current_simulated_date || todayISO()));
+    const target = expected + Math.max(0, Math.round(extraDebt));
+    const delta = target - portfolio.margin_debt;
+    portfolio.margin_debt = target;
+    portfolio.current_simulated_date = todayISO();
+    return delta;
+  },
+
   updateMarketPrice(symbol: string, market_price: number): Position {
     const positions = this.getPositions();
     const pos = positions.find((p) => p.symbol === symbol);
     if (!pos) throw new Error(`Không tìm thấy mã ${symbol} trong danh mục`);
 
+    const calc = computePositionPnL(pos.symbol, pos.total_quantity, pos.avg_price, market_price, new Date());
     pos.market_price = market_price;
     pos.market_value = pos.total_quantity * market_price;
-    const cost = pos.total_quantity * pos.avg_price;
-    pos.unrealized_pnl = pos.market_value - cost;
-    pos.unrealized_pnl_pct = cost > 0 ? (pos.unrealized_pnl / cost) * 100 : 0;
+    pos.unrealized_pnl = calc.pnl;
+    pos.unrealized_pnl_pct = calc.pnlPct;
+    pos.breakeven_price = calc.breakevenPrice;
     pos.updated_at = new Date().toISOString();
 
     this.savePositions(positions);
 
     const portfolio = this.getPortfolio();
+    this.syncMarginDebtToToday(portfolio);
     const stockValuation = positions.reduce((sum, p) => sum + p.market_value, 0);
+    portfolio.total_profit_loss = positions.reduce((sum, p) => sum + p.unrealized_pnl, 0);
     portfolio.total_equity = portfolio.cash + portfolio.receiving_cash + stockValuation - portfolio.margin_debt;
     this.savePortfolio(portfolio);
 
     return pos;
   },
 
-  settleDay(customMarginRate = 11.5): string {
+  settleDay(): string {
     const positions = this.getPositions();
     const portfolio = this.getPortfolio();
 
@@ -457,14 +492,14 @@ export const localTradingEngine = {
     portfolio.cash += cashReceived;
     portfolio.receiving_cash = 0;
 
-    // Tính lãi vay Margin lũy kế theo ngày thực tế dựa trên số dư nợ hiện hành
-    let marginInterestToday = 0;
-    if (portfolio.margin_debt > 0) {
-      marginInterestToday = Math.round((portfolio.margin_debt * (customMarginRate / 100)) / 365);
-      portfolio.margin_debt += marginInterestToday;
-      
+    /* Lãi vay Margin được tính lại theo SỐ NGÀY LỊCH THỰC kể từ ngày mở Deal
+       (lãi đơn trên dư nợ gốc), thay vì cộng thêm 1 ngày mỗi lần bấm nút như
+       phiên bản cũ — vốn khiến nợ đứng yên khi không bấm và nhảy vọt khi bấm
+       nhiều lần. */
+    const marginInterestToday = this.syncMarginDebtToToday(portfolio);
+    if (marginInterestToday !== 0) {
       // Phân bổ chi phí lãi vay vào giá hòa vốn theo TỶ TRỌNG VỐN (thay vì chia đều)
-      const totalMarginPositions = positions.filter((p) => p.total_quantity > 0);
+      const totalMarginPositions = positions.filter((p) => p.total_quantity > 0 && p.symbol !== DEAL_CONFIG.symbol);
       const totalStockValuation = totalMarginPositions.reduce((sum, p) => sum + (p.market_value || p.total_quantity * p.avg_price), 0);
       
       if (totalMarginPositions.length > 0 && totalStockValuation > 0) {
@@ -473,7 +508,7 @@ export const localTradingEngine = {
           const posWeight = posVal / totalStockValuation;
           const interestForPos = Math.round(marginInterestToday * posWeight);
           if (pos.total_quantity > 0) {
-            const currentBreakeven = pos.breakeven_price || Math.round(pos.avg_price * 1.004016);
+            const currentBreakeven = pos.breakeven_price || pos.avg_price;
             pos.breakeven_price = Math.round(currentBreakeven + (interestForPos / pos.total_quantity));
             pos.updated_at = new Date().toISOString();
           }
@@ -481,17 +516,15 @@ export const localTradingEngine = {
       }
     }
 
-    // Tăng ngày mô phỏng thêm 1 ngày giao dịch (bỏ qua Thứ 7 & Chủ Nhật)
-    try {
-      const curDate = new Date(portfolio.current_simulated_date || new Date());
-      curDate.setDate(curDate.getDate() + 1);
-      while (curDate.getDay() === 0 || curDate.getDay() === 6) {
-        curDate.setDate(curDate.getDate() + 1);
-      }
-      portfolio.current_simulated_date = curDate.toISOString().slice(0, 10);
-    } catch {}
+    for (const pos of positions) {
+      const calc = computePositionPnL(pos.symbol, pos.total_quantity, pos.avg_price, pos.market_price, new Date());
+      pos.unrealized_pnl = calc.pnl;
+      pos.unrealized_pnl_pct = calc.pnlPct;
+      pos.breakeven_price = calc.breakevenPrice;
+    }
 
     const stockValuation = positions.reduce((sum, p) => sum + p.market_value, 0);
+    portfolio.total_profit_loss = positions.reduce((sum, p) => sum + p.unrealized_pnl, 0);
     portfolio.total_equity = portfolio.cash + portfolio.receiving_cash + stockValuation - portfolio.margin_debt;
     portfolio.updated_at = new Date().toISOString();
 

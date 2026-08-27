@@ -15,6 +15,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
+import { DEAL_CONFIG } from '../services/dealModel';
 
 export const PositionDecisionEngine: React.FC = () => {
   const { positions, portfolio, watchlist, selectedSymbol, setSelectedStock } = useTradingStore();
@@ -142,7 +143,7 @@ export const PositionDecisionEngine: React.FC = () => {
           <div className="flex items-center justify-between text-indigo-300 font-sans text-[11px]">
             <span className="font-semibold">Nợ Margin Thực Tế</span>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30 font-mono">
-              11.50%/năm
+              {DEAL_CONFIG.marginRateAnnual.toFixed(2)}%/năm
             </span>
           </div>
           <p className="text-base font-bold text-indigo-300 mt-1">{formatNumber(marginDebt)} đ</p>

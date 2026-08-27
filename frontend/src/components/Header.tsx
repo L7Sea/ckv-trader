@@ -33,6 +33,7 @@ import { ShareAppModal } from './ShareAppModal';
 import { OnboardingTourModal } from './OnboardingTourModal';
 import { HelpCenterModal } from './HelpCenterModal';
 import { GoogleAuthPickerModal } from './GoogleAuthPickerModal';
+import { DEAL_CONFIG } from '../services/dealModel';
 
 export const Header: React.FC = () => {
   const { fetchData, settleDay, resetCleanSlate, isLoading, syncLiveMarketData, isLiveSyncing } = useTradingStore();
@@ -241,7 +242,7 @@ export const Header: React.FC = () => {
                       </p>
                       <p className="text-[11px] font-mono text-emerald-400">Email: {user?.email}</p>
                       <span className="text-[10px] font-bold text-slate-400">
-                        CTCK: <b className="text-purple-400">{user?.brokerage || 'DNSE'}</b> ({user?.customMarginRate || 11.5}%)
+                        CTCK: <b className="text-purple-400">{user?.brokerage || 'DNSE'}</b> ({user?.customMarginRate || DEAL_CONFIG.marginRateAnnual}%)
                       </span>
                     </div>
                   

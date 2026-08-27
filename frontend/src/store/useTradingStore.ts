@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { api } from '../services/api';
 import { localTradingEngine } from '../services/localTradingEngine';
 import { marketDataService, StockMarketInfo } from '../services/marketDataService';
+import { computePositionPnL, daysSinceOpen, marginDebtAt, vnDateString } from '../services/dealModel';
 import { OrderRequestPayload, Portfolio, Position, Transaction } from '../types';
 
 export type TabType = 'TRADE' | 'DECISION' | 'ALGORITHMS' | 'MARKET' | 'MACRO' | 'INTELLIGENCE' | 'CHARTS' | 'ANALYTICS';
@@ -136,8 +137,10 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   syncAllUnifiedData: async () => {
     set({ isLiveSyncing: true, error: null });
     try {
-      // 1. Đồng bộ dữ liệu giá thực tế 300 mã cổ phiếu
-      await marketDataService.syncAllLivePrices();
+      /* 1. Đồng bộ giá. Truyền kèm các mã ĐANG NẮM GIỮ để chắc chắn chúng được
+            lấy giá thực, kể cả khi chưa nằm trong danh mục theo dõi. */
+      const heldSymbols = get().positions.map((p) => p.symbol);
+      const priceSync = await marketDataService.syncAllLivePrices(heldSymbols);
       const updatedWatchlist = marketDataService.getWatchlist();
 
       // 2. Đồng bộ danh mục tài sản, vị thế và nợ margin
@@ -155,17 +158,10 @@ export const useTradingStore = create<TradingState>((set, get) => ({
         const livePrice = found ? found.price : pos.market_price;
         const marketVal = pos.total_quantity * livePrice;
         
-        // Đối với Deal TPB: Tính theo công thức chuẩn DNSE (bao gồm phí thuế và lãi vay tích luỹ 128.1k)
-        let pnl = 0;
-        let pnlPct = 0;
-        if (pos.symbol === 'TPB') {
-          pnl = marketVal - 15790000 - 128116; // -1,468,116đ khi ở 14.45; -1,418,116đ khi ở 14.50
-          pnlPct = (pnl / 15790000) * 100;
-        } else {
-          const cost = pos.total_quantity * pos.avg_price;
-          pnl = marketVal - cost;
-          pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
-        }
+        // Một công thức duy nhất cho mọi mã (dealModel là nguồn sự thật)
+        const calc = computePositionPnL(pos.symbol, pos.total_quantity, pos.avg_price, livePrice, new Date());
+        const pnl = calc.pnl;
+        const pnlPct = calc.pnlPct;
 
         totalStockVal += marketVal;
         totalProfit += pnl;
@@ -175,11 +171,19 @@ export const useTradingStore = create<TradingState>((set, get) => ({
           market_value: marketVal,
           unrealized_pnl: pnl,
           unrealized_pnl_pct: pnlPct,
+          breakeven_price: calc.breakevenPrice,
           updated_at: new Date().toISOString()
         };
       });
 
-      const actualMarginDebt = portfolio?.margin_debt !== undefined ? portfolio.margin_debt : 0;
+      /* Dư nợ được dựng lại theo số ngày thực kể từ ngày mở Deal, cộng phần nợ
+         phát sinh ngoài Deal (nếu có) — không bao giờ giữ nguyên số chụp cũ. */
+      const baselineDebt = marginDebtAt(daysSinceOpen(new Date()));
+      const extraDebt = Math.max(
+        0,
+        (portfolio?.margin_debt || 0) - marginDebtAt(daysSinceOpen(portfolio?.current_simulated_date || new Date()))
+      );
+      const actualMarginDebt = localTradingEngine.isAdmin() ? baselineDebt + extraDebt : (portfolio?.margin_debt || 0);
       const actualCash = portfolio?.cash !== undefined ? portfolio.cash : 0;
       const newEquity = actualCash + (portfolio?.receiving_cash || 0) + totalStockVal - actualMarginDebt;
       const updatedPortfolio: Portfolio = {
@@ -188,13 +192,15 @@ export const useTradingStore = create<TradingState>((set, get) => ({
         margin_debt: actualMarginDebt,
         total_equity: newEquity,
         total_profit_loss: totalProfit,
-        current_simulated_date: portfolio?.current_simulated_date || new Date().toISOString().slice(0, 10),
+        current_simulated_date: vnDateString(new Date()),
         updated_at: new Date().toISOString()
       };
 
-      // Lưu lại local trading engine
+      // Lưu local TRƯỚC, sau đó GHI NGƯỢC lên Supabase.
+      // Thiếu bước ghi ngược này là lý do mọi thay đổi bị số cũ trong DB ghi đè khi tải lại trang.
       localTradingEngine.savePortfolio(updatedPortfolio);
       localTradingEngine.savePositions(updatedPositions);
+      const persisted = await api.persistPortfolioState(updatedPortfolio, updatedPositions);
 
       set({
         watchlist: updatedWatchlist,
@@ -202,7 +208,7 @@ export const useTradingStore = create<TradingState>((set, get) => ({
         positions: updatedPositions,
         transactions,
         isLiveSyncing: false,
-        successMessage: `⚡ ĐỒNG BỘ TOÀN DIỆN THÀNH CÔNG: 300 mã giá thực (HOSE/HNX/UPCOM) + Lãi suất 20 Ngân hàng & FinTech + Tài sản NAV (${newEquity.toLocaleString('vi-VN')}đ) & Nợ Margin (${(updatedPortfolio.margin_debt).toLocaleString('vi-VN')}đ)!`
+        successMessage: `⚡ ĐỒNG BỘ ${persisted ? 'THÀNH CÔNG' : 'CỤC BỘ (chưa ghi được lên máy chủ)'}: ${priceSync.liveCount}/${priceSync.total} mã lấy được giá thực · NAV ${newEquity.toLocaleString('vi-VN')}đ · Nợ Margin ${updatedPortfolio.margin_debt.toLocaleString('vi-VN')}đ · Lãi/Lỗ ${totalProfit.toLocaleString('vi-VN')}đ`
       });
     } catch (e: any) {
       set({ isLiveSyncing: false, error: 'Lỗi đồng bộ toàn diện: ' + e.message });
@@ -240,12 +246,12 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   },
 
   resetCleanSlate: (startingCash = 0) => {
-    const clean = localTradingEngine.resetToUserExactData();
+    const clean = localTradingEngine.resetCleanSlate(startingCash);
     set({
       portfolio: clean.portfolio,
       positions: clean.positions,
       transactions: clean.transactions,
-      successMessage: 'Đã đồng bộ lại dữ liệu thực tế: 1,000 TPB, nợ margin 6.89tr, NAV 7.55tr.'
+      successMessage: `Đã dọn sạch danh mục. Tiền mặt khởi tạo: ${startingCash.toLocaleString('vi-VN')}đ.`
     });
   },
 
@@ -255,7 +261,7 @@ export const useTradingStore = create<TradingState>((set, get) => ({
       portfolio: exact.portfolio,
       positions: exact.positions,
       transactions: exact.transactions,
-      successMessage: 'Đã nạp chính xác danh mục thực tế: 1,000 TPB (Vốn thực có: 8.89tr, Nợ Margin: 6.89tr).'
+successMessage: `Đã nạp lại danh mục thực tế: ${exact.positions[0]?.total_quantity.toLocaleString('vi-VN') || 0} ${exact.positions[0]?.symbol || ''} · NAV ${exact.portfolio.total_equity.toLocaleString('vi-VN')}đ · Nợ ${exact.portfolio.margin_debt.toLocaleString('vi-VN')}đ.`
     });
   },
 
@@ -294,15 +300,7 @@ export const useTradingStore = create<TradingState>((set, get) => ({
       const updatedPos = await api.updateMarketPrice(symbol, price);
       set((state) => {
         const updatedPositions = state.positions.map((p) => (p.symbol === symbol ? updatedPos : p));
-        const totalStockVal = updatedPositions.reduce((sum, p) => sum + p.market_value, 0);
-        const newPortfolio = state.portfolio
-          ? {
-              ...state.portfolio,
-              total_equity: state.portfolio.cash + state.portfolio.receiving_cash + totalStockVal - state.portfolio.margin_debt,
-              total_profit_loss: updatedPositions.reduce((sum, p) => sum + p.unrealized_pnl, 0),
-              updated_at: new Date().toISOString()
-            }
-          : null;
+        const newPortfolio = localTradingEngine.getPortfolio();
 
         return {
           positions: updatedPositions,

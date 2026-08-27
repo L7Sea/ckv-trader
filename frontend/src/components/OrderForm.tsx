@@ -4,6 +4,7 @@ import { useTradingStore } from '../store/useTradingStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { TradeStrategy } from '../types';
 import { VN50_WATCHLIST } from './MarketBoard';
+import { DEAL_CONFIG } from '../services/dealModel';
 
 export const OrderForm: React.FC = () => {
   const {
@@ -18,7 +19,7 @@ export const OrderForm: React.FC = () => {
 
   const { user } = useAuthStore();
   const isCashAccount = user?.subAccount === '01';
-  const marginRate = user?.customMarginRate || 11.5;
+  const marginRate = user?.customMarginRate || DEAL_CONFIG.marginRateAnnual;
   const brokerageName = user?.brokerage || 'DNSE';
 
   const [type, setType] = useState<'BUY' | 'SELL'>('BUY');
@@ -88,7 +89,7 @@ export const OrderForm: React.FC = () => {
     if (quantity <= 0) return alert('Khối lượng phải lớn hơn 0');
 
     if (type === 'BUY' && fundingSource === 'CASH' && cash < netAmount) {
-      return alert(`Không đủ tiền mặt khả dụng! Cần ${formatNumber(netAmount)}đ, hiện có ${formatNumber(cash)}đ. Anh có thể chọn 'Vay Margin Deal (11.5%)' để giải ngân!`);
+      return alert(`Không đủ tiền mặt khả dụng! Cần ${formatNumber(netAmount)}đ, hiện có ${formatNumber(cash)}đ. Anh có thể chọn "Vay Margin Deal (${marginRate}%)" để giải ngân!`);
     }
 
     if (type === 'SELL' && availableShares < quantity) {
@@ -107,7 +108,7 @@ export const OrderForm: React.FC = () => {
       target_price: targetPrice > 0 ? targetPrice : undefined,
       stop_loss: stopLoss > 0 ? stopLoss : undefined,
       trade_date: tradeDate,
-      notes: notes || (fundingSource === 'MARGIN_DEAL' ? 'Giải ngân bằng Vốn Vay Margin Deal (11.5%)' : fundingSource === 'HYBRID' ? 'Giải ngân Hỗn Hợp (50% Tiền Mặt + 50% Margin)' : 'Mua bằng Tiền Mặt')
+      notes: notes || (fundingSource === 'MARGIN_DEAL' ? `Giải ngân bằng Vốn Vay Margin Deal (${marginRate}%)` : fundingSource === 'HYBRID' ? 'Giải ngân Hỗn Hợp (50% Tiền Mặt + 50% Margin)' : 'Mua bằng Tiền Mặt')
     });
 
     if (success) {

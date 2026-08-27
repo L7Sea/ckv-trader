@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 import { useAuthStore } from '../store/useAuthStore';
+import { DEAL_CONFIG, disbursedCapital } from '../services/dealModel';
 
 export const PortfolioOverview: React.FC = () => {
   const {
@@ -24,12 +25,12 @@ export const PortfolioOverview: React.FC = () => {
 
   const { user } = useAuthStore();
   const isCashAccount = user?.subAccount === '01';
-  const marginRate = user?.customMarginRate || 11.5;
+  const marginRate = user?.customMarginRate || DEAL_CONFIG.marginRateAnnual;
   const brokerageName = user?.brokerage || 'DNSE';
 
-  const cash = (portfolio?.cash !== undefined) ? portfolio.cash : (user?.role === 'ADMIN' ? 171 : 0);
+  const cash = portfolio?.cash || 0;
   const receivingCash = portfolio?.receiving_cash || 0;
-  const rawMarginDebt = portfolio?.margin_debt !== undefined ? portfolio.margin_debt : (user?.role === 'ADMIN' ? 7002051 : 0);
+  const rawMarginDebt = portfolio?.margin_debt || 0;
   const marginDebt = isCashAccount ? 0 : rawMarginDebt;
 
   const stockMarketValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0);
@@ -37,11 +38,19 @@ export const PortfolioOverview: React.FC = () => {
   const totalEquity = isCashAccount ? totalAssets : (totalAssets - marginDebt);
 
   const unrealizedPnL = positions.reduce((sum, p) => sum + (p.unrealized_pnl || 0), 0);
-  const totalInvestedStockCost = positions.reduce((sum, p) => sum + p.total_quantity * p.avg_price, 0);
-  const unrealizedPnLPct = totalInvestedStockCost > 0 ? (unrealizedPnL / totalInvestedStockCost) * 100 : 0;
+  /* Mẫu số phải TRÙNG với mẫu số dùng ở dòng vị thế, nếu không header và bảng sẽ
+     hiện hai phần trăm khác nhau cho cùng một khoản lỗ (lỗi cũ: -7.16% vs -7.22%). */
+  const holdsDeal = positions.some((p) => p.symbol === DEAL_CONFIG.symbol);
+  const pnlDenominator = holdsDeal
+    ? disbursedCapital()
+    : positions.reduce((sum, p) => sum + p.total_quantity * p.avg_price, 0);
+  const unrealizedPnLPct = pnlDenominator > 0 ? (unrealizedPnL / pnlDenominator) * 100 : 0;
   const equityRatio = totalAssets > 0 ? ((totalEquity / totalAssets) * 100).toFixed(2) : '100.00';
 
-  const dailyInterest = isCashAccount || marginDebt <= 0 ? 0 : Math.round(marginDebt * (marginRate / 100) / 365);
+  /* Lãi vay ngày tính trên dư nợ GỐC (lãi đơn) đúng như cách DNSE ghi nhận,
+     không tính trên dư nợ đã bao gồm lãi tích luỹ. */
+  const dailyInterest =
+    isCashAccount || marginDebt <= 0 ? 0 : Math.round((DEAL_CONFIG.principalLoan * (marginRate / 100)) / 365);
 
   const isProfit = unrealizedPnL >= 0;
 

@@ -7,12 +7,12 @@ export const CashModal: React.FC = () => {
   const [action, setAction] = useState<'DEPOSIT' | 'WITHDRAW' | 'REPAY_DEBT' | 'MANUAL_OVERRIDE'>('DEPOSIT');
   const [amount, setAmount] = useState<number>(10000000);
   const [customCash, setCustomCash] = useState<number>(portfolio?.cash || 171);
-  const [customDebt, setCustomDebt] = useState<number>(portfolio?.margin_debt || 7002051);
+  const [customDebt, setCustomDebt] = useState<number>(portfolio?.margin_debt || 0);
 
   if (!isCashModalOpen) return null;
 
   const currentCash = portfolio?.cash || 0;
-  const currentMarginDebt = portfolio?.margin_debt || 7002051;
+  const currentMarginDebt = portfolio?.margin_debt || 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
