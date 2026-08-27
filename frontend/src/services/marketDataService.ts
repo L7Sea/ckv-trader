@@ -31,6 +31,8 @@ export interface StockMarketInfo {
   dividendYield: number; // %
   lastUpdated: string;
   isCustom?: boolean;
+  /** true khi giá lấy được từ nguồn dữ liệu thực, false/undefined khi là giá tĩnh. */
+  isLivePrice?: boolean;
 }
 
 // Kho cơ sở dữ liệu gốc hơn 100+ mã chứng khoán phổ biến nhất TTCK Việt Nam
@@ -119,6 +121,11 @@ export const PRELOADED_VN_STOCKS: Record<string, Partial<StockMarketInfo>> = {
 };
 
 const WATCHLIST_STORAGE_KEY = 'CKV_CUSTOM_WATCHLIST_V2';
+
+/* Proxy Cloudflare Worker cho dữ liệu thị trường. Gọi thẳng Entrade/TCBS từ trình
+   duyệt bị CORS chặn, nên phải đi qua Worker (server-side). Để trống thì app chỉ
+   còn cách gọi thẳng và nhiều khả năng thất bại. */
+const MARKET_PROXY_BASE = (import.meta.env?.VITE_MARKET_PROXY_URL || '').replace(/\/$/, '');
 
 class MarketDataService {
   private watchlist: StockMarketInfo[] = [];
@@ -280,40 +287,78 @@ class MarketDataService {
     this.saveWatchlist();
   }
 
-  // Truy vấn giá thị trường trực tiếp theo thời gian thực từ Entrade / TCBS
+  /**
+   * Lấy giá khớp gần nhất của một mã.
+   *
+   * Gọi qua proxy Cloudflare Worker TRƯỚC (server-side không bị CORS chặn), chỉ khi
+   * proxy không dùng được mới gọi thẳng Entrade. Phiên bản cũ chỉ gọi thẳng từ trình
+   * duyệt nên gần như luôn bị CORS chặn, rơi vào catch rỗng và âm thầm dùng giá tĩnh.
+   *
+   * Dùng resolution=1 (nến 1 phút) thay vì 1D để có giá trong phiên, không phải giá
+   * đóng cửa ngày hôm trước.
+   */
   public async fetchLiveStockPrice(symbol: string): Promise<number | null> {
-    try {
-      const from = Math.floor(Date.now() / 1000) - 86400 * 7;
-      const to = Math.floor(Date.now() / 1000) + 86400;
-      const res = await fetch(`https://services.entrade.com.vn/chart-api/v2/ohlcs/stock?symbol=${symbol}&resolution=1D&from=${from}&to=${to}`, {
-        signal: AbortSignal.timeout(3500)
-      });
-      if (res.ok) {
+    const from = Math.floor(Date.now() / 1000) - 86400 * 5;
+    const to = Math.floor(Date.now() / 1000) + 3600;
+    const query = `symbol=${symbol}&resolution=1&from=${from}&to=${to}`;
+
+    const endpoints = [
+      MARKET_PROXY_BASE ? `${MARKET_PROXY_BASE}/api/market/ohlc?${query}` : null,
+      `https://services.entrade.com.vn/chart-api/v2/ohlcs/stock?${query}`
+    ].filter(Boolean) as string[];
+
+    for (const url of endpoints) {
+      try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+        if (!res.ok) continue;
         const data = await res.json();
-        if (data && data.c && data.c.length > 0) {
-          const rawPrice = data.c[data.c.length - 1]; // e.g. 14.45
-          return Math.round(rawPrice * 1000); // 14450
+        const closes = data?.c;
+        if (Array.isArray(closes) && closes.length > 0) {
+          const raw = Number(closes[closes.length - 1]);
+          if (!Number.isFinite(raw) || raw <= 0) continue;
+          // Entrade trả giá theo nghìn đồng (14.7) hoặc đồng (14700) tuỳ mã
+          return raw < 1000 ? Math.round(raw * 1000) : Math.round(raw);
         }
+      } catch {
+        // thử endpoint tiếp theo
       }
-    } catch {}
+    }
     return null;
   }
 
-  // Cập nhật giá mới nhất cho toàn bộ danh mục theo dõi từ nguồn dữ liệu trực tiếp + 300 mã
-  public async syncAllLivePrices(): Promise<void> {
+  /** Lấy giá thực cho nhiều mã song song, giới hạn để không quá tải nguồn dữ liệu. */
+  public async fetchLivePrices(symbols: string[]): Promise<Record<string, number>> {
+    const unique = Array.from(new Set(symbols)).slice(0, 40);
+    const out: Record<string, number> = {};
+    const BATCH = 8;
+    for (let i = 0; i < unique.length; i += BATCH) {
+      const chunk = unique.slice(i, i + BATCH);
+      const prices = await Promise.all(chunk.map((s) => this.fetchLiveStockPrice(s)));
+      chunk.forEach((sym, idx) => {
+        const price = prices[idx];
+        if (price && price > 0) out[sym] = price;
+      });
+    }
+    return out;
+  }
+
+  /**
+   * Cập nhật giá cho toàn bộ danh mục theo dõi.
+   * Ưu tiên GIÁ THỰC lấy được cho mọi mã (không chỉ riêng TPB như bản cũ);
+   * mã nào không lấy được mới rơi về bảng giá tĩnh TOP_300_STOCKS.
+   * Trả về số mã thực sự lấy được giá thực để UI báo cáo trung thực.
+   */
+  public async syncAllLivePrices(extraSymbols: string[] = []): Promise<{ liveCount: number; total: number }> {
     const { TOP_300_STOCKS } = await import('./top300Stocks');
-    
-    // Thử lấy giá live trực tiếp từ sàn cho TPB
-    let liveTPBPrice: number | null = null;
-    try {
-      liveTPBPrice = await this.fetchLiveStockPrice('TPB');
-    } catch {}
+
+    const symbols = [...extraSymbols, ...this.watchlist.map((s) => s.symbol)];
+    const livePrices = await this.fetchLivePrices(symbols);
 
     this.watchlist = this.watchlist.map((s) => {
       const topMatch = TOP_300_STOCKS.find((t) => t.symbol === s.symbol);
       let price = topMatch ? topMatch.price : s.price;
-      if (s.symbol === 'TPB' && liveTPBPrice && liveTPBPrice > 10000) {
-        price = liveTPBPrice;
+      if (livePrices[s.symbol]) {
+        price = livePrices[s.symbol];
       }
       const refPrice = topMatch ? topMatch.refPrice : s.refPrice;
       const change = price - refPrice;
@@ -328,10 +373,18 @@ class MarketDataService {
         change,
         changePct,
         volume: topMatch ? topMatch.volume : s.volume,
-        lastUpdated: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        lastUpdated: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        isLivePrice: Boolean(livePrices[s.symbol])
       };
     });
     this.saveWatchlist();
+    return { liveCount: Object.keys(livePrices).length, total: this.watchlist.length };
+  }
+
+  /** Giá thực gần nhất đã lấy được cho một mã, null nếu chưa có. */
+  public getLivePrice(symbol: string): number | null {
+    const found = this.watchlist.find((s) => s.symbol === symbol);
+    return found?.isLivePrice ? found.price : null;
   }
 }
 
