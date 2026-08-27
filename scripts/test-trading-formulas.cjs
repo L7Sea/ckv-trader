@@ -1,6 +1,13 @@
 /**
  * CKV PRO TRADER - CORE FORMULA & 150 QUANTITATIVE ALGORITHMS AUDIT TEST SUITE
  * Chạy kiểm thử: node scripts/test-trading-formulas.cjs
+ *
+ * PHẠM VI: các công thức nghiệp vụ độc lập (phí, thuế, T+2.5, chỉ báo định lượng).
+ *
+ * KHÔNG kiểm chứng mô hình tiền của Deal ở đây. Nguồn kiểm chứng duy nhất cho
+ * Nợ / NAV / Lãi lỗ / Giá hòa vốn là scripts/test-deal-model.mjs — file đó IMPORT
+ * đúng module app đang chạy và đối chiếu với ảnh chụp số dư thật trên DNSE.
+ * Các test dưới đây chỉ tái khẳng định hằng số đã hiệu chỉnh, không thay thế được.
  */
 
 const assert = require('assert');
@@ -97,37 +104,27 @@ test('5. Cổ tức tiền mặt: Tự động trừ 5% thuế TNCN theo quy đ�
   assert.strictEqual(netCash, 950000);
 });
 
-// 6. Công thức Tính Cơ Cấu Nguồn Vốn DNSE & Biến Động Thị Giá Realtime (9h42 26/8/2026)
-test('6. Cơ cấu nguồn vốn DNSE: Xác thực chuẩn xác Lãi Margin 11.5%, biến động giá TPB 14.50 (+50đ), NAV (7,498,120đ) và Lỗ Deal (-1,418,116đ)', () => {
-  const stockValue = 14500000; // 1000 TPB giá 14.50 (14,500đ)
-  const cash = 171;            // Tiền mặt thực tế DNSE
-  const receivingCash = 0;
-  const initialLoan = 6898107; // Gốc vay Margin ban đầu
-  const accruedInterest = 103944; // Lãi vay tích luỹ đến 26/8/2026
-  const marginDebt = initialLoan + accruedInterest; // 7,002,051đ
+// 6. Cơ cấu nguồn vốn DNSE — số liệu đã hiệu chỉnh trên 3 mốc số dư thật
+test('6. Cơ cấu nguồn vốn DNSE: Lãi vay 12.5%/năm (2,362đ/ngày), Nợ và NAV khớp ảnh 28/8/2026 06:26', () => {
+  const cash = 171;
+  const principalLoan = 6898107;   // Dư nợ GỐC, không đổi theo ngày
+  const daysHeld = 46;             // 13/07/2026 -> 28/08/2026
 
-  const totalAssets = cash + receivingCash + stockValue; // 14,500,171
-  const totalEquity = totalAssets - marginDebt; // 7,498,120đ (Khớp 100% ảnh Tab Tài sản 9h43)
+  // Lãi ĐƠN trên dư nợ gốc, cơ sở 365 ngày, làm tròn ở bước cuối
+  const accrued = Math.round((principalLoan * 0.125) / 365 * daysHeld);
+  const marginDebt = principalLoan + accrued;
 
-  // Kiểm chứng lãi suất thực tế 11.5%/năm:
-  const dailyInterest = Math.round((initialLoan * 0.115) / 365); // Đúng 2,173đ/ngày
-  const pnl25Aug = -1465943;
-  const pnl26AugRef = -1468116; // Khi TPB ở 14.45
-  const actualDailyLossIncrease = Math.abs(pnl26AugRef) - Math.abs(pnl25Aug); // 2,173đ
+  const stockValue = 1000 * 14700;
+  const nav = cash + stockValue - marginDebt;
 
-  const stockValueAt1440 = 1000 * 14400; // 14,400,000đ khi TPB ở 14.40 (-50đ)
-  const totalAssetsAt1440 = cash + receivingCash + stockValueAt1440; // 14,400,171đ
-  const totalEquityAt1440 = totalAssetsAt1440 - marginDebt; // 7,398,120đ (Khớp 100% ảnh Tab Trang chủ 10h11)
+  assert.strictEqual(accrued, 108669);
+  assert.strictEqual(marginDebt, 7006776);   // Khớp ảnh Tab Tài sản 28/8 06:25
+  assert.strictEqual(nav, 7693395);          // Khớp ảnh Tab Tài sản 28/8 06:25
 
-  // Khi TPB giảm -50đ từ tham chiếu về 14.40:
-  const priceLoss = (14400 - 14450) * 1000; // -50,000đ
-  const pnlLive1440 = pnl26AugRef + priceLoss; // -1,518,116đ (Khớp 100% ảnh Tab Deal 10h11)
-
-  assert.strictEqual(totalEquityAt1440, 7398120);
-  assert.strictEqual(pnlLive1440, -1518116);
-  assert.strictEqual(marginDebt, 7002051);
-  assert.strictEqual(dailyInterest, 2173);
-  assert.strictEqual(actualDailyLossIncrease, 2173);
+  // Lãi 1 ngày thực tế DNSE ghi nhận là 2,362-2,363đ, KHÔNG phải 2,173đ của mức 11.5%
+  const dayBefore = principalLoan + Math.round((principalLoan * 0.125) / 365 * 45);
+  assert.strictEqual(marginDebt - dayBefore, 2363);
+  assert.notStrictEqual(marginDebt - dayBefore, Math.round((principalLoan * 0.115) / 365));
 });
 
 // 7. Kiểm thử Hệ số Đồng thuận Đa lớp (Consensus Scoring Formula)
@@ -192,49 +189,42 @@ test('10. Tiền mặt chờ giải ngân: Tối ưu lợi suất linh hoạt kh
   assert.strictEqual(extraIncome, 2350000);
 });
 
-// 11. Giải Mã Chuẩn Xác Thuật Toán Deal DNSE (5 Lệnh Khớp Mua, Lãi Vay Tích Luỹ & Giá Hòa Vốn 15.920)
-test('11. Thuật toán Deal DNSE: Giải mã 5 lệnh mua TPB (15.79tr), Lãi vay tích luỹ (103.9k), Lỗ Deal (-1,418,116đ) và Giá hòa vốn (15.920)', () => {
-  // 5 lệnh khớp mua thực tế từ ảnh "Chi tiết deal":
+// 11. Giá vốn Deal tăng theo ngày nắm giữ (không còn hằng số 128,116 đóng băng)
+test('11. Thuật toán Deal DNSE: Giá vốn Deal 15,802,776 + 2,617đ/ngày, khớp Lãi chưa chốt 27/8 và 28/8', () => {
   const trades = [
-    { qty: 200, price: 16200 }, // 3,240,000đ (18/06/2026)
-    { qty: 200, price: 16200 }, // 3,240,000đ (09/07/2026)
-    { qty: 300, price: 15550 }, // 4,665,000đ (13/07/2026)
-    { qty: 200, price: 15500 }, // 3,100,000đ (13/07/2026)
-    { qty: 100, price: 15450 }  // 1,545,000đ (13/07/2026)
+    { qty: 200, price: 16200 },
+    { qty: 200, price: 16200 },
+    { qty: 300, price: 15550 },
+    { qty: 200, price: 15500 },
+    { qty: 100, price: 15450 }
   ];
-
-  const totalShares = trades.reduce((sum, t) => sum + t.qty, 0); // 1,000 CP
-  const initialCost = trades.reduce((sum, t) => sum + t.qty * t.price, 0); // 15,790,000đ
-  const avgCostPerShare = initialCost / totalShares; // 15,790đ/CP
+  const totalShares = trades.reduce((sum, t) => sum + t.qty, 0);
+  const disbursed = trades.reduce((sum, t) => sum + t.qty * t.price, 0);
 
   assert.strictEqual(totalShares, 1000);
-  assert.strictEqual(initialCost, 15790000);
-  assert.strictEqual(avgCostPerShare, 15790);
+  assert.strictEqual(disbursed, 15790000);
 
-  // Chi phí tài chính & Thuế phí Deal:
-  const estTaxesFees = 22916;     // Phí thuế dự tính
-  const estMarginInterest = 103944; // Lãi vay dự tính
-  const paidInterest = 1256;      // Lãi vay đã trả
-  const totalDealExpenses = estTaxesFees + estMarginInterest + paidInterest; // 128,116đ
+  // Giá vốn Deal tại ngày mở (N=0) và mức đội thêm mỗi ngày, hiệu chỉnh từ số thật
+  const costAtOpen = 15802776;
+  const dailyDealCost = 2617;
+  const costAt = (n) => costAtOpen + dailyDealCost * n;
 
-  // Thị giá 14.50 (14,500đ):
-  const marketPrice = 14500;
-  const currentValuation = totalShares * marketPrice; // 14,500,000đ
-  const purePricePnL = currentValuation - initialCost; // -1,290,000đ
+  // 27/8 (N=45, giá 14.70): DNSE hiện -1,220,541 (-7.73%)
+  const pnl27 = 1000 * 14700 - costAt(45);
+  assert.strictEqual(pnl27, -1220541);
+  assert.strictEqual(Number(((pnl27 / disbursed) * 100).toFixed(2)), -7.73);
 
-  // Lãi chưa chốt Deal thực tế:
-  const dealPnL = purePricePnL - totalDealExpenses; // -1,418,116đ
-  const dealPnLPct = (dealPnL / initialCost) * 100;  // -8.981% -> -8.99%
+  // 28/8 (N=46, giá 14.70): DNSE hiện -1,223,158 (-7.75%)
+  const pnl28 = 1000 * 14700 - costAt(46);
+  assert.strictEqual(pnl28, -1223158);
+  assert.strictEqual(Number(((pnl28 / disbursed) * 100).toFixed(2)), -7.75);
 
-  assert.strictEqual(currentValuation, 14500000);
-  assert.strictEqual(dealPnL, -1418116);
-  assert.strictEqual(dealPnLPct.toFixed(2), '-8.98');
+  // Giá đứng yên nhưng qua 1 ngày lỗ vẫn tăng đúng bằng chi phí Deal
+  assert.strictEqual(pnl27 - pnl28, dailyDealCost);
 
-  // Giá hòa vốn Deal:
-  const breakevenTargetRevenue = initialCost + totalDealExpenses + 1884; // Bù đắp thuế bán khi hòa vốn
-  const breakevenPrice = Math.round(breakevenTargetRevenue / totalShares); // 15,920đ
-
-  assert.strictEqual(breakevenPrice, 15920);
+  // Giá hòa vốn phải nhích lên theo ngày, không đứng yên ở 15.920
+  assert.strictEqual(Math.round(costAt(46) / totalShares), 15923);
+  assert.ok(Math.round(costAt(46) / 1000) > Math.round(costAt(45) / 1000));
 });
 
 // 12. Cơ Chế Giải Ngân Nguồn Vốn Margin Deal & Sức Mua Nở Ra (Purchasing Power Expansion)
@@ -280,15 +270,17 @@ test('12. Giải ngân Margin Deal: Kiểm chứng mua bằng Vốn tự có, Va
 });
 
 // 13. Tùy Biến CTCK & Lãi Suất Margin (VPS 13.5%, TCBS 10.5%, SSI 12%) vs Giao Dịch Thuần Tiền Mặt (TK 01)
-test('13. Tùy biến CTCK & Lãi Suất Margin: Kiểm chứng VPS (13.5%), TCBS (10.5%), DNSE (11.5%) & Chế độ Thuần Tiền Mặt (0% Lãi)', () => {
+test('13. Tùy biến CTCK & Lãi Suất Margin: Kiểm chứng DNSE (12.5% - đo thực tế), VPS (13.5%), TCBS (10.5%) & Chế độ Thuần Tiền Mặt (0% Lãi)', () => {
   const marginPrincipal = 6898107; // Gốc vay Deal thực tế 6.898tr
 
   // Lãi vay 1 ngày theo từng CTCK:
-  const dnseDailyInterest = Math.round(marginPrincipal * 0.115 / 365); // DNSE 11.5% -> 2,173đ/ngày
+  // 12.5% là mức ĐO ĐƯỢC từ chênh lệch dư nợ thật giữa 3 ngày liên tiếp trên app DNSE,
+  // không phải mức 11.5% ghi trong tài liệu cũ.
+  const dnseDailyInterest = Math.round(marginPrincipal * 0.125 / 365); // DNSE 12.5% -> 2,362đ/ngày
   const vpsDailyInterest = Math.round(marginPrincipal * 0.135 / 365);  // VPS 13.5%  -> 2,551đ/ngày
   const tcbsDailyInterest = Math.round(marginPrincipal * 0.105 / 365); // TCBS 10.5% -> 1,984đ/ngày
 
-  assert.strictEqual(dnseDailyInterest, 2173);
+  assert.strictEqual(dnseDailyInterest, 2362);
   assert.strictEqual(vpsDailyInterest, 2551);
   assert.strictEqual(tcbsDailyInterest, 1984);
 

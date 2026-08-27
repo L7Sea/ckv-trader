@@ -23,21 +23,49 @@
 3. **Mạng Lưới Điều Hướng Chéo (Cross-Navigation Engine)**:
    - `navigateToStock(symbol, targetTab, action, targetPrice)` kết nối tức thì giữa Tin tức / Gợi ý AI / Radar / Danh mục / Vĩ mô sang Bảng Giá & Nến Kỹ Thuật hoặc Sổ Lệnh / Hòa Vốn.
 
-4. **Dữ Liệu Tài Sản Thực Tế & Lãi Suất Vay Margin Deal (DNSE 26/08/2026 - 13h53 Phiên Chiều)**:
-   - **Vị thế**: 1,000 cổ phiếu TPB (Khả dụng: 1,000 CP).
-   - **Thị giá**: 14.60 (14,600 đ/CP) $\rightarrow$ Giá trị CP: **14,600,000 đ** (+150,000 đ).
-   - **Giá vốn mua bình quân ban đầu (Avg Cost)**: **15.790 (15,790 đ/CP)** (Tổng tiền 5 lệnh mua: 15,790,000 đ).
-   - **Giá hòa vốn Deal thực tế (Breakeven Price)**: **15.920 (15,920 đ/CP)** (Đã bù đắp đủ 15.79tr vốn + 103.9k lãi vay Margin + 24.1k thuế phí đóng deal).
-   - **Tiền mặt**: **171 đ**.
-   - **Gốc vay Deal ban đầu**: **6,898,107 đ** (tổng ứng 6,997,221đ - đã trả 99,114đ).
-   - **Lãi suất vay Margin Deal thực tế**: **11.50% / năm** ($\approx \mathbf{2,173 \text{ đ/ngày}}$).
-   - **Lãi vay tích luỹ qua các ngày**: **103,944 đ** (Lãi đã trả trước đó: 1,256đ, Phí thuế deal: 22,916đ).
-   - **Tổng Nợ Margin thực tế**: $6,898,107 + 103,944 = \mathbf{7,002,051 \text{ đ}}$.
-   - **Tài Sản Ròng Thực Có (NAV)**: $14,600,171 - 7,002,051 = \mathbf{7,598,120 \text{ đ}}$.
-   - **Lãi/Lỗ chưa chốt Deal**: **-1,418,116 đ (-8.98%)**.
-   - **Tỷ lệ tự có thực tế**: **52.04%**.
-   - **TradingView Pro Interactive Widget**: Tích hợp trực tiếp widget TradingView Advanced Realtime với toàn bộ công cụ kỹ thuật, khung thời gian (1m, 5m, 15m, 1h, 1D, 1W, 1M), bộ chỉ báo (RSI, MACD, MA, Bollinger Bands), và sàn HOSE, HNX, UPCOM.
-   - **Cơ chế Auto-Migration Cache**: Khóa phiên bản `ckv_data_version_lock` (`2026-08-26-1353-v6`) tự động đồng bộ LocalStorage client.
+4. **MÔ HÌNH TIỀN CỦA DEAL — NGUỒN SỰ THẬT DUY NHẤT**
+
+   Toàn bộ Nợ / NAV / Lãi lỗ / Giá hòa vốn được TÍNH từ `frontend/src/services/dealModel.ts`.
+   **Cấm hardcode ảnh chụp số dư ở bất kỳ file nào khác** — đó chính là nguyên nhân
+   khiến 4 nơi trong app từng hiện 4 con số khác nhau cho cùng một khoản tiền.
+
+   **Tham số gốc (bất biến của Deal):**
+   | Tham số | Giá trị | Nguồn |
+   |---|---|---|
+   | Mã / khối lượng | TPB / 1,000 CP | Sổ lệnh 5 lệnh khớp |
+   | Vốn tự có | 8,891,893 đ | Tab Deal DNSE |
+   | Dư nợ gốc vay | 6,898,107 đ | Tab Deal DNSE |
+   | Tổng giải ngân | 15,790,000 đ | 8,891,893 + 6,898,107 |
+   | Ngày mốc N=0 | 13/07/2026 | Ngày khớp 3 lệnh DCA cuối |
+   | Giá vốn Deal tại N=0 | 15,802,776 đ | Hồi quy từ số dư thật |
+   | Lãi suất vay | **12.5%/năm** (365 ngày) | Đo từ chênh lệch nợ 3 ngày liên tiếp |
+   | Chi phí Deal/ngày | 2,617 đ (2,362 lãi vay + 255 phí) | Hồi quy từ số dư thật |
+   | Tiền mặt | 171 đ | Tab Tài sản DNSE |
+
+   **Công thức (N = số ngày lịch kể từ 13/07/2026):**
+   - Lãi vay tích luỹ = `round(6,898,107 × 12.5% / 365 × N)` — lãi ĐƠN trên dư nợ GỐC
+   - Tổng nợ Margin = `6,898,107 + lãi vay tích luỹ`
+   - Giá vốn Deal = `15,802,776 + 2,617 × N`
+   - Lãi/Lỗ chưa chốt = `KL × Thị giá − Giá vốn Deal`
+   - % Lãi/Lỗ = `Lãi lỗ / 15,790,000` (mẫu số là VỐN GIẢI NGÂN, đúng quy ước DNSE)
+   - NAV = `Tiền mặt + KL × Thị giá − Tổng nợ Margin`
+   - Giá hòa vốn = `Giá vốn Deal / KL`
+
+   **Đối chiếu 3 mốc số dư thật (khớp tới từng đồng):**
+   | Mốc | N | Thị giá | Nợ thật / mô hình | NAV thật / mô hình | Lãi lỗ thật / mô hình |
+   |---|---|---|---|---|---|
+   | 26/08/2026 13:53 | 44 | 14,600 | 7,002,051 = 7,002,051 | 7,598,120 = 7,598,120 | (không có ảnh) |
+   | 27/08/2026 15:43 | 45 | 14,700 | 7,004,413 = 7,004,413 | 7,695,758 = 7,695,758 | −1,220,541 = −1,220,541 (−7.73%) |
+   | 28/08/2026 06:26 | 46 | 14,700 | 7,006,776 = 7,006,776 | 7,693,395 = 7,693,395 | −1,223,158 = −1,223,158 (−7.75%) |
+
+   **Hai hiệu chỉnh quan trọng so với tài liệu cũ:**
+   1. Lãi suất vay thật là **12.5%/năm (2,362 đ/ngày)**, không phải 11.5% (2,173 đ/ngày).
+   2. Ngoài lãi vay, DNSE còn cộng **~255 đ/ngày** phí Deal vào giá vốn. Bằng chứng: ngày
+      27/8 và 28/8 giá TPB đứng yên 14,700 nhưng lãi chưa chốt vẫn xấu đi 2,617 đ.
+
+   - **TradingView Pro Interactive Widget**: iframe nhúng để XEM biểu đồ. Không đọc được
+     dữ liệu giá từ iframe (Same-Origin Policy) — giá thực lấy qua proxy Worker, xem mục 6.
+   - **Cơ chế Auto-Migration Cache**: Khóa phiên bản `ckv_data_version_lock` (`2026-08-28-dealmodel-v7`).
 
 ---
 
@@ -62,7 +90,7 @@
 ## 4. 👥 KIẾN TRÚC ĐA NGƯỜI DÙNG, TÙY CHỌN CTCK & TRUNG TÂM HƯỚNG DẪN
 - **👑 Tài khoản Chủ Nhân (Admin VIP)**: Giữ trọn vẹn số dư tài sản thực tế (1,000 TPB, nợ Margin 7.002tr, NAV 7.448tr). Có quyền mở Admin Panel để giám sát danh sách người dùng và trả lời tin nhắn trực tiếp.
 - **👤 Người Dùng Mới (Guest / New Trader)**: Tự do tạo tài khoản bằng Email/Mật khẩu hoặc Đăng nhập 1-Click Google. Khởi tạo sạch sẽ từ 0đ (Tiền mặt: 0đ, Nợ: 0đ, Danh mục: Rỗng) để tự trải nghiệm độc lập.
-- **🏦 Tùy Chọn CTCK & Lãi Suất Margin**: Tùy chỉnh lãi suất gói vay theo DNSE (11.5%), VPS (13.5%), TCBS (10.5%), SSI (12.0%), VNDirect (12.8%) hoặc tỷ lệ tùy ý.
+- **🏦 Tùy Chọn CTCK & Lãi Suất Margin**: Tùy chỉnh lãi suất gói vay theo DNSE (12.5% - mức đo được từ dư nợ thực tế), VPS (13.5%), TCBS (10.5%), SSI (12.0%), VNDirect (12.8%) hoặc tỷ lệ tùy ý.
 - **🛡️ Chế Độ Thuần Tiền Mặt (Tiểu khoản 01)**: Tự động triệt tiêu toàn bộ nợ Margin, tiền lãi vay = 0đ/ngày, giá hòa vốn thuần túy chỉ gồm thuế phí 0.25%.
 - **🔍 Nạp Mã Lạ & Sàn UPCOM**: Tự động fetch live giá từ sàn Entrade/TCBS API hoặc cho phép nhập/chỉnh giá thủ công linh hoạt.
 - **📖 Trung Tâm Hướng Dẫn & Cẩm Nang Tương Tác (Help Center)**: Hướng dẫn chi tiết 4 chuyên đề, FAQ, và nút gọi lại Onboarding Tour / Chat Admin.
@@ -113,7 +141,7 @@
 - **Tự động nhận diện Chủ Nhân Admin VIP qua Email**:
   - Email Master độc quyền: **`leminhhaia5890@gmail.com`**.
   - Mã tài khoản độc quyền của Admin: **`026A00000`**.
-  - Toàn bộ danh mục thực tế của Chủ nhân (**1,000 TPB @ 14.60, NAV 7,598,120 đ, Nợ Margin 7,002,051 đ, Tiền mặt 171 đ**) được bảo vệ độc quyền 100%.
+  - Toàn bộ danh mục thực tế của Chủ nhân (**1,000 TPB, Tiền mặt 171 đ**, Nợ/NAV tính động theo `dealModel.ts`) được bảo vệ độc quyền 100%.
 - **Quy luật tạo Mã Số Tài Khoản Thành Viên (Năm Động + Chữ Cái Đầu Tên Chính + 5 Số Ngẫu Nhiên)**:
   - **Tiền tố năm**: 3 số cuối của năm đăng ký (Năm 2026 là `026`, Năm 2027 là `027`, Năm 2123 là `123`...).
   - **Chữ cái Tên Chính**: Lấy chữ cái in hoa đầu tiên của **Tên Chính** (từ cuối cùng trong họ tên, hoặc từ duy nhất nếu chỉ có 1 tên như "Minh", khử dấu tiếng Việt):
@@ -155,6 +183,39 @@
     - **Quản Trị Admin (AdminPanelModal)**: Thêm Empty State minh họa khi chưa có thành viên phụ đăng ký.
 14. **Bộ Test Bắt Buộc 100% Pass**: 20/20 Test Định lượng & Vĩ mô PASS, 17/17 Test SQL Schema PASS, Vite 6 Production Build Sạch 100%.
 
+---
 
+## 6. 📡 DỮ LIỆU THỊ TRƯỜNG THỜI GIAN THỰC
 
+**Vì sao không lấy được số liệu từ TradingView:** widget nhúng `s.tradingview.com/widgetembed`
+là iframe khác origin — trình duyệt chặn tuyệt đối việc JavaScript đọc dữ liệu bên trong.
+Widget miễn phí cũng không cung cấp API trả giá ra ngoài. Nó chỉ để NHÌN.
 
+**Đường lấy giá thật (đã triển khai):**
+1. `marketDataService.fetchLiveStockPrice(symbol)` gọi endpoint `/api/market/ohlc` của
+   Cloudflare Worker (`backend/src/worker.ts`). Worker chạy server-side nên **không vướng CORS**.
+2. Worker proxy sang `services.entrade.com.vn` với `resolution=1` (nến 1 phút) — giá trong
+   phiên, không phải giá đóng cửa ngày như bản cũ dùng `resolution=1D`.
+3. Không cấu hình được proxy thì gọi thẳng Entrade (nhiều khả năng bị CORS chặn).
+4. `syncAllLivePrices(heldSymbols)` lấy giá cho **mọi mã đang nắm giữ và cả watchlist**,
+   không chỉ riêng TPB như bản cũ. Trả về `{ liveCount, total }` để UI báo cáo trung thực
+   bao nhiêu mã thực sự lấy được giá thực.
+
+**Cấu hình:** đặt `VITE_MARKET_PROXY_URL` trong `frontend/.env` trỏ tới domain Worker đã deploy.
+
+**Giới hạn còn lại:** app vẫn cập nhật theo lần bấm nút, chưa có WebSocket/polling tự động.
+
+---
+
+## 7. 🧪 NGUYÊN TẮC KIỂM THỬ (bài học từ bộ test cũ)
+
+Bộ test cũ khai báo hằng số ngay trong test rồi assert lại chính hằng số đó
+(`const marginDebt = 6898107 + 103944; assert(marginDebt === 7002051)`). Kiểu test này
+**luôn PASS kể cả khi app sai hoàn toàn** — nó từng báo 20/20 PASS trong khi test khẳng định
+NAV 7,498,120 còn app hardcode 7,598,120.
+
+**Quy tắc bắt buộc từ nay:**
+1. Test về tiền phải **import đúng module app đang chạy**, không được chép lại công thức.
+2. Chuẩn đối chiếu là **ảnh chụp số dư thật trên DNSE**, không phải kỳ vọng của lập trình viên.
+3. `scripts/test-deal-model.mjs` là nguồn kiểm chứng duy nhất cho Nợ / NAV / Lãi lỗ / Hòa vốn.
+4. Có test quét mã nguồn chặn hằng số ảnh chụp số dư quay lại (test 13).

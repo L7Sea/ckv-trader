@@ -5,6 +5,10 @@
   "scripts": {
     "build": "npm --prefix frontend install && npm --prefix frontend run build",
     "deploy:pages": "npx wrangler pages deploy frontend/dist --project-name=ckv-trader",
-    "clean:md": "node scripts/smart-clean-md.cjs"
+    "clean:md": "node scripts/smart-clean-md.cjs",
+    "test:deal": "node scripts/test-deal-model.mjs",
+    "test:formulas": "node scripts/test-trading-formulas.cjs",
+    "test:sql": "node scripts/test-sql-schema.cjs",
+    "test:all": "npm run test:deal && npm run test:formulas && npm run test:sql"
   }
 }

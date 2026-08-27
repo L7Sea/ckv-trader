@@ -12,10 +12,11 @@
 Bất cứ khi nào khởi động phiên làm việc mới trên máy tính mới hoặc khi người dùng yêu cầu **"dò xét lại toàn app"** (hoặc câu lệnh tương tự):
 1. **ĐỌC TOÀN BỘ 4 TÀI LIỆU CỐT LÕI**: `GEMINI.md`, `tài liệu/CONTEXT.md`, `tài liệu/HUONG_DAN_SU_DUNG_SKILLS_VA_RULES_AKIDEVRULE.md`, `README.md`.
 2. **ÁP DỤNG TRIỆT ĐỂ BỘ 10 SKILLS & 18 RULES**: Tuân thủ Single Source of Truth, Fact-checking, không ảo giác, phân tách rạch ròi 8 trang, điều hướng chéo mượt mà.
-3. **CHẠY BỘ 3 LỆNH TEST BẮT BUỘC 100% PASS**:
+3. **CHẠY BỘ TEST BẮT BUỘC 100% PASS**:
    ```bash
-   node scripts/test-trading-formulas.cjs   # 10/10 bài test toán học định lượng & vĩ mô
-   node scripts/test-sql-schema.cjs         # 13/13 bài test toàn vẹn mô hình dữ liệu SQL
+   node scripts/test-deal-model.mjs         # 15/15 - đối chiếu Nợ/NAV/Lãi lỗ với số dư thật DNSE
+   node scripts/test-trading-formulas.cjs   # 20/20 bài test toán học định lượng & vĩ mô
+   node scripts/test-sql-schema.cjs         # 17/17 bài test toàn vẹn mô hình dữ liệu SQL
    npm --prefix frontend run build          # Biên dịch sạch sẽ 100%, 0 lỗi TypeScript
    ```
 4. **TỰ ĐỘNG ĐẨY LÊN GITHUB / CLOUDFLARE PAGES**:
@@ -36,11 +37,10 @@ AI phải nhận diện chính xác ý định của Chủ nhân để chọn đ
 - **Hành vi bắt buộc của AI**:
   1. Sửa code triệt để theo đúng phương án đã phân tích.
   2. Tự động cập nhật bối cảnh mới vào `tài liệu/CONTEXT.md` (Single Source of Truth).
-  3. Tự động cập nhật test case vào `scripts/test-trading-formulas.cjs`.
-  4. Chạy bộ 3 lệnh test (100% PASS):
+  3. Tự động cập nhật test case. Test về TIỀN (Nợ/NAV/Lãi lỗ/Hòa vốn) vào `scripts/test-deal-model.mjs` — **bắt buộc import module thật và đối chiếu số dư thật trên DNSE, cấm chép lại công thức vào test**. Test nghiệp vụ khác vào `scripts/test-trading-formulas.cjs`.
+  4. Chạy bộ test (100% PASS):
      ```bash
-     node scripts/test-trading-formulas.cjs
-     node scripts/test-sql-schema.cjs
+     npm run test:all
      npm --prefix frontend run build
      ```
   5. Tự động commit chuẩn Conventional Commits và `git push origin master` lên Cloudflare Pages.
@@ -54,6 +54,6 @@ AI phải nhận diện chính xác ý định của Chủ nhân để chọn đ
 ## 5. 🔄 Cơ Chế Tự Động Cập Nhật Bối Cảnh & Bộ Test (Continuous Context Evolution)
 Bất cứ khi nào Chủ nhân cung cấp thông tin mới (ảnh chụp số dư thực tế, lãi suất vay mới, công thức mới, thêm trang/mã mới):
 1. **Tự Động Cập Nhật Bối Cảnh**: Cập nhật ngay vào `tài liệu/CONTEXT.md` (và `README.md` nếu là thông số lớn) để tài liệu luôn phản ánh đúng 100% thực tế.
-2. **Tự Động Đồng Bộ Bộ Test**: Bổ sung test case tương ứng vào `scripts/test-trading-formulas.cjs` hoặc `scripts/test-sql-schema.cjs`.
+2. **Tự Động Đồng Bộ Bộ Test**: Bổ sung test case vào `scripts/test-deal-model.mjs` (mọi thứ liên quan đến tiền), `scripts/test-trading-formulas.cjs` hoặc `scripts/test-sql-schema.cjs`.
 3. **Sửa Code & Chạy Test 100% Pass**: Đảm bảo code và test luôn đồng bộ với bối cảnh mới nhất (khi ở Chế độ Thực thi).
 4. **Tự Động Đẩy Lên Cloudflare Pages**: Commit và `git push origin master` ngay lập tức.
