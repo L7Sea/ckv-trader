@@ -60,9 +60,9 @@ app.post('/api/order', async (c) => {
       portfolio = {
         cash: 0,
         receiving_cash: 0,
-        margin_debt: 6898107,
-        total_equity: 7551893,
-        total_profit_loss: -1465943,
+        margin_debt: 7006776,
+        total_equity: 7693395,
+        total_profit_loss: -1223158,
         updated_at: now
       };
     }
@@ -216,9 +216,9 @@ app.get('/api/portfolio', async (c) => {
       portfolio = {
         cash: 0,
         receiving_cash: 0,
-        margin_debt: 6898107,
-        total_equity: 7551893,
-        total_profit_loss: -1465943,
+        margin_debt: 7006776,
+        total_equity: 7693395,
+        total_profit_loss: -1223158,
         updated_at: new Date().toISOString()
       };
     }
@@ -253,7 +253,7 @@ app.get('/api/positions', async (c) => {
         avg_price: 15918,
         market_price: 14450,
         market_value: 14450000,
-        unrealized_pnl: -1465943,
+        unrealized_pnl: -1223158,
         unrealized_pnl_pct: -9.29,
         updated_at: new Date().toISOString()
       }
@@ -374,9 +374,9 @@ app.post('/api/portfolio/cash-adjust', async (c) => {
       portfolio = {
         cash: 0,
         receiving_cash: 0,
-        margin_debt: 6898107,
-        total_equity: 7551893,
-        total_profit_loss: -1465943,
+        margin_debt: 7006776,
+        total_equity: 7693395,
+        total_profit_loss: -1223158,
         updated_at: new Date().toISOString()
       };
     }
@@ -401,6 +401,39 @@ app.post('/api/portfolio/cash-adjust', async (c) => {
     });
   } catch (error: any) {
     return c.json({ success: false, message: error.message }, 500);
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROXY DỮ LIỆU THỊ TRƯỜNG
+   Trình duyệt gọi thẳng services.entrade.com.vn / TCBS sẽ bị CORS chặn — đó là lý
+   do app trước đây luôn phải rơi về bảng giá tĩnh. Worker chạy server-side nên
+   không vướng CORS, và tự đính kèm header CORS cho frontend.
+   ═══════════════════════════════════════════════════════════════════════════ */
+app.get('/api/market/ohlc', async (c) => {
+  const symbol = (c.req.query('symbol') || '').trim().toUpperCase();
+  if (!/^[A-Z0-9]{3,10}$/.test(symbol)) {
+    return c.json({ error: 'Mã cổ phiếu không hợp lệ' }, 400);
+  }
+
+  const resolution = c.req.query('resolution') || '1';
+  const now = Math.floor(Date.now() / 1000);
+  const from = Number(c.req.query('from')) || now - 86400 * 5;
+  const to = Number(c.req.query('to')) || now + 3600;
+
+  const url =
+    'https://services.entrade.com.vn/chart-api/v2/ohlcs/stock' +
+    `?symbol=${symbol}&resolution=${encodeURIComponent(resolution)}&from=${from}&to=${to}`;
+
+  try {
+    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!res.ok) {
+      return c.json({ error: 'Nguồn dữ liệu trả lỗi', status: res.status }, 502);
+    }
+    const data = await res.json();
+    return c.json(data, 200, { 'Cache-Control': 'public, max-age=15' });
+  } catch (e: any) {
+    return c.json({ error: 'Không kết nối được nguồn dữ liệu', detail: String(e?.message || e) }, 502);
   }
 });
 

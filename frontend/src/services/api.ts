@@ -11,6 +11,55 @@ const getHeaders = (extra: Record<string, string> = {}) => ({
   ...extra
 });
 
+/* Danh sách cột THỰC SỰ tồn tại trong Supabase (đồng bộ với schema.sql).
+   Gửi thừa cột khiến PostgREST trả 400 PGRST204 và huỷ toàn bộ lệnh ghi — đây là
+   nguyên nhân app trước đây báo "thành công" nhưng không lưu được gì. */
+const PORTFOLIO_COLUMNS = [
+  'id', 'cash', 'receiving_cash', 'margin_debt',
+  'total_equity', 'total_profit_loss', 'current_simulated_date', 'updated_at'
+];
+
+const POSITION_COLUMNS = [
+  'symbol', 'total_quantity', 'available_quantity', 't1_quantity', 't2_quantity',
+  'avg_price', 'breakeven_price', 'market_price', 'market_value',
+  'unrealized_pnl', 'unrealized_pnl_pct', 'target_price', 'stop_loss', 'updated_at'
+];
+
+const TRANSACTION_COLUMNS = [
+  'id', 'type', 'symbol', 'price', 'quantity', 'fee', 'tax', 'total_amount',
+  'net_amount', 'realized_pnl', 'strategy', 'target_price', 'stop_loss',
+  'trade_date', 'notes'
+];
+
+/** Chỉ giữ lại các khoá có thật trong bảng, bỏ undefined. */
+function pick(obj: Record<string, any>, columns: string[]): Record<string, any> {
+  const out: Record<string, any> = {};
+  for (const key of columns) {
+    if (obj[key] !== undefined) out[key] = obj[key];
+  }
+  return out;
+}
+
+/** Ghi lên Supabase và BÁO LỖI THẬT thay vì nuốt im lặng. */
+async function writeToSupabase(path: string, body: unknown, method: 'POST' | 'PATCH' = 'POST'): Promise<boolean> {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+      method,
+      headers: getHeaders(method === 'POST' ? { Prefer: 'resolution=merge-duplicates' } : {}),
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(6000)
+    });
+    if (!res.ok) {
+      console.error('[Supabase ' + method + ' ' + path + '] ' + res.status + ': ' + (await res.text()));
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('[Supabase ' + method + ' ' + path + '] loi mang:', e);
+    return false;
+  }
+}
+
 export const api = {
   // 1. Lấy tổng quan tài sản từ Supabase (Chỉ dành cho Admin Master)
   async getPortfolio(): Promise<Portfolio> {
@@ -27,11 +76,12 @@ export const api = {
         if (rows && rows.length > 0) {
           const p = rows[0];
           return {
-            cash: Number(p.cash !== undefined ? p.cash : 171),
+            cash: Number(p.cash || 0),
             receiving_cash: Number(p.receiving_cash || 0),
-            margin_debt: Number(p.margin_debt || 7002051),
-            total_equity: Number(p.total_equity || 7498120),
-            total_profit_loss: Number(p.total_profit_loss || -1418116),
+            margin_debt: Number(p.margin_debt || 0),
+            total_equity: Number(p.total_equity || 0),
+            total_profit_loss: Number(p.total_profit_loss || 0),
+            current_simulated_date: p.current_simulated_date || undefined,
             updated_at: p.updated_at
           };
         }
@@ -60,6 +110,7 @@ export const api = {
             t1_quantity: Number(r.t1_quantity || 0),
             t2_quantity: Number(r.t2_quantity || 0),
             avg_price: Number(r.avg_price || 0),
+            breakeven_price: r.breakeven_price != null ? Number(r.breakeven_price) : undefined,
             market_price: Number(r.market_price || 0),
             market_value: Number(r.market_value || 0),
             unrealized_pnl: Number(r.unrealized_pnl || 0),
@@ -109,47 +160,21 @@ export const api = {
   // 4. Đặt lệnh giao dịch Mua / Bán & Đồng bộ lên Supabase
   async placeOrder(payload: OrderRequestPayload): Promise<{ transaction: Transaction; position: Position; portfolio: Portfolio }> {
     const localResult = localTradingEngine.placeOrder(payload);
-    try {
-      // Đồng bộ lên Supabase trong nền
-      await Promise.all([
-        fetch(`${SUPABASE_URL}/rest/v1/portfolios`, {
-          method: 'POST',
-          headers: getHeaders({ 'Prefer': 'resolution=merge-duplicates' }),
-          body: JSON.stringify({ id: 'default', ...localResult.portfolio })
-        }),
-        fetch(`${SUPABASE_URL}/rest/v1/positions`, {
-          method: 'POST',
-          headers: getHeaders({ 'Prefer': 'resolution=merge-duplicates' }),
-          body: JSON.stringify(localResult.position)
-        }),
-        fetch(`${SUPABASE_URL}/rest/v1/transactions`, {
-          method: 'POST',
-          headers: getHeaders(),
-          body: JSON.stringify(localResult.transaction)
-        })
-      ]);
-    } catch (e) {
-      console.warn('Sync to Supabase background error:', e);
-    }
+    await Promise.all([
+      writeToSupabase('portfolios', pick({ id: 'default', ...localResult.portfolio }, PORTFOLIO_COLUMNS)),
+      writeToSupabase('positions', pick(localResult.position as any, POSITION_COLUMNS)),
+      writeToSupabase('transactions', pick(localResult.transaction as any, TRANSACTION_COLUMNS))
+    ]);
     return localResult;
   },
 
   // 5. Cập nhật giá thị trường
   async updateMarketPrice(symbol: string, market_price: number): Promise<Position> {
     const updated = localTradingEngine.updateMarketPrice(symbol, market_price);
-    try {
-      await fetch(`${SUPABASE_URL}/rest/v1/positions?symbol=eq.${symbol}`, {
-        method: 'PATCH',
-        headers: getHeaders(),
-        body: JSON.stringify({
-          market_price,
-          market_value: updated.market_value,
-          unrealized_pnl: updated.unrealized_pnl,
-          unrealized_pnl_pct: updated.unrealized_pnl_pct,
-          updated_at: new Date().toISOString()
-        })
-      });
-    } catch {}
+    await Promise.all([
+      writeToSupabase('positions?symbol=eq.' + symbol, pick({ ...updated, updated_at: new Date().toISOString() } as any, POSITION_COLUMNS), 'PATCH'),
+      writeToSupabase('portfolios', pick({ id: 'default', ...localTradingEngine.getPortfolio() }, PORTFOLIO_COLUMNS))
+    ]);
     return updated;
   },
 
@@ -158,33 +183,27 @@ export const api = {
     const msg = localTradingEngine.settleDay();
     const currentPortfolio = localTradingEngine.getPortfolio();
     const currentPositions = localTradingEngine.getPositions();
-    try {
-      await fetch(`${SUPABASE_URL}/rest/v1/portfolios`, {
-        method: 'POST',
-        headers: getHeaders({ 'Prefer': 'resolution=merge-duplicates' }),
-        body: JSON.stringify({ id: 'default', ...currentPortfolio })
-      });
-      for (const pos of currentPositions) {
-        await fetch(`${SUPABASE_URL}/rest/v1/positions`, {
-          method: 'POST',
-          headers: getHeaders({ 'Prefer': 'resolution=merge-duplicates' }),
-          body: JSON.stringify(pos)
-        });
-      }
-    } catch {}
+    await api.persistPortfolioState(currentPortfolio, currentPositions);
     return msg;
   },
 
   // 7. Nạp hoặc Rút tiền
   async adjustCash(amount: number, action: 'DEPOSIT' | 'WITHDRAW'): Promise<Portfolio> {
     const p = localTradingEngine.adjustCash(amount, action);
-    try {
-      await fetch(`${SUPABASE_URL}/rest/v1/portfolios`, {
-        method: 'POST',
-        headers: getHeaders({ 'Prefer': 'resolution=merge-duplicates' }),
-        body: JSON.stringify({ id: 'default', ...p })
-      });
-    } catch {}
+    await writeToSupabase('portfolios', pick({ id: 'default', ...p }, PORTFOLIO_COLUMNS));
     return p;
+  },
+
+  /**
+   * Ghi trạng thái tài sản + vị thế lên Supabase.
+   * Trả về true khi TẤT CẢ lệnh ghi thành công, để UI báo trung thực.
+   */
+  async persistPortfolioState(portfolio: Portfolio, positions: Position[]): Promise<boolean> {
+    if (!localTradingEngine.isAdmin()) return true;
+    const results = await Promise.all([
+      writeToSupabase('portfolios', pick({ id: 'default', ...portfolio }, PORTFOLIO_COLUMNS)),
+      ...positions.map((pos) => writeToSupabase('positions', pick(pos as any, POSITION_COLUMNS)))
+    ]);
+    return results.every(Boolean);
   }
 };
