@@ -49,9 +49,7 @@ export const CapyStylePickerModal: React.FC<CapyStylePickerModalProps> = ({ isOp
 
   const handleConfirm = () => {
     setGreetingStyle(selected);
-    try {
-      localStorage.setItem('ckv_style_initialized', 'true');
-    } catch {}
+    // Việc ghi nhớ "đã hỏi rồi" do App.tsx làm, gắn theo từng tài khoản đăng nhập
     onClose();
   };
 

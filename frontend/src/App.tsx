@@ -17,6 +17,8 @@ import { CapyStylePickerModal } from './components/CapyStylePickerModal';
 import Capy from './components/Capy';
 import { BackgroundProvider } from './lib/backgroundContext';
 import { useTradingStore, TabType } from './store/useTradingStore';
+import { useAuthStore } from './store/useAuthStore';
+import { useAutoSync } from './lib/useAutoSync';
 import {
   TrendingUp,
   LayoutGrid,
@@ -39,15 +41,41 @@ import {
 
 export const AppContent: React.FC = () => {
   const { activeTab, setActiveTab, fetchData, error, successMessage, clearMessages } = useTradingStore();
+  const { user } = useAuthStore();
   const [isMobileMoreOpen, setIsMobileMoreOpen] = useState(false);
-  const [isStylePickerOpen, setIsStylePickerOpen] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return !localStorage.getItem('ckv_style_initialized');
-  });
+  const [isStylePickerOpen, setIsStylePickerOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Tự động đồng bộ theo mốc sáng/trưa/chiều/tối, chỉ khi đã đăng nhập
+  useAutoSync(Boolean(user));
+
+  /* Chỉ hỏi phong cách Capy SAU KHI đã đăng nhập. Bản cũ mở modal ngay lúc dựng
+     giao diện, tức là đè lên cả màn hình đăng nhập của khách mới.
+     Khoá ghi nhớ gắn theo TỪNG tài khoản, nên mỗi thành viên mới vẫn được hỏi
+     một lần của riêng họ thay vì bị bỏ qua vì máy đã từng có người chọn. */
+  useEffect(() => {
+    if (!user) {
+      setIsStylePickerOpen(false);
+      return;
+    }
+    try {
+      if (!localStorage.getItem(`ckv_style_initialized_${user.id}`)) {
+        setIsStylePickerOpen(true);
+      }
+    } catch {
+      // Trình duyệt chặn localStorage thì bỏ qua, không chặn luồng vào app
+    }
+  }, [user?.id]);
+
+  const closeStylePicker = () => {
+    setIsStylePickerOpen(false);
+    try {
+      if (user) localStorage.setItem(`ckv_style_initialized_${user.id}`, '1');
+    } catch {}
+  };
 
   return (
     <div className="min-h-screen bg-transparent text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white pb-20 md:pb-6">
@@ -360,10 +388,7 @@ export const AppContent: React.FC = () => {
       )}
 
       {/* Capy 4-Style Onboarding Picker Modal */}
-      <CapyStylePickerModal
-        isOpen={isStylePickerOpen}
-        onClose={() => setIsStylePickerOpen(false)}
-      />
+      <CapyStylePickerModal isOpen={isStylePickerOpen} onClose={closeStylePicker} />
 
       {/* Cash Deposit / Withdraw Modal */}
       <CashModal />

@@ -28,7 +28,7 @@ export interface UserProfile {
   accountNumber: string;
   subAccount: '01' | '06'; // 01: Thường, 06: Margin
   brokerage: 'DNSE' | 'VPS' | 'TCBS' | 'SSI' | 'VNDIRECT' | 'CUSTOM';
-  customMarginRate: number; // %/năm (VD: DNSE 11.5, VPS 13.5, TCBS 10.5, SSI 12.0)
+  customMarginRate: number; // %/năm (VD: DNSE 12.5, VPS 13.5, TCBS 10.5, SSI 12.0)
   pin: string;
   theme: 'CYBERPUNK' | 'DARK_NAVY' | 'BLACK_AMOLED';
   backgroundUrl?: string;
