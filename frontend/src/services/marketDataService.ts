@@ -122,9 +122,12 @@ export const PRELOADED_VN_STOCKS: Record<string, Partial<StockMarketInfo>> = {
 
 const WATCHLIST_STORAGE_KEY = 'CKV_CUSTOM_WATCHLIST_V2';
 
-/* Proxy Cloudflare Worker cho dữ liệu thị trường. Gọi thẳng Entrade/TCBS từ trình
-   duyệt bị CORS chặn, nên phải đi qua Worker (server-side). Để trống thì app chỉ
-   còn cách gọi thẳng và nhiều khả năng thất bại. */
+/* Proxy dữ liệu thị trường. Gọi thẳng Entrade/TCBS từ trình duyệt bị CORS chặn nên
+   bắt buộc phải đi qua một endpoint server-side.
+
+   Mặc định dùng Cloudflare Pages Function CÙNG ORIGIN (frontend/functions/api/market/ohlc.ts)
+   — tự deploy kèm mỗi lần build, không cần cấu hình gì. VITE_MARKET_PROXY_URL chỉ
+   dùng khi muốn trỏ sang một Worker riêng. */
 const MARKET_PROXY_BASE = (import.meta.env?.VITE_MARKET_PROXY_URL || '').replace(/\/$/, '');
 
 class MarketDataService {
@@ -303,7 +306,11 @@ class MarketDataService {
     const query = `symbol=${symbol}&resolution=1&from=${from}&to=${to}`;
 
     const endpoints = [
+      // 1. Proxy cùng origin (Pages Function) — đường đi mặc định, luôn có sau khi deploy
+      `/api/market/ohlc?${query}`,
+      // 2. Worker riêng nếu được cấu hình
       MARKET_PROXY_BASE ? `${MARKET_PROXY_BASE}/api/market/ohlc?${query}` : null,
+      // 3. Gọi thẳng nguồn (chạy dev trên localhost, hoặc proxy chưa deploy)
       `https://services.entrade.com.vn/chart-api/v2/ohlcs/stock?${query}`
     ].filter(Boolean) as string[];
 
