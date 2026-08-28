@@ -17,8 +17,10 @@ console.log('🧪 CKV PRO TRADER - KIỂM THỬ 150 THUẬT TOÁN ĐỊNH LƯỢ
 console.log('══════════════════════════════════════════════════════════════════════\n');
 
 let passedTests = 0;
+let totalTests = 0;
 
 function test(name, fn) {
+  totalTests++;
   try {
     fn();
     console.log(`  ✅ [PASS] ${name}`);
@@ -511,5 +513,13 @@ test('20. Tính năng xóa người dùng và bảo vệ an toàn tài khoản A
   assert.strictEqual(userList.some((u) => u.id === 'user_1'), false);
 });
 
-console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/20 TESTS ĐẠT CHUẨN 100% VĨ MÔ & ĐỊNH LƯỢNG!\n`);
+/* Thông báo phải phản ánh ĐÚNG kết quả. Bản cũ luôn in "ĐẠT CHUẨN 100%" kể cả
+   khi có bài test hỏng, và số tổng bị gán cứng là 20 nên thêm/bớt test là sai. */
+const failedTests = totalTests - passedTests;
+if (failedTests > 0) {
+  console.error(`\n❌ KIỂM THỬ THẤT BẠI: ${passedTests}/${totalTests} đạt, ${failedTests} lỗi.\n`);
+  process.exitCode = 1;
+} else {
+  console.log(`\n🎉 HOÀN TẤT KIỂM THỬ: ${passedTests}/${totalTests} TESTS ĐẠT CHUẨN VĨ MÔ & ĐỊNH LƯỢNG!\n`);
+}
 

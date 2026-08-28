@@ -12,7 +12,7 @@ const getHeaders = (extra: Record<string, string> = {}) => ({
   ...extra
 });
 
-/* Danh sách cột THỰC SỰ tồn tại trong Supabase (đồng bộ với schema.sql).
+/* Danh sách cột THỰC SỰ tồn tại trong Supabase (đồng bộ với sql/01-cau-truc.sql).
    Gửi thừa cột khiến PostgREST trả 400 PGRST204 và huỷ toàn bộ lệnh ghi — đây là
    nguyên nhân app trước đây báo "thành công" nhưng không lưu được gì. */
 const PORTFOLIO_COLUMNS = [
@@ -47,7 +47,7 @@ function pick(obj: Record<string, any>, columns: string[]): Record<string, any> 
  * Nếu cơ sở dữ liệu chưa được cập nhật cấu trúc (thiếu cột), PostgREST huỷ TOÀN BỘ
  * lệnh ghi chỉ vì một cột lạ — đúng lỗi đã khiến app im lặng không lưu được gì suốt
  * từ 25/8. Ở đây ta bỏ cột bị thiếu rồi thử lại, để dữ liệu vẫn lưu được trên DB cũ,
- * đồng thời log cảnh báo nhắc chạy CAP-NHAT-SUPABASE.sql.
+ * đồng thời log cảnh báo nhắc chạy sql/01-cau-truc.sql.
  */
 async function writeToSupabase(
   path: string,
@@ -70,7 +70,7 @@ async function writeToSupabase(
     if (missing && missing in (body as Record<string, any>)) {
       console.warn(
         `[Supabase] Bảng thiếu cột "${missing}" — bỏ qua cột này và thử lại. ` +
-          'Hãy chạy CAP-NHAT-SUPABASE.sql trong SQL Editor để bổ sung đầy đủ.'
+          'Hãy chạy sql/01-cau-truc.sql trong Supabase SQL Editor để bổ sung đầy đủ.'
       );
       const { [missing]: _removed, ...rest } = body as Record<string, any>;
       return writeToSupabase(path, rest, method, attempt + 1);

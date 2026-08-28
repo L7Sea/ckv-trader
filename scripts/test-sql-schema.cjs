@@ -22,11 +22,93 @@ console.log('══════════════════════�
 console.log('🧪 CKV PRO TRADER - KIỂM THỬ TOÀN VẸN MÔ HÌNH DỮ LIỆU SQL & SCHEMA');
 console.log('══════════════════════════════════════════════════════════════════════\n');
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   0. ĐỐI CHIẾU THẬT: SQL trong sql/01-cau-truc.sql  vs  cột app thực sự ghi
+   ───────────────────────────────────────────────────────────────────────────
+   Đây là bài test QUAN TRỌNG NHẤT file này. Nó đọc file SQL thật và file
+   api.ts thật, không dùng bảng giả.
+
+   Lệch nhau là app ghi dữ liệu THẤT BẠI: PostgREST huỷ TOÀN BỘ lệnh ghi chỉ vì
+   một cột lạ. Đúng lỗi này đã khiến app im lặng không lưu được gì từ 25/08/2026
+   trong khi giao diện vẫn báo "đồng bộ thành công".
+   ═══════════════════════════════════════════════════════════════════════════ */
+const fs = require('fs');
+const path = require('path');
+
+const root = path.resolve(__dirname, '..');
+const sqlText = fs.readFileSync(path.join(root, 'sql', '01-cau-truc.sql'), 'utf8');
+const apiText = fs.readFileSync(path.join(root, 'frontend', 'src', 'services', 'api.ts'), 'utf8');
+
+/** Tập hợp cột của một bảng: gộp cột trong CREATE TABLE và mọi ALTER ... ADD COLUMN. */
+function sqlColumnsOf(table) {
+  const columns = new Set();
+
+  const createMatch = sqlText.match(
+    new RegExp('CREATE TABLE IF NOT EXISTS public\\.' + table + '\\s*\\(([\\s\\S]*?)\\n\\);', 'i')
+  );
+  if (createMatch) {
+    for (const line of createMatch[1].split('\n')) {
+      const col = line.trim().match(/^([a-z_][a-z0-9_]*)\s+[A-Z]/);
+      if (col) columns.add(col[1]);
+    }
+  }
+
+  const alterRe = new RegExp(
+    'ALTER TABLE public\\.' + table + ' ADD COLUMN IF NOT EXISTS ([a-z_][a-z0-9_]*)',
+    'gi'
+  );
+  let m;
+  while ((m = alterRe.exec(sqlText)) !== null) columns.add(m[1]);
+
+  return columns;
+}
+
+/** Danh sách cột app gửi lên, đọc thẳng từ hằng số trong api.ts. */
+function apiColumnsOf(constName) {
+  const block = apiText.match(new RegExp(constName + '\\s*=\\s*\\[([\\s\\S]*?)\\];'));
+  if (!block) return [];
+  return [...block[1].matchAll(/'([a-z_][a-z0-9_]*)'/g)].map((x) => x[1]);
+}
+
+for (const [table, constName] of [
+  ['portfolios', 'PORTFOLIO_COLUMNS'],
+  ['positions', 'POSITION_COLUMNS'],
+  ['transactions', 'TRANSACTION_COLUMNS']
+]) {
+  const inSql = sqlColumnsOf(table);
+  const inApi = apiColumnsOf(constName);
+
+  ok(inSql.size > 0, `SQL: đọc được định nghĩa bảng \`${table}\` từ sql/01-cau-truc.sql`);
+  ok(inApi.length > 0, `api.ts: đọc được danh sách ${constName}`);
+
+  const missing = inApi.filter((col) => col !== 'id' && !inSql.has(col));
+  eq(
+    missing,
+    [],
+    `Đồng bộ schema: mọi cột app ghi vào \`${table}\` đều tồn tại trong SQL (thiếu sẽ làm hỏng TOÀN BỘ lệnh ghi)`
+  );
+}
+
+// Các cột từng thiếu và đã gây lỗi ghi im lặng — chốt lại để không tái diễn
+ok(sqlColumnsOf('portfolios').has('current_simulated_date'), 'SQL: portfolios có cột current_simulated_date');
+ok(sqlColumnsOf('positions').has('breakeven_price'), 'SQL: positions có cột breakeven_price');
+ok(sqlColumnsOf('transactions').has('net_amount'), 'SQL: transactions có cột net_amount');
+
+// Seed phải ghi đè được hàng cũ, nếu không chạy lại cũng không sửa được số lệch
+const seedText = fs.readFileSync(path.join(root, 'sql', '02-nap-moc-doi-chieu.sql'), 'utf8');
+ok(seedText.includes('DO UPDATE'), 'SQL seed: dùng ON CONFLICT DO UPDATE, không phải DO NOTHING');
+ok(!/ON CONFLICT\s*\([^)]*\)\s*DO NOTHING/i.test(seedText), 'SQL seed: không còn DO NOTHING nào sót lại');
+
+// File cấu trúc phải an toàn khi chạy lại nhiều lần
+ok(!/INSERT INTO/i.test(sqlText), 'SQL cấu trúc: không chứa INSERT, nên chạy lại không đụng số dư');
+ok(sqlText.includes('DROP POLICY IF EXISTS'), 'SQL cấu trúc: policy idempotent, chạy lại không lỗi trùng tên');
+
 /* ═══ 1. Kiểm tra cấu trúc bảng `positions` (Danh mục cổ phiếu) ═══ */
+// Đọc cột THẬT từ sql/01-cau-truc.sql thay vì bịa một bảng giả với tên cột không tồn tại
 const mockPositionsTable = {
-  columns: ['id', 'user_id', 'symbol', 'total_quantity', 'available_quantity', 't1_quantity', 't2_quantity', 'avg_buy_price', 'market_price', 'updated_at'],
-  primaryKey: 'id',
-  uniqueConstraint: ['user_id', 'symbol']
+  columns: [...sqlColumnsOf('positions')],
+  primaryKey: 'symbol'
 };
 
 ok(mockPositionsTable.columns.includes('symbol'), 'SQL Positions: Chứa cột mã cổ phiếu `symbol`');

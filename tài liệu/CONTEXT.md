@@ -234,13 +234,27 @@ không có tài liệu. Tham số `symboledit=1` cho phép widget TỰ GHI NHỚ
 của chính tradingview.com; khi mã trong URL không khớp thứ nó nhớ, nó lặng lẽ hiện lại mã cũ.
 Đó là lý do chọn VCB/TCB nhưng biểu đồ vẫn là Apple Inc.
 
-Đã thay bằng widget CHÍNH THỨC (`embed-widget-advanced-chart.js`) trong
-`components/TradingViewChart.tsx`: mã truyền qua cấu hình JSON, widget được DỰNG LẠI mỗi
-lần đổi mã. Sàn niêm yết lấy từ dữ liệu của chính mã đó thay vì hai mảng cứng.
+Thử thay bằng widget chính thức `embed-widget-advanced-chart.js` nhưng script đó cũng không
+tải được (mạng chặn / trình chặn quảng cáo) — biểu đồ trống với **mọi** mã.
 
-Thêm hai lớp bảo vệ để không bao giờ sai âm thầm nữa:
-- Badge **"Đang yêu cầu: HOSE:VCB"** luôn hiện góc phải biểu đồ — nhìn là biết chart có đúng mã không
-- Không dựng được widget trong 8 giây thì hiện cảnh báo + nút mở thẳng trên tradingview.com
+**Kết luận: bỏ hẳn phụ thuộc TradingView cho biểu đồ chính.** App tự vẽ nến bằng SVG thuần
+trong `components/CandleChart.tsx`, lấy dữ liệu qua `services/stockCandleService.ts`:
+
+- Nguồn: đúng proxy đã dùng cho giá (Pages Function cùng origin → Worker → gọi thẳng)
+- Khung thời gian: 15 phút, 1 giờ, Ngày, Tuần, Tháng (W/M gộp từ nến ngày)
+- Chỉ báo MA20, MA50, EMA9 + thanh khối lượng + trỏ chuột xem OHLC từng nến
+- **Đã xoá `generateCandleSeries()`** — hàm cũ dựng nến bằng số giả ngẫu nhiên. Biểu đồ kỹ
+  thuật vẽ từ dữ liệu bịa còn tệ hơn không có biểu đồ, vì nó dẫn tới quyết định sai.
+- Không lấy được dữ liệu thì hiện thông báo rõ + nút thử lại, **không bao giờ vẽ nến giả**
+
+TradingView chỉ còn là liên kết phụ "Xem sâu trên TradingView".
+
+**Hai phát hiện khi kiểm chứng thật:**
+1. Entrade **không trả header `Access-Control-Allow-Origin`** ⇒ trình duyệt luôn chặn gọi
+   thẳng. Bắt buộc phải qua proxy server-side. Local dev không có Pages Function nên đã thêm
+   proxy `/api/market/ohlc` vào `vite.config.ts` để dev khớp production.
+2. Entrade nhận `resolution` là `1`, `5`, `15`, `30`, `1H`, `1D` — **không nhận `60`, `D`, `W`, `M`**.
+   Dùng `60` trả về 0 nến. Đã sửa ở cả 3 tầng proxy.
 
 ### 11.2 Hỏi phong cách Capy trước khi đăng nhập
 

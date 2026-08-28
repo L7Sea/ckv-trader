@@ -60,7 +60,7 @@ Chỉ cần nhấp đúp chuột vào file:
 
 ### 2. Triển khai Cơ sở dữ liệu Supabase:
 1. Tạo dự án mới tại [supabase.com](https://supabase.com).
-2. Mở mục **SQL Editor**, dán toàn bộ nội dung file **`schema.sql`** và bấm **Run**.
+2. Mở mục **SQL Editor**, chạy **`sql/01-cau-truc.sql`** rồi **`sql/02-nap-moc-doi-chieu.sql`**, cuối cùng **`sql/03-kiem-tra.sql`** để xác nhận. Chi tiết: [sql/README.md](sql/README.md).
 3. Lấy `Project URL` và `Anon Key` điền vào `backend/wrangler.toml` hoặc `.env`.
 
 ### 3. Triển khai Cloudflare Pages & Workers:
@@ -92,7 +92,7 @@ CKV/
 │   ├── test-trading-formulas.cjs   # Formula & 150 Algorithms Unit Test Suite
 │   └── bot-simulate-trading.cjs    # Live Bot Simulator
 │
-├── schema.sql                # Supabase PostgreSQL Database Schema
+├── sql/                      # Cấu trúc & dữ liệu Supabase (xem sql/README.md)
 ├── start-all.bat             # 1-Click Launch Script
 ├── connect-github.bat        # 1-Click GitHub Sync Script
 └── deploy-to-cloudflare.bat  # 1-Click Cloudflare Deploy Script

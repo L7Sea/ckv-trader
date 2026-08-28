@@ -1,9 +1,14 @@
--- ══════════════════════════════════════════════════════════════════════
--- CKV PRO TRADER - SUPABASE POSTGRESQL DATABASE SCHEMA
--- Dán và chạy toàn bộ mã SQL này trong Supabase SQL Editor (supabase.com)
--- ══════════════════════════════════════════════════════════════════════
+-- ══════════════════════════════════════════════════════════════════════════
+--  CKV — 01. CẤU TRÚC CƠ SỞ DỮ LIỆU
+--  ─────────────────────────────────────────────────────────────────────────
+--  CHẠY KHI NÀO: lần đầu dựng dự án, hoặc bất cứ khi nào app báo thiếu cột.
+--  AN TOÀN CHẠY LẠI BAO NHIÊU LẦN CŨNG ĐƯỢC — file này chỉ tạo/bổ sung cấu
+--  trúc, TUYỆT ĐỐI KHÔNG đụng tới số dư đang có.
+--
+--  CÁCH DÙNG: supabase.com > dự án của bạn > SQL Editor > dán toàn bộ > RUN.
+-- ══════════════════════════════════════════════════════════════════════════
 
--- 1. BẢNG TỔNG QUAN TÀI SẢN (PORTFOLIO)
+-- ── 1. BẢNG TỔNG QUAN TÀI SẢN ───────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.portfolios (
     id TEXT PRIMARY KEY DEFAULT 'default',
     account_name TEXT DEFAULT 'VIP Trader',
@@ -18,10 +23,9 @@ CREATE TABLE IF NOT EXISTS public.portfolios (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Bổ sung cột cho cơ sở dữ liệu đã tạo từ trước (chạy lại an toàn):
 ALTER TABLE public.portfolios ADD COLUMN IF NOT EXISTS current_simulated_date DATE DEFAULT CURRENT_DATE;
 
--- 2. BẢNG DANH MỤC VỊ THẾ NẮM GIỮ (POSITIONS)
+-- ── 2. BẢNG DANH MỤC VỊ THẾ NẮM GIỮ ─────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.positions (
     symbol TEXT PRIMARY KEY,
     total_quantity INTEGER NOT NULL DEFAULT 0,
@@ -39,12 +43,11 @@ CREATE TABLE IF NOT EXISTS public.positions (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Bổ sung cột cho cơ sở dữ liệu đã tạo từ trước (chạy lại an toàn):
 ALTER TABLE public.positions ADD COLUMN IF NOT EXISTS breakeven_price NUMERIC;
 ALTER TABLE public.positions ADD COLUMN IF NOT EXISTS target_price NUMERIC;
 ALTER TABLE public.positions ADD COLUMN IF NOT EXISTS stop_loss NUMERIC;
 
--- 3. BẢNG LỊCH SỬ GIAO DỊCH & SỔ LỆNH (TRANSACTIONS)
+-- ── 3. BẢNG LỊCH SỬ GIAO DỊCH & SỔ LỆNH ─────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.transactions (
     id TEXT PRIMARY KEY,
     type TEXT NOT NULL CHECK (type IN ('BUY', 'SELL', 'DIVIDEND_CASH', 'DIVIDEND_SHARE')),
@@ -64,14 +67,13 @@ CREATE TABLE IF NOT EXISTS public.transactions (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Bổ sung cột cho cơ sở dữ liệu đã tạo từ trước (chạy lại an toàn):
 ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS net_amount NUMERIC;
 ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS realized_pnl NUMERIC;
 ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS strategy TEXT;
 ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS target_price NUMERIC;
 ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS stop_loss NUMERIC;
 
--- 4. BẢNG DANH MỤC THEO DÕI TÙY BIẾN (WATCHLIST)
+-- ── 4. BẢNG DANH MỤC THEO DÕI TÙY BIẾN ──────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.watchlist (
     symbol TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -87,23 +89,15 @@ CREATE TABLE IF NOT EXISTS public.watchlist (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. BẬT ROW LEVEL SECURITY (RLS) & CHO PHÉP TRUY CẬP AN TOÀN
+-- ── 5. ROW LEVEL SECURITY ───────────────────────────────────────────────────
+-- ⚠️ CẢNH BÁO BẢO MẬT: chính sách USING(true) cho phép BẤT KỲ ai có anon key
+-- (key này nằm công khai trong bundle JS) đọc và GHI toàn bộ danh mục tài sản.
+-- Cần siết lại theo auth.uid() khi bật đăng nhập thật.
 ALTER TABLE public.portfolios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.positions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.watchlist ENABLE ROW LEVEL SECURITY;
 
--- CẢNH BÁO BẢO MẬT: chính sách USING(true) cho phép BẤT KỲ ai có anon key (key này
--- nằm công khai trong bundle JS) đọc và ghi toàn bộ danh mục tài sản. Cần siết lại
--- theo auth.uid() khi bật đăng nhập thật.
-DROP POLICY IF EXISTS "Cho phep truy cap toan quyen portfolios" ON public.portfolios;
-DROP POLICY IF EXISTS "Cho phep truy cap toan quyen positions" ON public.positions;
-DROP POLICY IF EXISTS "Cho phep truy cap toan quyen transactions" ON public.transactions;
-DROP POLICY IF EXISTS "Cho phep truy cap toan quyen watchlist" ON public.watchlist;
-
--- CẢNH BÁO BẢO MẬT: chính sách USING(true) cho phép BẤT KỲ ai có anon key (key này
--- nằm công khai trong bundle JS) đọc và ghi toàn bộ danh mục tài sản. Cần siết lại
--- theo auth.uid() khi bật đăng nhập thật.
 DROP POLICY IF EXISTS "Cho phep truy cap toan quyen portfolios" ON public.portfolios;
 DROP POLICY IF EXISTS "Cho phep truy cap toan quyen positions" ON public.positions;
 DROP POLICY IF EXISTS "Cho phep truy cap toan quyen transactions" ON public.transactions;
@@ -113,30 +107,3 @@ CREATE POLICY "Cho phep truy cap toan quyen portfolios" ON public.portfolios FOR
 CREATE POLICY "Cho phep truy cap toan quyen positions" ON public.positions FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Cho phep truy cap toan quyen transactions" ON public.transactions FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Cho phep truy cap toan quyen watchlist" ON public.watchlist FOR ALL USING (true) WITH CHECK (true);
-
--- 6. NẠP MỐC ĐỐI CHIẾU 28/08/2026 06:26 (khớp 100% ảnh DNSE)
---    DO UPDATE (không phải DO NOTHING) để chạy lại là sửa được hàng cũ đã lệch.
---    Sau khi nạp, app tự tính lại theo tài liệu/dealModel.ts mỗi lần đồng bộ.
-INSERT INTO public.portfolios (id, account_name, account_number, sub_account, cash, receiving_cash, margin_debt, total_equity, total_profit_loss, current_simulated_date)
-VALUES ('default', 'VIP Trader', '001C888999', '06', 171, 0, 7006776, 7693395, -1223158, DATE '2026-08-28')
-ON CONFLICT (id) DO UPDATE SET
-    cash = EXCLUDED.cash,
-    receiving_cash = EXCLUDED.receiving_cash,
-    margin_debt = EXCLUDED.margin_debt,
-    total_equity = EXCLUDED.total_equity,
-    total_profit_loss = EXCLUDED.total_profit_loss,
-    current_simulated_date = EXCLUDED.current_simulated_date,
-    updated_at = NOW();
-
-INSERT INTO public.positions (symbol, total_quantity, available_quantity, t1_quantity, t2_quantity, avg_price, breakeven_price, market_price, market_value, unrealized_pnl, unrealized_pnl_pct, target_price, stop_loss)
-VALUES ('TPB', 1000, 1000, 0, 0, 15803, 15923, 14700, 14700000, -1223158, -7.75, 16500, 13800)
-ON CONFLICT (symbol) DO UPDATE SET
-    total_quantity = EXCLUDED.total_quantity,
-    available_quantity = EXCLUDED.available_quantity,
-    avg_price = EXCLUDED.avg_price,
-    breakeven_price = EXCLUDED.breakeven_price,
-    market_price = EXCLUDED.market_price,
-    market_value = EXCLUDED.market_value,
-    unrealized_pnl = EXCLUDED.unrealized_pnl,
-    unrealized_pnl_pct = EXCLUDED.unrealized_pnl_pct,
-    updated_at = NOW();
