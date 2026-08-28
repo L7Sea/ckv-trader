@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 import { VN50_WATCHLIST } from './MarketBoard';
-import { TradingViewChart } from './TradingViewChart';
+import { CandleChart } from './CandleChart';
 
 interface TickTrade {
   id: string;
@@ -141,7 +141,7 @@ export const TechnicalChart: React.FC = () => {
             }`}
           >
             <Activity className="h-4 w-4" />
-            <span>Biểu Đồ Nến TradingView Pro ({activeSymbol})</span>
+            <span>Biểu Đồ Nến ({activeSymbol})</span>
           </button>
           <button
             onClick={() => setActiveTab('ORDERBOOK')}
@@ -159,7 +159,7 @@ export const TechnicalChart: React.FC = () => {
 
       {/* ══ 1. BIỂU ĐỒ NẾN TRADINGVIEW INTERACTIVE PRO ══ */}
       {activeTab === 'TRADINGVIEW' && (
-        <TradingViewChart key={`${exchange}-${activeSymbol}`} symbol={activeSymbol} exchange={exchange} height={560} />
+        <CandleChart key={`${exchange}-${activeSymbol}`} symbol={activeSymbol} exchange={exchange} height={560} />
       )}
 
       {/* ══ 2. SỔ LỆNH BƯỚC GIÁ 3 CẤP (DNSE ENTRADE X STYLE) ══ */}

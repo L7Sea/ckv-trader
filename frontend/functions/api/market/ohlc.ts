@@ -43,7 +43,7 @@ export const onRequestGet = async (context: { request: Request }) => {
   // resolution=1 là nến 1 phút (giá trong phiên). Chỉ nhận vài giá trị hợp lệ
   // để không biến endpoint này thành proxy mở cho người khác lợi dụng.
   const resolution = url.searchParams.get('resolution') || '1';
-  if (!['1', '5', '15', '30', '60', '1D'].includes(resolution)) {
+  if (!['1', '5', '15', '30', '1H', '1D'].includes(resolution)) {
     return json({ error: 'Khung thời gian không hợp lệ' }, 400);
   }
 

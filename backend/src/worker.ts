@@ -417,6 +417,9 @@ app.get('/api/market/ohlc', async (c) => {
   }
 
   const resolution = c.req.query('resolution') || '1';
+  if (!['1', '5', '15', '30', '1H', '1D'].includes(resolution)) {
+    return c.json({ error: 'Khung thời gian không hợp lệ' }, 400);
+  }
   const now = Math.floor(Date.now() / 1000);
   const from = Number(c.req.query('from')) || now - 86400 * 5;
   const to = Number(c.req.query('to')) || now + 3600;
