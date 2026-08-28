@@ -167,6 +167,26 @@ test('12. Mã KHÁC ngoài Deal dùng giá vốn bình quân, không dính hằn
   assert.equal(r.breakevenPrice, 20000);
 });
 
+test('12b. Đọc đúng tên cột thiếu từ thông báo lỗi THẬT của Supabase', async () => {
+  const { missingColumnFrom } = await import('../frontend/src/services/supabaseErrors.ts');
+
+  /* Hai chuỗi dưới đây là phản hồi THẬT lấy từ máy chủ srgdawqqwogkyncqvqta
+     ngày 28/08/2026, không phải chuỗi tự nghĩ ra. */
+  const pgrst204 =
+    '{"code":"PGRST204","details":null,"hint":null,"message":"Could not find the ' +
+    "'current_simulated_date' column of 'portfolios' in the schema cache\"}";
+  const err42703 =
+    '{"code":"42703","details":null,"hint":null,"message":"column positions.breakeven_price does not exist"}';
+
+  assert.equal(missingColumnFrom(pgrst204), 'current_simulated_date');
+  assert.equal(missingColumnFrom(err42703), 'breakeven_price');
+
+  // Lỗi thuộc loại khác thì KHÔNG được bỏ cột nào — tránh âm thầm mất dữ liệu
+  assert.equal(missingColumnFrom('{"code":"42501","message":"permission denied for table positions"}'), null);
+  assert.equal(missingColumnFrom('{"message":"JWT expired"}'), null);
+  assert.equal(missingColumnFrom(''), null);
+});
+
 test('13. Không còn hằng số ảnh chụp số dư nào sót lại trong mã nguồn', async () => {
   const { readFileSync, readdirSync, statSync } = await import('node:fs');
   const { join } = await import('node:path');

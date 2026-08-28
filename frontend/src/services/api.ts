@@ -1,5 +1,6 @@
 import { OrderRequestPayload, Portfolio, Position, Transaction } from '../types';
 import { localTradingEngine } from './localTradingEngine';
+import { missingColumnFrom } from './supabaseErrors';
 
 const SUPABASE_URL = 'https://srgdawqqwogkyncqvqta.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNyZ2Rhd3Fxd29na3luY3F2cXRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2NDY3OTIsImV4cCI6MjEwMzIyMjc5Mn0._VPuo9m9dw7NEYWTbJmmRQAaw4KiNDuEH7Y5mGHfr08';
@@ -40,8 +41,20 @@ function pick(obj: Record<string, any>, columns: string[]): Record<string, any> 
   return out;
 }
 
-/** Ghi lên Supabase và BÁO LỖI THẬT thay vì nuốt im lặng. */
-async function writeToSupabase(path: string, body: unknown, method: 'POST' | 'PATCH' = 'POST'): Promise<boolean> {
+/**
+ * Ghi lên Supabase và BÁO LỖI THẬT thay vì nuốt im lặng.
+ *
+ * Nếu cơ sở dữ liệu chưa được cập nhật cấu trúc (thiếu cột), PostgREST huỷ TOÀN BỘ
+ * lệnh ghi chỉ vì một cột lạ — đúng lỗi đã khiến app im lặng không lưu được gì suốt
+ * từ 25/8. Ở đây ta bỏ cột bị thiếu rồi thử lại, để dữ liệu vẫn lưu được trên DB cũ,
+ * đồng thời log cảnh báo nhắc chạy CAP-NHAT-SUPABASE.sql.
+ */
+async function writeToSupabase(
+  path: string,
+  body: Record<string, any> | Record<string, any>[],
+  method: 'POST' | 'PATCH' = 'POST',
+  attempt = 0
+): Promise<boolean> {
   try {
     const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
       method,
@@ -49,11 +62,22 @@ async function writeToSupabase(path: string, body: unknown, method: 'POST' | 'PA
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(6000)
     });
-    if (!res.ok) {
-      console.error('[Supabase ' + method + ' ' + path + '] ' + res.status + ': ' + (await res.text()));
-      return false;
+    if (res.ok) return true;
+
+    const errorText = await res.text();
+    const missing = attempt < 8 && !Array.isArray(body) ? missingColumnFrom(errorText) : null;
+
+    if (missing && missing in (body as Record<string, any>)) {
+      console.warn(
+        `[Supabase] Bảng thiếu cột "${missing}" — bỏ qua cột này và thử lại. ` +
+          'Hãy chạy CAP-NHAT-SUPABASE.sql trong SQL Editor để bổ sung đầy đủ.'
+      );
+      const { [missing]: _removed, ...rest } = body as Record<string, any>;
+      return writeToSupabase(path, rest, method, attempt + 1);
     }
-    return true;
+
+    console.error('[Supabase ' + method + ' ' + path + '] ' + res.status + ': ' + errorText);
+    return false;
   } catch (e) {
     console.error('[Supabase ' + method + ' ' + path + '] loi mang:', e);
     return false;
