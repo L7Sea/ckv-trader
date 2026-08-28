@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 import { VN50_WATCHLIST } from './MarketBoard';
+import { TradingViewChart } from './TradingViewChart';
 
 interface TickTrade {
   id: string;
@@ -29,10 +30,13 @@ export const TechnicalChart: React.FC = () => {
   const foundStock = watchlist.find((s) => s.symbol === activeSymbol) || VN50_WATCHLIST.find((s) => s.symbol === activeSymbol);
   const currentPos = positions.find((p) => p.symbol === activeSymbol);
 
-  // Xác định sàn giao dịch (HOSE / HNX / UPCOM)
+  /* Sàn niêm yết lấy TỪ DỮ LIỆU của chính mã đó; hai danh sách cứng bên dưới chỉ
+     là phương án dự phòng cho mã lạ chưa có trong kho. */
   const hnxSymbols = ['SHS', 'IDC', 'PVS', 'CEO', 'MBS', 'NVB', 'TNG', 'VCS', 'DTD', 'BVS', 'HUT', 'TIG'];
   const upcomSymbols = ['BSR', 'VGI', 'C4G', 'ABB', 'QNS', 'MCH', 'VEA', 'OIL', 'SSH', 'NAB', 'DDV', 'ACV'];
-  const exchange = hnxSymbols.includes(activeSymbol) ? 'HNX' : upcomSymbols.includes(activeSymbol) ? 'UPCOM' : 'HOSE';
+  const exchange =
+    foundStock?.exchange ||
+    (hnxSymbols.includes(activeSymbol) ? 'HNX' : upcomSymbols.includes(activeSymbol) ? 'UPCOM' : 'HOSE');
 
   // Giá và thông số thị trường thực tế
   const currentPrice = currentPos?.market_price || foundStock?.price || 14600;
@@ -155,15 +159,7 @@ export const TechnicalChart: React.FC = () => {
 
       {/* ══ 1. BIỂU ĐỒ NẾN TRADINGVIEW INTERACTIVE PRO ══ */}
       {activeTab === 'TRADINGVIEW' && (
-        <div className="w-full h-[560px] rounded-2xl overflow-hidden border border-[#212636] bg-[#0c1017]">
-          <iframe
-            key={`${exchange}-${activeSymbol}`}
-            title={`TradingView Chart ${activeSymbol}`}
-            src={`https://s.tradingview.com/widgetembed/?symbol=${exchange}%3A${activeSymbol}&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=121620&studies=%5B%5D&theme=dark&style=1&timezone=Asia%2FHo_Chi_Minh&withdateranges=1&showpopupbutton=1&popupwidth=1000&popupheight=650&locale=vi_VN`}
-            className="w-full h-full border-0"
-            allowFullScreen
-          />
-        </div>
+        <TradingViewChart key={`${exchange}-${activeSymbol}`} symbol={activeSymbol} exchange={exchange} height={560} />
       )}
 
       {/* ══ 2. SỔ LỆNH BƯỚC GIÁ 3 CẤP (DNSE ENTRADE X STYLE) ══ */}
