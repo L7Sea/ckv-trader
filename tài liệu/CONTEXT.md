@@ -63,8 +63,8 @@
    2. Ngoài lãi vay, DNSE còn cộng **~255 đ/ngày** phí Deal vào giá vốn. Bằng chứng: ngày
       27/8 và 28/8 giá TPB đứng yên 14,700 nhưng lãi chưa chốt vẫn xấu đi 2,617 đ.
 
-   - **TradingView Pro Interactive Widget**: iframe nhúng để XEM biểu đồ. Không đọc được
-     dữ liệu giá từ iframe (Same-Origin Policy) — giá thực lấy qua proxy Worker, xem mục 6.
+   - **TradingView Pro Interactive Widget**: widget chính thức để XEM biểu đồ. Không đọc được
+     dữ liệu giá từ widget (Same-Origin Policy) — giá thực lấy qua proxy, xem mục 9 và 11.1.
    - **Cơ chế Auto-Migration Cache**: Khóa phiên bản `ckv_data_version_lock` (`2026-08-28-dealmodel-v7`).
 
 ---
@@ -80,15 +80,18 @@
 ## 3. 🧪 TIÊU CHUẨN KIỂM THỬ & PHÂN LUỒNG MỆNH LỆNH
 - **Chế độ Báo cáo / Tìm lỗi (Inspect Mode)**: Khi người dùng hỏi "báo cáo lỗi", "chỉ ra lỗi sai", "tại sao lệch" $\rightarrow$ AI chỉ tập trung phân tích chuyên môn và đề xuất hướng xử lý, tuyệt đối không tự ý sửa code hay push.
 - **Chế độ Thực thi (Execution Mode)**: Khi người dùng ra lệnh "sửa và push", "sửa cho tôi đi", "tiến hành sửa toàn bộ" $\rightarrow$ AI sửa code, chạy test suites, build và tự động commit/push Cloudflare Pages.
-- `node scripts/test-trading-formulas.cjs`: **15/15 bài test toán học định lượng & vĩ mô đạt chuẩn 100%** (bao gồm CTCK tùy chỉnh VPS/TCBS/DNSE, Thuần Tiền Mặt 01, Realized PnL khi bán, SettleDay lãi động, Sizing 1.5% NAV và Stress-Test -21% sập sàn).
-- `node scripts/test-sql-schema.cjs`: **18/18 bài test toàn vẹn mô hình dữ liệu SQL** (bao gồm multi-user auth, private 1-1 support threads & backup/restore).
+- `npm run test:all` chạy trọn bộ. Riêng lẻ:
+- `node scripts/test-deal-model.mjs`: **17/17 bài test mô hình tiền**, đối chiếu số dư thật DNSE.
+- `node scripts/test-auto-sync.mjs`: **8/8 bài test lịch tự động đồng bộ**.
+- `node scripts/test-trading-formulas.cjs`: **20/20 bài test toán học định lượng & vĩ mô đạt chuẩn 100%** (bao gồm CTCK tùy chỉnh VPS/TCBS/DNSE, Thuần Tiền Mặt 01, Realized PnL khi bán, SettleDay lãi động, Sizing 1.5% NAV và Stress-Test -21% sập sàn).
+- `node scripts/test-sql-schema.cjs`: **17/17 bài test toàn vẹn mô hình dữ liệu SQL** (bao gồm multi-user auth, private 1-1 support threads & backup/restore).
 - `npm --prefix frontend run build`: 100% sạch cảnh báo và 0 lỗi TypeScript.
 - **Triển khai thường trực**: Tự động commit chuẩn Conventional Commits và đẩy thẳng lên Cloudflare Pages / GitHub (`git push origin master`) sau mỗi lần cập nhật.
 
 ---
 
 ## 4. 👥 KIẾN TRÚC ĐA NGƯỜI DÙNG, TÙY CHỌN CTCK & TRUNG TÂM HƯỚNG DẪN
-- **👑 Tài khoản Chủ Nhân (Admin VIP)**: Giữ trọn vẹn số dư tài sản thực tế (1,000 TPB, nợ Margin 7.002tr, NAV 7.448tr). Có quyền mở Admin Panel để giám sát danh sách người dùng và trả lời tin nhắn trực tiếp.
+- **👑 Tài khoản Chủ Nhân (Admin VIP)**: Giữ trọn vẹn số dư tài sản thực tế (1,000 TPB; Nợ và NAV tính động theo `dealModel.ts`, không hardcode). Có quyền mở Admin Panel để giám sát danh sách người dùng và trả lời tin nhắn trực tiếp.
 - **👤 Người Dùng Mới (Guest / New Trader)**: Tự do tạo tài khoản bằng Email/Mật khẩu hoặc Đăng nhập 1-Click Google. Khởi tạo sạch sẽ từ 0đ (Tiền mặt: 0đ, Nợ: 0đ, Danh mục: Rỗng) để tự trải nghiệm độc lập.
 - **🏦 Tùy Chọn CTCK & Lãi Suất Margin**: Tùy chỉnh lãi suất gói vay theo DNSE (12.5% - mức đo được từ dư nợ thực tế), VPS (13.5%), TCBS (10.5%), SSI (12.0%), VNDirect (12.8%) hoặc tỷ lệ tùy ý.
 - **🛡️ Chế Độ Thuần Tiền Mặt (Tiểu khoản 01)**: Tự động triệt tiêu toàn bộ nợ Margin, tiền lãi vay = 0đ/ngày, giá hòa vốn thuần túy chỉ gồm thuế phí 0.25%.
@@ -185,7 +188,7 @@
 
 ---
 
-## 6. 📡 DỮ LIỆU THỊ TRƯỜNG THỜI GIAN THỰC
+## 9. 📡 DỮ LIỆU THỊ TRƯỜNG THỜI GIAN THỰC
 
 **Vì sao không lấy được số liệu từ TradingView:** widget nhúng `s.tradingview.com/widgetembed`
 là iframe khác origin — trình duyệt chặn tuyệt đối việc JavaScript đọc dữ liệu bên trong.
@@ -207,7 +210,7 @@ Widget miễn phí cũng không cung cấp API trả giá ra ngoài. Nó chỉ �
 
 ---
 
-## 7. 🧪 NGUYÊN TẮC KIỂM THỬ (bài học từ bộ test cũ)
+## 10. 🧪 NGUYÊN TẮC KIỂM THỬ (bài học từ bộ test cũ)
 
 Bộ test cũ khai báo hằng số ngay trong test rồi assert lại chính hằng số đó
 (`const marginDebt = 6898107 + 103944; assert(marginDebt === 7002051)`). Kiểu test này
@@ -219,3 +222,52 @@ NAV 7,498,120 còn app hardcode 7,598,120.
 2. Chuẩn đối chiếu là **ảnh chụp số dư thật trên DNSE**, không phải kỳ vọng của lập trình viên.
 3. `scripts/test-deal-model.mjs` là nguồn kiểm chứng duy nhất cho Nợ / NAV / Lãi lỗ / Hòa vốn.
 4. Có test quét mã nguồn chặn hằng số ảnh chụp số dư quay lại (test 13).
+
+---
+
+## 11. 🖥️ BA LỖI TRẢI NGHIỆM ĐÃ SỬA (28/08/2026)
+
+### 11.1 Biểu đồ không đổi theo mã đang chọn
+
+Bản cũ nhúng iframe `s.tradingview.com/widgetembed/?symbol=...&symboledit=1` — endpoint nội bộ
+không có tài liệu. Tham số `symboledit=1` cho phép widget TỰ GHI NHỚ mã cuối vào localStorage
+của chính tradingview.com; khi mã trong URL không khớp thứ nó nhớ, nó lặng lẽ hiện lại mã cũ.
+Đó là lý do chọn VCB/TCB nhưng biểu đồ vẫn là Apple Inc.
+
+Đã thay bằng widget CHÍNH THỨC (`embed-widget-advanced-chart.js`) trong
+`components/TradingViewChart.tsx`: mã truyền qua cấu hình JSON, widget được DỰNG LẠI mỗi
+lần đổi mã. Sàn niêm yết lấy từ dữ liệu của chính mã đó thay vì hai mảng cứng.
+
+Thêm hai lớp bảo vệ để không bao giờ sai âm thầm nữa:
+- Badge **"Đang yêu cầu: HOSE:VCB"** luôn hiện góc phải biểu đồ — nhìn là biết chart có đúng mã không
+- Không dựng được widget trong 8 giây thì hiện cảnh báo + nút mở thẳng trên tradingview.com
+
+### 11.2 Hỏi phong cách Capy trước khi đăng nhập
+
+`isStylePickerOpen` khởi tạo thẳng từ localStorage, không hề tham chiếu trạng thái đăng nhập,
+nên modal bật ngay lúc dựng giao diện và đè lên cả màn hình đăng nhập của khách mới.
+
+Đã sửa: chỉ mở SAU KHI có `user`. Khoá ghi nhớ đổi từ toàn cục `ckv_style_initialized`
+sang theo từng tài khoản `ckv_style_initialized_<userId>` — mỗi thành viên mới vẫn được
+hỏi một lần của riêng họ thay vì bị bỏ qua vì máy đã từng có người khác chọn.
+
+### 11.3 Phải tự bấm nút Đồng Bộ
+
+Không hề có bộ hẹn giờ nào. Đã thêm `lib/useAutoSync.ts` + `lib/syncSchedule.ts`:
+
+| Mốc | Giờ Việt Nam |
+|---|---|
+| Sáng (mở cửa) | 09:20 |
+| Trưa (nghỉ giữa phiên) | 11:40 |
+| Chiều (sau ATC) | 15:05 |
+| Tối (chốt ngày) | 20:00 |
+
+- Mỗi mốc chạy ĐÚNG một lần mỗi ngày (dấu vết `ngày|mốc` trong localStorage) — mở app 10 lần không đồng bộ 10 lần
+- Tắt máy cả ngày rồi mở lúc 21h: chỉ chạy mốc mới nhất, không dồn 4 lần
+- Trong phiên (T2-T6, 09:00-15:00) làm tươi giá mỗi 2 phút, bỏ qua khi tab đang ẩn
+- Chỉ chạy khi ĐÃ đăng nhập
+- Logic giờ giấc tách riêng ở `syncSchedule.ts` để kiểm thử thật bằng `scripts/test-auto-sync.mjs` (8/8 PASS)
+
+**Lưu ý về import:** module nào cần kiểm thử bằng Node phải viết đuôi `.ts` tường minh trong
+đường dẫn tương đối (`from '../services/dealModel.ts'`). Vite và `allowImportingTsExtensions`
+đều chấp nhận, còn Node ESM thì bắt buộc.
