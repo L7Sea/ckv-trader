@@ -117,31 +117,31 @@ export const OrderForm: React.FC = () => {
   };
 
   return (
-    <div className={`bg-slate-900/90 border rounded-3xl p-5 shadow-sm space-y-4 transition-all duration-300 ${
+    <div className={`bg-the border rounded-3xl p-5 shadow-sm space-y-4 transition-all duration-300 ${
       isPulsing
-        ? 'border-emerald-400 ring-2 ring-emerald-500/40 shadow-xl shadow-emerald-500/20'
-        : 'border-slate-800/80'
+        ? 'border-tot ring-2 ring-tot shadow-xl shadow-md'
+        : 'border-vien'
     }`}>
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-        <h2 className="text-base font-bold text-white flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-emerald-400" />
+      <div className="flex items-center justify-between pb-3 border-b border-vien">
+        <h2 className="text-base font-bold text-chu flex items-center gap-2">
+          <BookOpen className="h-5 w-5 text-tot" />
           <span>Ghi Nhật Ký Lệnh & Đề Xuất</span>
         </h2>
-        <span className="text-[10px] uppercase font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full font-mono">
+        <span className="text-[10px] uppercase font-bold text-canh-bao bg-canh-bao-nen border border-vien px-2 py-0.5 rounded-full font-mono">
           Chuẩn T+2.5
         </span>
       </div>
 
       {/* Tabs MUA / BÁN */}
-      <div className="grid grid-cols-2 gap-2 p-1 bg-slate-950/80 rounded-2xl border border-slate-800">
+      <div className="grid grid-cols-2 gap-2 p-1 bg-nen rounded-2xl border border-vien">
         <button
           type="button"
           onClick={() => setType('BUY')}
           className={`py-2 rounded-xl text-xs font-bold transition ${
             type === 'BUY'
-              ? 'bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/20'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-tot text-tren-nhan font-black shadow-md shadow-md'
+              : 'text-chu-phu hover:text-chu'
           }`}
         >
           GHI MUA (VÀO LỆNH)
@@ -151,8 +151,8 @@ export const OrderForm: React.FC = () => {
           onClick={() => setType('SELL')}
           className={`py-2 rounded-xl text-xs font-bold transition ${
             type === 'SELL'
-              ? 'bg-rose-500 text-white font-black shadow-md shadow-rose-500/20'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-loi text-tren-nhan font-black shadow-md shadow-md'
+              : 'text-chu-phu hover:text-chu'
           }`}
         >
           GHI BÁN (CHỐT / CẮT)
@@ -161,16 +161,16 @@ export const OrderForm: React.FC = () => {
 
       {/* Tùy Chọn Nguồn Vốn Khi MUA */}
       {type === 'BUY' && (
-        <div className="p-2.5 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-1.5">
-          <div className="flex items-center justify-between text-[11px] text-slate-400 font-semibold">
+        <div className="p-2.5 rounded-2xl bg-nen border border-vien space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] text-chu-phu font-semibold">
             <span>Nguồn Vốn Giải Ngân:</span>
-            <span className="font-mono text-emerald-400 text-[10px]">
+            <span className="font-mono text-tot text-[10px]">
               {isCashAccount ? 'TK 01: Thuần Tiền Mặt' : `TK 06: Margin ${brokerageName} (${marginRate}%)`}
             </span>
           </div>
 
           {isCashAccount ? (
-            <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center text-xs text-emerald-300 font-bold">
+            <div className="p-2 rounded-xl bg-tot-nen border border-vien text-center text-xs text-tot font-bold">
               💰 Mua 100% bằng Tiền Mặt khả dụng (Không phát sinh nợ Margin)
             </div>
           ) : (
@@ -180,36 +180,36 @@ export const OrderForm: React.FC = () => {
                 onClick={() => setFundingSource('CASH')}
                 className={`py-1.5 px-2 rounded-xl border transition flex flex-col items-center justify-center gap-0.5 ${
                   fundingSource === 'CASH'
-                    ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    ? 'bg-tot-nen border-tot text-tot'
+                    : 'bg-the border-vien text-chu-phu hover:text-chu'
                 }`}
               >
                 <span>100% Tiền Mặt</span>
-                <span className="text-[9px] font-normal text-slate-400 font-sans">Tiền tự có</span>
+                <span className="text-[9px] font-normal text-chu-phu font-sans">Tiền tự có</span>
               </button>
               <button
                 type="button"
                 onClick={() => setFundingSource('MARGIN_DEAL')}
                 className={`py-1.5 px-2 rounded-xl border transition flex flex-col items-center justify-center gap-0.5 ${
                   fundingSource === 'MARGIN_DEAL'
-                    ? 'bg-purple-500/20 border-purple-500 text-purple-300'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    ? 'bg-the2 border-nhan-chu text-nhan-chu'
+                    : 'bg-the border-vien text-chu-phu hover:text-chu'
                 }`}
               >
                 <span>100% Vay {brokerageName}</span>
-                <span className="text-[9px] font-normal text-purple-300/80 font-sans">Margin {marginRate}%</span>
+                <span className="text-[9px] font-normal text-nhan-chu font-sans">Margin {marginRate}%</span>
               </button>
               <button
                 type="button"
                 onClick={() => setFundingSource('HYBRID')}
                 className={`py-1.5 px-2 rounded-xl border transition flex flex-col items-center justify-center gap-0.5 ${
                   fundingSource === 'HYBRID'
-                    ? 'bg-amber-500/20 border-amber-500 text-amber-300'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    ? 'bg-canh-bao-nen border-canh-bao text-canh-bao'
+                    : 'bg-the border-vien text-chu-phu hover:text-chu'
                 }`}
               >
                 <span>Hỗn Hợp (50-50)</span>
-                <span className="text-[9px] font-normal text-amber-300/80 font-sans">Tự có + Vay</span>
+                <span className="text-[9px] font-normal text-canh-bao font-sans">Tự có + Vay</span>
               </button>
             </div>
           )}
@@ -219,56 +219,56 @@ export const OrderForm: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-3.5">
         {/* Ngày Giao Dịch */}
         <div className="space-y-1">
-          <label className="text-xs text-slate-400 flex items-center gap-1 font-semibold">
-            <Calendar className="h-3.5 w-3.5 text-indigo-400" />
+          <label className="text-xs text-chu-phu flex items-center gap-1 font-semibold">
+            <Calendar className="h-3.5 w-3.5 text-nhan-chu" />
             <span>Ngày giao dịch (Khớp lệnh):</span>
           </label>
           <input
             type="date"
             value={tradeDate}
             onChange={(e) => setTradeDate(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500"
+            className="w-full bg-nen border border-vien rounded-xl px-3 py-2 text-xs font-mono text-chu focus:outline-none focus:border-tot"
           />
         </div>
 
         {/* Mã Cổ Phiếu & Giá Khớp */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <label className="text-xs text-slate-400 font-semibold">Mã Cổ Phiếu:</label>
+            <label className="text-xs text-chu-phu font-semibold">Mã Cổ Phiếu:</label>
             <input
               type="text"
               placeholder="VD: HPG, FPT..."
               value={symbol}
               onChange={(e) => setSymbol(e.target.value.toUpperCase())}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-emerald-500"
+              className="w-full bg-nen border border-vien rounded-xl px-3 py-2 text-xs font-mono font-bold text-chu focus:outline-none focus:border-tot"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs text-slate-400 font-semibold">Giá Đề Xuất / Khớp:</label>
+            <label className="text-xs text-chu-phu font-semibold">Giá Đề Xuất / Khớp:</label>
             <input
               type="number"
               step="50"
               placeholder="VND"
               value={price || ''}
               onChange={(e) => setPrice(Number(e.target.value))}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-emerald-500"
+              className="w-full bg-nen border border-vien rounded-xl px-3 py-2 text-xs font-mono font-bold text-chu focus:outline-none focus:border-tot"
             />
           </div>
         </div>
 
         {/* Khối Lượng (Lô 100) & Quản Trị Rủi Ro 1.5% NAV */}
         <div className="space-y-1">
-          <div className="flex justify-between text-xs text-slate-400">
+          <div className="flex justify-between text-xs text-chu-phu">
             <span className="font-semibold flex items-center gap-1.5">
               <span>Khối lượng (Lô 100):</span>
               {quantity % 100 !== 0 && (
-                <span className="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/30">
+                <span className="text-[10px] text-canh-bao bg-canh-bao-nen px-1.5 py-0.2 rounded border border-vien">
                   Lô lẻ
                 </span>
               )}
             </span>
-            <span className="font-mono text-emerald-400">{formatNumber(quantity)} CP</span>
+            <span className="font-mono text-tot">{formatNumber(quantity)} CP</span>
           </div>
           <input
             type="number"
@@ -276,7 +276,7 @@ export const OrderForm: React.FC = () => {
             min="1"
             value={quantity || ''}
             onChange={(e) => setQuantity(Number(e.target.value))}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-emerald-500"
+            className="w-full bg-nen border border-vien rounded-xl px-3 py-2 text-xs font-mono font-bold text-chu focus:outline-none focus:border-tot"
           />
           {/* Quick Quantity Shortcuts & 1.5% Risk Rule */}
           <div className="space-y-1.5 pt-1">
@@ -286,7 +286,7 @@ export const OrderForm: React.FC = () => {
                   key={q}
                   type="button"
                   onClick={() => setQuantity(q)}
-                  className="py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300 hover:text-white font-semibold"
+                  className="py-1.5 rounded-xl bg-nen border border-vien text-[11px] font-mono text-chu-phu hover:text-chu font-semibold"
                 >
                   +{formatNumber(q)}
                 </button>
@@ -301,7 +301,7 @@ export const OrderForm: React.FC = () => {
                 setQuantity(safeQty);
               }}
               title="Tính khối lượng theo quy tắc quản trị rủi ro tối đa 1.5% NAV"
-              className="w-full py-2 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-mono text-indigo-300 font-bold flex items-center justify-center gap-1.5 transition active:scale-95"
+              className="w-full py-2 rounded-xl bg-the2 hover:bg-the2 border border-vien text-xs font-mono text-nhan-chu font-bold flex items-center justify-center gap-1.5 transition active:scale-95"
             >
               <span>🎯 Tính Khối Lượng An Toàn (1.5% NAV)</span>
             </button>
@@ -310,14 +310,14 @@ export const OrderForm: React.FC = () => {
 
         {/* Chiến Lược & Lý Do Vào Lệnh */}
         <div className="space-y-1">
-          <label className="text-xs text-slate-400 font-semibold flex items-center gap-1">
-            <Target className="h-3.5 w-3.5 text-amber-400" />
+          <label className="text-xs text-chu-phu font-semibold flex items-center gap-1">
+            <Target className="h-3.5 w-3.5 text-canh-bao" />
             <span>Chiến lược / Lý do giao dịch:</span>
           </label>
           <select
             value={strategy}
             onChange={(e) => setStrategy(e.target.value as TradeStrategy)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer"
+            className="w-full bg-nen border border-vien rounded-xl px-3 py-2 text-xs text-chu focus:outline-none focus:border-tot cursor-pointer"
           >
             <option value="PULLBACK_MA20">📈 Bắt đáy / Chạm hỗ trợ MA20</option>
             <option value="BREAKOUT">🚀 Mua vượt đỉnh (Breakout)</option>
@@ -331,30 +331,30 @@ export const OrderForm: React.FC = () => {
 
         {/* Giá Mục Tiêu & Cắt Lỗ (Kế hoạch quản trị rủi ro) */}
         {type === 'BUY' && (
-          <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-2">
+          <div className="p-3 bg-nen border border-vien rounded-2xl space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-slate-300">Kế Hoạch Quản Trị Rủi Ro (R:R)</span>
-              <span className="font-mono text-emerald-400 font-bold">R:R = {rrRatio}</span>
+              <span className="font-bold text-chu-phu">Kế Hoạch Quản Trị Rủi Ro (R:R)</span>
+              <span className="font-mono text-tot font-bold">R:R = {rrRatio}</span>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] text-emerald-400">Target (Mục tiêu):</label>
+                <label className="text-[11px] text-tot">Target (Mục tiêu):</label>
                 <input
                   type="number"
                   placeholder="Giá chốt lời"
                   value={targetPrice || ''}
                   onChange={(e) => setTargetPrice(Number(e.target.value))}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs font-mono text-emerald-400"
+                  className="w-full bg-the border border-vien rounded-lg px-2 py-1 text-xs font-mono text-tot"
                 />
               </div>
               <div>
-                <label className="text-[11px] text-rose-400">Stop Loss (Cắt lỗ):</label>
+                <label className="text-[11px] text-loi">Stop Loss (Cắt lỗ):</label>
                 <input
                   type="number"
                   placeholder="Giá cắt lỗ"
                   value={stopLoss || ''}
                   onChange={(e) => setStopLoss(Number(e.target.value))}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs font-mono text-rose-400"
+                  className="w-full bg-the border border-vien rounded-lg px-2 py-1 text-xs font-mono text-loi"
                 />
               </div>
             </div>
@@ -363,29 +363,29 @@ export const OrderForm: React.FC = () => {
 
         {/* Ghi chú nhật ký tâm lý */}
         <div className="space-y-1">
-          <label className="text-xs text-slate-400 font-semibold">Ghi chú & Tâm lý vào lệnh:</label>
+          <label className="text-xs text-chu-phu font-semibold">Ghi chú & Tâm lý vào lệnh:</label>
           <textarea
             rows={2}
             placeholder="Ghi lại lý do, nhận định thị trường hoặc bài học..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 resize-none"
+            className="w-full bg-nen border border-vien rounded-xl p-2.5 text-xs text-chu placeholder:text-chu-mo focus:outline-none focus:border-tot resize-none"
           />
         </div>
 
         {/* Tóm tắt dòng tiền */}
-        <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 font-mono text-xs">
-          <div className="flex justify-between text-slate-400">
+        <div className="p-3 bg-nen rounded-2xl border border-vien space-y-1.5 font-mono text-xs">
+          <div className="flex justify-between text-chu-phu">
             <span>Giá trị giao dịch:</span>
-            <span className="text-white">{formatNumber(tradeValue)} VND</span>
+            <span className="text-chu">{formatNumber(tradeValue)} VND</span>
           </div>
-          <div className="flex justify-between text-slate-400">
+          <div className="flex justify-between text-chu-phu">
             <span>Thuế & Phí (0.15% - 0.25%):</span>
-            <span className="text-slate-300">{formatNumber(fee + tax)} VND</span>
+            <span className="text-chu-phu">{formatNumber(fee + tax)} VND</span>
           </div>
-          <div className="flex justify-between text-white font-bold pt-1 border-t border-slate-800">
+          <div className="flex justify-between text-chu font-bold pt-1 border-t border-vien">
             <span>Tổng thanh toán ({type === 'BUY' ? 'Trừ tiền' : 'Tiền về'}):</span>
-            <span className={type === 'BUY' ? 'text-emerald-400' : 'text-cyan-400'}>
+            <span className={type === 'BUY' ? 'text-tot' : 'text-nhan-chu'}>
               {formatNumber(netAmount)} VND
             </span>
           </div>
@@ -397,8 +397,8 @@ export const OrderForm: React.FC = () => {
           disabled={isLoading || (type === 'BUY' && !isBuyValid) || (type === 'SELL' && !isSellValid)}
           className={`w-full py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition active:scale-95 shadow-lg ${
             type === 'BUY'
-              ? 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-emerald-500/20 disabled:opacity-40'
-              : 'bg-rose-500 hover:bg-rose-400 text-white shadow-rose-500/20 disabled:opacity-40'
+              ? 'bg-tot hover:bg-tot text-tren-nhan shadow-md disabled:opacity-40'
+              : 'bg-loi hover:bg-loi text-tren-nhan shadow-md disabled:opacity-40'
           }`}
         >
           {isLoading ? 'ĐANG GHI SỔ CÁI...' : type === 'BUY' ? 'GHI SỔ LỆNH MUA' : 'GHI SỔ LỆNH BÁN'}

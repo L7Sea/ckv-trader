@@ -51,40 +51,40 @@ export const HelpCenterModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-3xl max-h-[90vh] p-5 sm:p-6 shadow-2xl relative flex flex-col justify-between space-y-4">
+    <div className="fixed inset-0 z-50 bg-nen backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+      <div className="bg-the border border-vien rounded-3xl w-full max-w-3xl max-h-[90vh] p-5 sm:p-6 shadow-2xl relative flex flex-col justify-between space-y-4">
         <button
           onClick={closeHelpCenter}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition"
+          className="absolute top-4 right-4 text-chu-phu hover:text-chu p-1.5 rounded-xl hover:bg-the2 transition"
         >
           <X className="h-5 w-5" />
         </button>
 
         {/* Header */}
-        <div className="flex items-center gap-3 pb-3 border-b border-slate-800 shrink-0">
-          <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <div className="flex items-center gap-3 pb-3 border-b border-vien shrink-0">
+          <div className="p-3 rounded-2xl bg-tot-nen text-tot border border-vien">
             <BookOpen className="h-6 w-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-white">Trung Tâm Cẩm Nang & Hướng Dẫn Sử Dụng</h3>
-              <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-mono">
+              <h3 className="text-base font-bold text-chu">Trung Tâm Cẩm Nang & Hướng Dẫn Sử Dụng</h3>
+              <span className="text-[10px] uppercase font-bold text-tot bg-tot-nen border border-vien px-2 py-0.5 rounded-full font-mono">
                 Knowledge Base
               </span>
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-chu-phu">
               Cẩm nang 8 trang, Hướng dẫn Capy Gunny, tùy chỉnh CTCK, giao dịch tiền mặt & mã cổ phiếu lạ
             </p>
           </div>
         </div>
 
         {/* 5 Tabs Menu */}
-        <div className="grid grid-cols-5 gap-1 p-1 bg-slate-950 rounded-2xl border border-slate-800 text-[11px] sm:text-xs font-bold shrink-0">
+        <div className="grid grid-cols-5 gap-1 p-1 bg-nen rounded-2xl border border-vien text-[11px] sm:text-xs font-bold shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab('GUIDE')}
             className={`py-2 px-1 rounded-xl transition text-center truncate ${
-              activeTab === 'GUIDE' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
+              activeTab === 'GUIDE' ? 'bg-tot text-tren-nhan font-black' : 'text-chu-phu hover:text-chu'
             }`}
           >
             📖 TỔNG QUAN
@@ -93,7 +93,7 @@ export const HelpCenterModal: React.FC = () => {
             type="button"
             onClick={() => setActiveTab('CAPY_TOUR')}
             className={`py-2 px-1 rounded-xl transition text-center truncate ${
-              activeTab === 'CAPY_TOUR' ? 'bg-amber-500 text-slate-950 font-black' : 'text-amber-400/80 hover:text-amber-300'
+              activeTab === 'CAPY_TOUR' ? 'bg-canh-bao text-tren-nhan font-black' : 'text-canh-bao hover:text-canh-bao'
             }`}
           >
             🐾 HƯỚNG DẪN CAPY
@@ -102,7 +102,7 @@ export const HelpCenterModal: React.FC = () => {
             type="button"
             onClick={() => setActiveTab('BROKERAGE')}
             className={`py-2 px-1 rounded-xl transition text-center truncate ${
-              activeTab === 'BROKERAGE' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
+              activeTab === 'BROKERAGE' ? 'bg-tot text-tren-nhan font-black' : 'text-chu-phu hover:text-chu'
             }`}
           >
             🏦 CHỌN CTCK
@@ -111,7 +111,7 @@ export const HelpCenterModal: React.FC = () => {
             type="button"
             onClick={() => setActiveTab('CUSTOM_STOCKS')}
             className={`py-2 px-1 rounded-xl transition text-center truncate ${
-              activeTab === 'CUSTOM_STOCKS' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
+              activeTab === 'CUSTOM_STOCKS' ? 'bg-tot text-tren-nhan font-black' : 'text-chu-phu hover:text-chu'
             }`}
           >
             🔍 MÃ LẠ
@@ -120,7 +120,7 @@ export const HelpCenterModal: React.FC = () => {
             type="button"
             onClick={() => setActiveTab('FAQ')}
             className={`py-2 px-1 rounded-xl transition text-center truncate ${
-              activeTab === 'FAQ' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
+              activeTab === 'FAQ' ? 'bg-tot text-tren-nhan font-black' : 'text-chu-phu hover:text-chu'
             }`}
           >
             ❓ FAQ
@@ -131,25 +131,25 @@ export const HelpCenterModal: React.FC = () => {
         <div className="flex-1 overflow-y-auto space-y-4 pr-1 text-xs leading-relaxed font-sans">
           {activeTab === 'GUIDE' && (
             <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
-                <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-emerald-400" />
+              <div className="p-4 rounded-2xl bg-nen border border-vien space-y-2.5">
+                <h4 className="text-sm font-bold text-chu flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-tot" />
                   <span>Bản Chất Cốt Lõi Của CKV Pro Trader</span>
                 </h4>
-                <p className="text-slate-300">
+                <p className="text-chu-phu">
                   CKV Pro Trader là <b>Nền tảng Quản trị Vị thế, Nhật ký Giao dịch & Phân tích Định lượng Vĩ mô</b> chuyên sâu, không phải là app đẩy lệnh khớp trực tiếp lên sàn HOSE/HNX. Nền tảng giúp bạn:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 font-mono text-[11px]">
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-300">
+                  <div className="p-3 rounded-xl bg-the border border-vien text-chu-phu">
                     🎯 <b>Quản Trị Vị Thế Kỷ Luật:</b> Theo dõi chính xác Giá Vốn Mua Ban Đầu vs Giá Hòa Vốn sau khi gánh lãi vay Margin và thuế phí.
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-300">
+                  <div className="p-3 rounded-xl bg-the border border-vien text-chu-phu">
                     ⚡ <b>Đồng Bộ Toàn Diện 1-Click:</b> Nạp giá thực tế 300 mã sàn HOSE/HNX/UPCOM + Lãi suất 20 Ngân hàng.
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-300">
+                  <div className="p-3 rounded-xl bg-the border border-vien text-chu-phu">
                     🤖 <b>Radar 150 Thuật Toán:</b> Hệ thống chấm điểm AI Alpha từ 0 - 100 điểm tìm mã dẫn sóng.
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-300">
+                  <div className="p-3 rounded-xl bg-the border border-vien text-chu-phu">
                     💬 <b>Kênh Hỗ Trợ Trực Tuyến:</b> Nhắn tin trực tiếp với Admin bất kỳ lúc nào để nhận giải đáp.
                   </div>
                 </div>
@@ -159,31 +159,31 @@ export const HelpCenterModal: React.FC = () => {
 
           {activeTab === 'CAPY_TOUR' && (
             <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3">
+              <div className="p-4 rounded-2xl bg-canh-bao-nen border border-vien space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-amber-400" />
+                  <h4 className="text-sm font-bold text-chu flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-canh-bao" />
                     <span>Trợ Lý Capy Gunny — Thú Cưng Tương Tác & Game Gunny Mini</span>
                   </h4>
-                  <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/40">
+                  <span className="text-[10px] font-mono font-bold text-canh-bao bg-canh-bao-nen px-2 py-0.5 rounded border border-vien">
                     Interactive Pet
                   </span>
                 </div>
-                <p className="text-slate-300 text-xs">
+                <p className="text-chu-phu text-xs">
                   Capy Gunny ở góc màn hình có 4 cách chơi đùa & tương tác vật lý cực kỳ thú vị:
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono">
-                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+                  <div className="p-2.5 rounded-xl bg-the border border-vien text-chu-phu">
                     😊 <b>1. Chạm 1 Lần:</b> Capy chớp mắt, đổi 4 biểu cảm (vui vẻ, ngạc nhiên, ngầu, troll) và phát câu thoại chứng khoán dí dỏm.
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+                  <div className="p-2.5 rounded-xl bg-the border border-vien text-chu-phu">
                     👒 <b>2. Nhấp Đúp (Double-Click):</b> Capy xoay vòng đổi trang phục (Nón cam, Mũ cối, Kính râm Cyberpunk, Vương miện, Đồ Gunny).
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+                  <div className="p-2.5 rounded-xl bg-the border border-vien text-chu-phu">
                     🚀 <b>3. Kéo Thả & Quăng Ném:</b> Cầm nắm Capy kéo ném khắp màn hình, Capy bay lượn, nảy bật vào tường và rơi tự do theo trọng lực.
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+                  <div className="p-2.5 rounded-xl bg-the border border-vien text-chu-phu">
                     🎯 <b>4. Giữ 3s "Gunny Mode":</b> Nhấn giữ chuột 3 giây để đếm ngược 3..2..1, kéo tia laser đo góc độ và thanh Power % bắn đại bác Gunny!
                   </div>
                 </div>
@@ -195,7 +195,7 @@ export const HelpCenterModal: React.FC = () => {
                       closeHelpCenter();
                       openOnboarding();
                     }}
-                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 uppercase tracking-wide"
+                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-canh-bao to-canh-bao hover:from-canh-bao hover:to-canh-bao text-chu font-black text-xs transition shadow-lg shadow-md flex items-center justify-center gap-2 uppercase tracking-wide"
                   >
                     <Sparkles className="h-4 w-4" />
                     <span>🚀 Khởi Chạy Hướng Dẫn Tương Tác Capy Gunny (4 Bước Chi Tiết)</span>
@@ -207,17 +207,17 @@ export const HelpCenterModal: React.FC = () => {
 
           {activeTab === 'BROKERAGE' && (
             <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+              <div className="p-4 rounded-2xl bg-nen border border-vien space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                    <Landmark className="h-4 w-4 text-purple-400" />
+                  <h4 className="text-sm font-bold text-chu flex items-center gap-2">
+                    <Landmark className="h-4 w-4 text-nhan-chu" />
                     <span>Cấu Hình Công Ty Chứng Khoán & Lãi Suất Margin</span>
                   </h4>
-                  <span className="text-[10px] font-mono font-bold text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                  <span className="text-[10px] font-mono font-bold text-nhan-chu bg-the2 px-2 py-0.5 rounded border border-vien">
                     Đang chọn: {user?.brokerage || 'DNSE'} ({user?.customMarginRate || DEAL_CONFIG.marginRateAnnual}%/năm)
                   </span>
                 </div>
-                <p className="text-slate-300 text-[11px]">
+                <p className="text-chu-phu text-[11px]">
                   Nếu bạn dùng <b>VPS, TCBS, SSI, VNDirect</b> hoặc có gói ưu đãi lãi suất riêng, hãy chọn bên dưới để app tự động tính đúng chi phí lãi vay Margin mỗi ngày:
                 </p>
 
@@ -233,34 +233,34 @@ export const HelpCenterModal: React.FC = () => {
                       }}
                       className={`p-3 rounded-2xl border text-left transition flex flex-col justify-between gap-1 ${
                         selectedBroker === b.code
-                          ? 'bg-purple-500/20 border-purple-500 text-white'
-                          : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:text-white'
+                          ? 'bg-the2 border-nhan-chu text-chu'
+                          : 'bg-the border-vien text-chu-phu hover:text-chu'
                       }`}
                     >
                       <div className="flex items-center justify-between font-bold text-xs">
                         <span>{b.name}</span>
-                        <span className="font-mono text-purple-400">{b.rate}%</span>
+                        <span className="font-mono text-nhan-chu">{b.rate}%</span>
                       </div>
-                      <span className="text-[10px] text-slate-500 font-sans">{b.desc}</span>
+                      <span className="text-[10px] text-chu-mo font-sans">{b.desc}</span>
                     </button>
                   ))}
                 </div>
 
                 <div className="flex items-center gap-3 pt-2">
                   <div className="flex-1">
-                    <label className="text-[11px] text-slate-400 block mb-1">Lãi suất Margin thực tế (%/năm):</label>
+                    <label className="text-[11px] text-chu-phu block mb-1">Lãi suất Margin thực tế (%/năm):</label>
                     <input
                       type="number"
                       step="0.01"
                       value={customRate}
                       onChange={(e) => setCustomRate(Number(e.target.value))}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm font-mono font-bold text-white focus:outline-none focus:border-purple-500"
+                      className="w-full bg-the border border-vien rounded-xl px-3 py-2 text-sm font-mono font-bold text-chu focus:outline-none focus:border-nhan-chu"
                     />
                   </div>
                   <button
                     type="button"
                     onClick={handleSaveBrokerage}
-                    className="px-5 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-white font-bold text-xs transition mt-5 shadow-md shadow-purple-500/20"
+                    className="px-5 py-2.5 rounded-xl bg-nhan hover:bg-nhan text-tren-nhan font-bold text-xs transition mt-5 shadow-md shadow-md"
                   >
                     LƯU CẤU HÌNH CTCK
                   </button>
@@ -268,8 +268,8 @@ export const HelpCenterModal: React.FC = () => {
               </div>
 
               {/* Chế độ Thuần Tiền Mặt (Tiểu khoản 01) */}
-              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-2 text-slate-300">
-                <h4 className="text-sm font-bold text-emerald-400 flex items-center gap-2">
+              <div className="p-4 rounded-2xl bg-tot-nen border border-vien space-y-2 text-tot">
+                <h4 className="text-sm font-bold text-tot flex items-center gap-2">
                   <ShieldCheck className="h-4 w-4" />
                   <span>Bạn Không Vay Margin? (Giao dịch 100% Tiền Mặt)</span>
                 </h4>
@@ -282,7 +282,7 @@ export const HelpCenterModal: React.FC = () => {
                     switchSubAccount('01');
                     alert('Đã chuyển sang Tiểu khoản 01: Giao dịch thuần tiền mặt (Không Margin)!');
                   }}
-                  className="px-4 py-1.5 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs shadow-md shadow-emerald-500/20"
+                  className="px-4 py-1.5 rounded-xl bg-tot text-tren-nhan font-bold text-xs shadow-md shadow-md"
                 >
                   Chuyển Sang Tiểu Khoản 01 (Thường) Ngay
                 </button>
@@ -292,19 +292,19 @@ export const HelpCenterModal: React.FC = () => {
 
           {activeTab === 'CUSTOM_STOCKS' && (
             <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
-                <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Search className="h-4 w-4 text-cyan-400" />
+              <div className="p-4 rounded-2xl bg-nen border border-vien space-y-3">
+                <h4 className="text-sm font-bold text-chu flex items-center gap-2">
+                  <Search className="h-4 w-4 text-nhan-chu" />
                   <span>Cách Giao Dịch & Nạp Mã Cổ Phiếu Lạ (Sàn UPCOM, HNX, HOSE)</span>
                 </h4>
-                <p className="text-slate-300 text-[11px]">
+                <p className="text-chu-phu text-[11px]">
                   Ngoài kho 300 mã mặc định, bạn có thể nhập và theo dõi <b>BẤT KỲ MÃ CỔ PHIẾU NÀO</b> trên thị trường chứng khoán Việt Nam:
                 </p>
-                <div className="space-y-2 font-mono text-[11px] text-slate-300">
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                <div className="space-y-2 font-mono text-[11px] text-chu-phu">
+                  <div className="p-3 rounded-xl bg-the border border-vien">
                     1️⃣ <b>Tại Sổ Lệnh (Trang 1):</b> Nhập bất kỳ mã nào vào ô "Mã Cổ Phiếu" (VD: <code>VNZ</code>, <code>SGP</code>, <code>NAB</code>, <code>CTR</code>, <code>PRT</code>). Hệ thống sẽ tự động gửi request kéo thị giá live từ sàn về.
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                  <div className="p-3 rounded-xl bg-the border border-vien">
                     2️⃣ <b>Cập Nhật Giá Thủ Công:</b> Nếu một mã sàn UPCOM ít thanh khoản không có nến trên API, bạn chỉ cần bấm nút <b>"Sửa Giá"</b> ở Bảng vị thế hoặc nhập giá khớp thực tế của bạn, app sẽ tự động tính PnL và giá vốn chuẩn xác 100%!
                   </div>
                 </div>
@@ -314,23 +314,23 @@ export const HelpCenterModal: React.FC = () => {
 
           {activeTab === 'FAQ' && (
             <div className="space-y-3">
-              <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-                <h5 className="font-bold text-white text-xs">❓ Tôi mới tạo tài khoản thì tiền có bị mất hay ảnh hưởng không?</h5>
-                <p className="text-slate-400 text-[11px]">
+              <div className="p-3.5 rounded-2xl bg-nen border border-vien space-y-1">
+                <h5 className="font-bold text-chu text-xs">❓ Tôi mới tạo tài khoản thì tiền có bị mất hay ảnh hưởng không?</h5>
+                <p className="text-chu-phu text-[11px]">
                   Số dư ban đầu của bạn là 0 VNĐ. Toàn bộ giao dịch và số tiền của bạn được lưu trong không gian độc lập, bạn có thể tự do nạp vốn ảo để trải nghiệm mà không ảnh hưởng đến bất kỳ ai.
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-                <h5 className="font-bold text-white text-xs">❓ Làm sao để tính giá hòa vốn sau khi mua gom (DCA)?</h5>
-                <p className="text-slate-400 text-[11px]">
+              <div className="p-3.5 rounded-2xl bg-nen border border-vien space-y-1">
+                <h5 className="font-bold text-chu text-xs">❓ Làm sao để tính giá hòa vốn sau khi mua gom (DCA)?</h5>
+                <p className="text-chu-phu text-[11px]">
                   Hãy vào <b>Trang 2 (Quản trị Vị thế & Hòa vốn)</b>, kéo thanh trượt kịch bản mua thêm. Hệ thống sẽ tính ngay giá hòa vốn mới và có nút <b>1-Click Action</b> bắn thẳng lệnh sang Sổ lệnh!
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-                <h5 className="font-bold text-white text-xs">❓ Làm sao để nhắn tin trực tiếp cho Admin?</h5>
-                <p className="text-slate-400 text-[11px]">
+              <div className="p-3.5 rounded-2xl bg-nen border border-vien space-y-1">
+                <h5 className="font-bold text-chu text-xs">❓ Làm sao để nhắn tin trực tiếp cho Admin?</h5>
+                <p className="text-chu-phu text-[11px]">
                   Bấm nút <b>"Hỗ Trợ Admin"</b> ở góc dưới màn hình hoặc trên thanh Header để gửi tin nhắn trực tiếp tới anh Hải (Admin VIP).
                 </p>
               </div>
@@ -339,7 +339,7 @@ export const HelpCenterModal: React.FC = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className="pt-3 border-t border-slate-800 shrink-0 flex flex-wrap items-center justify-between gap-2">
+        <div className="pt-3 border-t border-vien shrink-0 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -347,7 +347,7 @@ export const HelpCenterModal: React.FC = () => {
                 closeHelpCenter();
                 openOnboarding();
               }}
-              className="px-3.5 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-emerald-400 border border-emerald-500/30 font-bold text-xs transition flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-xl bg-nen hover:bg-the2 text-tot border border-vien font-bold text-xs transition flex items-center gap-1.5"
             >
               <Sparkles className="h-3.5 w-3.5" />
               <span>Xem Lại Tour 5 Bước</span>
@@ -359,7 +359,7 @@ export const HelpCenterModal: React.FC = () => {
                 closeHelpCenter();
                 openSupportChat();
               }}
-              className="px-3.5 py-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 font-bold text-xs transition flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-xl bg-the2 hover:bg-the2 text-nhan-chu border border-vien font-bold text-xs transition flex items-center gap-1.5"
             >
               <MessageSquare className="h-3.5 w-3.5" />
               <span>Nhắn Tin Hỏi Admin</span>
@@ -369,7 +369,7 @@ export const HelpCenterModal: React.FC = () => {
           <button
             type="button"
             onClick={closeHelpCenter}
-            className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow-md shadow-emerald-500/20"
+            className="px-5 py-2 rounded-xl bg-tot hover:bg-tot text-tren-nhan font-bold text-xs transition shadow-md shadow-md"
           >
             ĐÃ HIỂU & ĐÓNG
           </button>

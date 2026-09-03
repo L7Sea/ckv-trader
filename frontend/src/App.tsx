@@ -82,7 +82,7 @@ export const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white pb-20 md:pb-6">
+    <div className="min-h-screen bg-transparent text-tren-nhan flex flex-col font-sans selection:bg-tot selection:text-tren-nhan pb-20 md:pb-6">
       {/* Header Bar */}
       <Header />
 
@@ -90,24 +90,24 @@ export const AppContent: React.FC = () => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-5">
         {/* Toast / Notification Banner */}
         {error && (
-          <div className="flex items-center justify-between p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-rose-300 text-sm shadow-lg animate-in fade-in">
+          <div className="flex items-center justify-between p-4 bg-loi-nen border border-vien rounded-2xl text-loi text-sm shadow-lg animate-in fade-in">
             <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-rose-400 shrink-0" />
+              <AlertCircle className="h-5 w-5 text-loi shrink-0" />
               <span>{error}</span>
             </div>
-            <button onClick={clearMessages} className="p-1 hover:bg-rose-500/20 rounded-lg text-rose-400">
+            <button onClick={clearMessages} className="p-1 hover:bg-loi-nen rounded-lg text-loi">
               <X className="h-4 w-4" />
             </button>
           </div>
         )}
 
         {successMessage && (
-          <div className="flex items-center justify-between p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-emerald-300 text-sm shadow-lg animate-in fade-in">
+          <div className="flex items-center justify-between p-4 bg-tot-nen border border-vien rounded-2xl text-tot text-sm shadow-lg animate-in fade-in">
             <div className="flex items-center gap-3">
-              <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
+              <CheckCircle2 className="h-5 w-5 text-tot shrink-0" />
               <span>{successMessage}</span>
             </div>
-            <button onClick={clearMessages} className="p-1 hover:bg-emerald-500/20 rounded-lg text-emerald-400">
+            <button onClick={clearMessages} className="p-1 hover:bg-tot-nen rounded-lg text-tot">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -117,15 +117,15 @@ export const AppContent: React.FC = () => {
         <PortfolioOverview />
 
         {/* Navigation Tabs Bar (Desktop & Tablet Pill Bar - Tinh gọn, vừa vặn 100% trên 1 hàng) */}
-        <div className="hidden md:flex items-center justify-start border-b border-[#212636] pb-2 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-1 p-1 bg-[#121620] rounded-2xl border border-[#212636] text-xs font-semibold backdrop-blur-md shrink-0 w-full justify-between">
+        <div className="hidden md:flex items-center justify-start border-b border-vien pb-2 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1 p-1 bg-the rounded-2xl border border-vien text-xs font-semibold backdrop-blur-md shrink-0 w-full justify-between">
             <button
               data-tab="TRADE"
               onClick={() => setActiveTab('TRADE')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'TRADE'
-                  ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                  ? 'bg-tot text-tren-nhan font-bold shadow-md shadow-md'
+                  : 'text-chu-phu hover:text-chu hover:bg-the2'
               }`}
             >
               <TrendingUp className="h-4 w-4" />
@@ -137,8 +137,8 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('DECISION')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'DECISION'
-                  ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                  ? 'bg-canh-bao text-tren-nhan font-bold shadow-md shadow-md'
+                  : 'text-chu-phu hover:text-chu hover:bg-the2'
               }`}
             >
               <Scale className="h-4 w-4" />
@@ -150,8 +150,8 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('ALGORITHMS')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'ALGORITHMS'
-                  ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                  ? 'bg-nhan text-tren-nhan font-bold shadow-md shadow-md'
+                  : 'text-chu-phu hover:text-chu hover:bg-the2'
               }`}
             >
               <Cpu className="h-4 w-4" />
@@ -163,8 +163,8 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('MARKET')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'MARKET'
-                  ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                  ? 'bg-nhan text-tren-nhan font-bold shadow-md shadow-md'
+                  : 'text-chu-phu hover:text-chu hover:bg-the2'
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
@@ -176,11 +176,11 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('MACRO')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'MACRO'
-                  ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/30'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                  ? 'bg-tot text-tren-nhan font-bold shadow-md shadow-md'
+                  : 'text-chu-phu hover:text-chu hover:bg-the2'
               }`}
             >
-              <Landmark className="h-4 w-4 text-emerald-300" />
+              <Landmark className="h-4 w-4 text-tot" />
               <span>LÃI SUẤT VĨ MÔ</span>
             </button>
 
@@ -189,8 +189,8 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('INTELLIGENCE')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'INTELLIGENCE'
-                  ? 'bg-teal-500 text-slate-950 font-bold shadow-md shadow-teal-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                  ? 'bg-tot text-tren-nhan font-bold shadow-md shadow-md'
+                  : 'text-chu-phu hover:text-chu hover:bg-the2'
               }`}
             >
               <Newspaper className="h-4 w-4" />
@@ -202,8 +202,8 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('CHARTS')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'CHARTS'
-                  ? 'bg-purple-600 text-white font-bold shadow-md shadow-purple-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                  ? 'bg-nhan text-tren-nhan font-bold shadow-md shadow-md'
+                  : 'text-chu-phu hover:text-chu hover:bg-the2'
               }`}
             >
               <PieChart className="h-4 w-4" />
@@ -215,8 +215,8 @@ export const AppContent: React.FC = () => {
               onClick={() => setActiveTab('ANALYTICS')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
                 activeTab === 'ANALYTICS'
-                  ? 'bg-rose-500 text-white font-bold shadow-md shadow-rose-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                  ? 'bg-loi text-tren-nhan font-bold shadow-md shadow-md'
+                  : 'text-chu-phu hover:text-chu hover:bg-the2'
               }`}
             >
               <Award className="h-4 w-4" />
@@ -240,12 +240,12 @@ export const AppContent: React.FC = () => {
       <Capy />
 
       {/* Mobile Bottom Navigation (Chuẩn Mobile Native 5 Nút & Bottom Sheet Khám Phá Đầy Đủ 8 Trang) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 border-t border-slate-800 backdrop-blur-2xl px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),10px)] shadow-2xl">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-nen border-t border-vien backdrop-blur-2xl px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),10px)] shadow-2xl">
         <div className="grid grid-cols-5 gap-1 text-center">
           <button
             onClick={() => setActiveTab('TRADE')}
             className={`flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl transition ${
-              activeTab === 'TRADE' ? 'text-emerald-400 font-bold bg-emerald-500/10' : 'text-slate-400'
+              activeTab === 'TRADE' ? 'text-tot font-bold bg-tot-nen' : 'text-chu-phu'
             }`}
           >
             <TrendingUp className="h-4 w-4" />
@@ -255,7 +255,7 @@ export const AppContent: React.FC = () => {
           <button
             onClick={() => setActiveTab('DECISION')}
             className={`flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl transition ${
-              activeTab === 'DECISION' ? 'text-amber-400 font-bold bg-amber-500/10' : 'text-slate-400'
+              activeTab === 'DECISION' ? 'text-canh-bao font-bold bg-canh-bao-nen' : 'text-chu-phu'
             }`}
           >
             <Scale className="h-4 w-4" />
@@ -265,7 +265,7 @@ export const AppContent: React.FC = () => {
           <button
             onClick={() => setActiveTab('MARKET')}
             className={`flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl transition ${
-              activeTab === 'MARKET' ? 'text-cyan-400 font-bold bg-cyan-500/10' : 'text-slate-400'
+              activeTab === 'MARKET' ? 'text-nhan-chu font-bold bg-the2' : 'text-chu-phu'
             }`}
           >
             <LayoutGrid className="h-4 w-4" />
@@ -275,7 +275,7 @@ export const AppContent: React.FC = () => {
           <button
             onClick={() => setActiveTab('ALGORITHMS')}
             className={`flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl transition ${
-              activeTab === 'ALGORITHMS' ? 'text-indigo-400 font-bold bg-indigo-500/10' : 'text-slate-400'
+              activeTab === 'ALGORITHMS' ? 'text-nhan-chu font-bold bg-the2' : 'text-chu-phu'
             }`}
           >
             <Cpu className="h-4 w-4" />
@@ -287,8 +287,8 @@ export const AppContent: React.FC = () => {
             onClick={() => setIsMobileMoreOpen(!isMobileMoreOpen)}
             className={`flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl transition ${
               ['MACRO', 'CHARTS', 'ANALYTICS', 'INTELLIGENCE'].includes(activeTab) || isMobileMoreOpen
-                ? 'text-purple-400 font-bold bg-purple-500/10'
-                : 'text-slate-400'
+                ? 'text-nhan-chu font-bold bg-the2'
+                : 'text-chu-phu'
             }`}
           >
             <Compass className="h-4 w-4" />
@@ -299,16 +299,16 @@ export const AppContent: React.FC = () => {
 
       {/* Mobile More Bottom Sheet (Trang Vĩ Mô, Tài Sản, Hiệu Suất, Tin Tức) */}
       {isMobileMoreOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col justify-end animate-in fade-in">
-          <div className="bg-slate-900 border-t border-slate-800 rounded-t-3xl p-5 space-y-4 shadow-2xl animate-in slide-in-from-bottom pb-[max(env(safe-area-inset-bottom),20px)]">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="md:hidden fixed inset-0 z-50 bg-nen backdrop-blur-md flex flex-col justify-end animate-in fade-in">
+          <div className="bg-the border-t border-vien rounded-t-3xl p-5 space-y-4 shadow-2xl animate-in slide-in-from-bottom pb-[max(env(safe-area-inset-bottom),20px)]">
+            <div className="flex items-center justify-between border-b border-vien pb-3">
               <div className="flex items-center gap-2">
-                <Compass className="h-5 w-5 text-purple-400" />
-                <h3 className="text-sm font-bold text-white">Khám Phá Toàn Diện CKV Pro</h3>
+                <Compass className="h-5 w-5 text-nhan-chu" />
+                <h3 className="text-sm font-bold text-chu">Khám Phá Toàn Diện CKV Pro</h3>
               </div>
               <button
                 onClick={() => setIsMobileMoreOpen(false)}
-                className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
+                className="p-1 text-chu-phu hover:text-chu rounded-lg hover:bg-the2"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -322,14 +322,14 @@ export const AppContent: React.FC = () => {
                 }}
                 className={`p-3 rounded-2xl border text-left flex items-center gap-2.5 transition ${
                   activeTab === 'MACRO'
-                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
-                    : 'bg-slate-950/80 border-slate-800 text-slate-300'
+                    ? 'bg-tot-nen border-vien text-tot'
+                    : 'bg-nen border-vien text-chu-phu'
                 }`}
               >
-                <Landmark className="h-5 w-5 text-emerald-400 shrink-0" />
+                <Landmark className="h-5 w-5 text-tot shrink-0" />
                 <div>
                   <div className="font-bold">Lãi Suất Vĩ Mô</div>
-                  <div className="text-[10px] text-slate-400 font-normal">20 Bank & FinTech</div>
+                  <div className="text-[10px] text-chu-phu font-normal">20 Bank & FinTech</div>
                 </div>
               </button>
 
@@ -340,14 +340,14 @@ export const AppContent: React.FC = () => {
                 }}
                 className={`p-3 rounded-2xl border text-left flex items-center gap-2.5 transition ${
                   activeTab === 'CHARTS'
-                    ? 'bg-purple-500/20 border-purple-500/50 text-purple-300'
-                    : 'bg-slate-950/80 border-slate-800 text-slate-300'
+                    ? 'bg-the2 border-vien text-nhan-chu'
+                    : 'bg-nen border-vien text-chu-phu'
                 }`}
               >
-                <PieChart className="h-5 w-5 text-purple-400 shrink-0" />
+                <PieChart className="h-5 w-5 text-nhan-chu shrink-0" />
                 <div>
                   <div className="font-bold">Cơ Cấu Vốn & NAV</div>
-                  <div className="text-[10px] text-slate-400 font-normal">Phân bổ tài sản</div>
+                  <div className="text-[10px] text-chu-phu font-normal">Phân bổ tài sản</div>
                 </div>
               </button>
 
@@ -358,14 +358,14 @@ export const AppContent: React.FC = () => {
                 }}
                 className={`p-3 rounded-2xl border text-left flex items-center gap-2.5 transition ${
                   activeTab === 'ANALYTICS'
-                    ? 'bg-rose-500/20 border-rose-500/50 text-rose-300'
-                    : 'bg-slate-950/80 border-slate-800 text-slate-300'
+                    ? 'bg-loi-nen border-vien text-loi'
+                    : 'bg-nen border-vien text-chu-phu'
                 }`}
               >
-                <Award className="h-5 w-5 text-rose-400 shrink-0" />
+                <Award className="h-5 w-5 text-loi shrink-0" />
                 <div>
                   <div className="font-bold">Hiệu Suất & Excel</div>
-                  <div className="text-[10px] text-slate-400 font-normal">Xuất file kiểm toán</div>
+                  <div className="text-[10px] text-chu-phu font-normal">Xuất file kiểm toán</div>
                 </div>
               </button>
 
@@ -376,14 +376,14 @@ export const AppContent: React.FC = () => {
                 }}
                 className={`p-3 rounded-2xl border text-left flex items-center gap-2.5 transition ${
                   activeTab === 'INTELLIGENCE'
-                    ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300'
-                    : 'bg-slate-950/80 border-slate-800 text-slate-300'
+                    ? 'bg-the2 border-vien text-nhan-chu'
+                    : 'bg-nen border-vien text-chu-phu'
                 }`}
               >
-                <Newspaper className="h-5 w-5 text-cyan-400 shrink-0" />
+                <Newspaper className="h-5 w-5 text-nhan-chu shrink-0" />
                 <div>
                   <div className="font-bold">Tin Tức Thị Trường</div>
-                  <div className="text-[10px] text-slate-400 font-normal">BCTC & Gợi ý AI</div>
+                  <div className="text-[10px] text-chu-phu font-normal">BCTC & Gợi ý AI</div>
                 </div>
               </button>
             </div>

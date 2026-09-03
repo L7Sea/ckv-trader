@@ -8,27 +8,27 @@ export const TransactionHistory: React.FC = () => {
   const formatNumber = (num: number) => (num || 0).toLocaleString('vi-VN');
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-5 shadow-sm">
-      <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+    <div className="bg-the border border-vien rounded-2xl p-5 shadow-sm">
+      <div className="flex items-center justify-between pb-4 border-b border-vien">
         <div className="flex items-center gap-2">
-          <History className="h-5 w-5 text-emerald-400" />
-          <h2 className="text-base font-bold text-white">Nhật Ký Khớp Lệnh (Transaction History)</h2>
+          <History className="h-5 w-5 text-tot" />
+          <h2 className="text-base font-bold text-chu">Nhật Ký Khớp Lệnh (Transaction History)</h2>
         </div>
-        <span className="text-xs text-slate-400 font-mono">
+        <span className="text-xs text-chu-phu font-mono">
           {transactions.length} giao dịch
         </span>
       </div>
 
       {transactions.length === 0 ? (
-        <div className="py-10 text-center text-slate-500">
+        <div className="py-10 text-center text-chu-mo">
           <FileSpreadsheet className="h-9 w-9 mx-auto stroke-1 opacity-40 mb-2" />
           <p className="text-sm">Chưa có dữ liệu giao dịch nào.</p>
         </div>
       ) : (
         <div className="overflow-x-auto mt-4 max-h-96">
           <table className="w-full text-left text-xs font-mono">
-            <thead className="sticky top-0 bg-slate-900 z-10">
-              <tr className="border-b border-slate-800 text-slate-400 uppercase tracking-wider font-sans font-semibold">
+            <thead className="sticky top-0 bg-the z-10">
+              <tr className="border-b border-vien text-chu-phu uppercase tracking-wider font-sans font-semibold">
                 <th className="pb-3 px-2">Thời Gian</th>
                 <th className="pb-3 px-2">Loại</th>
                 <th className="pb-3 px-2">Mã CP</th>
@@ -40,7 +40,7 @@ export const TransactionHistory: React.FC = () => {
                 <th className="pb-3 px-2">Ghi Chú</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/50">
+            <tbody className="divide-y divide-the2">
               {transactions.map((tx) => {
                 const isBuy = tx.type === 'BUY';
                 const totalFeeTax = (tx.fee || 0) + (tx.tax || 0);
@@ -48,9 +48,9 @@ export const TransactionHistory: React.FC = () => {
                 const isProfit = (tx.realized_pnl || 0) >= 0;
 
                 return (
-                  <tr key={tx.id} className="hover:bg-slate-800/30 transition">
+                  <tr key={tx.id} className="hover:bg-the2 transition">
                     {/* Thời gian */}
-                    <td className="py-3 px-2 text-slate-400 text-[11px]">
+                    <td className="py-3 px-2 text-chu-phu text-[11px]">
                       {tx.timestamp ? new Date(tx.timestamp).toLocaleString('vi-VN') : tx.trade_date}
                     </td>
 
@@ -59,8 +59,8 @@ export const TransactionHistory: React.FC = () => {
                       <span
                         className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] ${
                           isBuy
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                            ? 'bg-tot-nen text-tot border border-vien'
+                            : 'bg-loi-nen text-loi border border-vien'
                         }`}
                       >
                         {isBuy ? <ArrowDownLeft className="h-3 w-3" /> : <ArrowUpRight className="h-3 w-3" />}
@@ -69,43 +69,43 @@ export const TransactionHistory: React.FC = () => {
                     </td>
 
                     {/* Mã CP */}
-                    <td className="py-3 px-2 font-bold text-white text-sm">
+                    <td className="py-3 px-2 font-bold text-chu text-sm">
                       {tx.symbol}
                     </td>
 
                     {/* Khối lượng */}
-                    <td className="py-3 px-2 text-right font-bold text-slate-200">
+                    <td className="py-3 px-2 text-right font-bold text-chu">
                       {formatNumber(tx.quantity)}
                     </td>
 
                     {/* Giá khớp */}
-                    <td className="py-3 px-2 text-right text-slate-300">
+                    <td className="py-3 px-2 text-right text-chu-phu">
                       {formatNumber(tx.price)}
                     </td>
 
                     {/* Tổng giá trị */}
-                    <td className="py-3 px-2 text-right font-semibold text-slate-200">
+                    <td className="py-3 px-2 text-right font-semibold text-chu">
                       {formatNumber(tx.total_amount)}
                     </td>
 
                     {/* Phí & Thuế */}
-                    <td className="py-3 px-2 text-right text-slate-400 text-[11px]">
+                    <td className="py-3 px-2 text-right text-chu-phu text-[11px]">
                       {formatNumber(totalFeeTax)}
                     </td>
 
                     {/* Lãi / Lỗ Chốt */}
                     <td className="py-3 px-2 text-right font-bold">
                       {hasPnl ? (
-                        <span className={isProfit ? 'text-emerald-400' : 'text-rose-400'}>
+                        <span className={isProfit ? 'text-tot' : 'text-loi'}>
                           {isProfit ? '+' : ''}{formatNumber(tx.realized_pnl!)}
                         </span>
                       ) : (
-                        <span className="text-slate-600">-</span>
+                        <span className="text-chu-mo">-</span>
                       )}
                     </td>
 
                     {/* Ghi chú */}
-                    <td className="py-3 px-2 text-slate-400 text-[11px] max-w-[150px] truncate font-sans">
+                    <td className="py-3 px-2 text-chu-phu text-[11px] max-w-[150px] truncate font-sans">
                       {tx.notes || '-'}
                     </td>
                   </tr>

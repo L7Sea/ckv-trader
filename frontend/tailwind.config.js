@@ -41,7 +41,11 @@ export default {
       },
       fontFamily: {
         'tieu-de': PHONG.tieuDe,
-        than: PHONG.than
+        than: PHONG.than,
+        /* `font-sans` đang được dùng rải rác khắp app. Trỏ nó về đúng phông của
+           app thay vì để rơi về mặc định Tailwind — nếu không, mọi chỗ có
+           `font-sans` sẽ ghi đè phông tiêu đề lẫn thân bài. */
+        sans: PHONG.than
       },
       fontSize: Object.fromEntries(Object.entries(THANG_CHU).map(([k, v]) => [k, v])),
       borderRadius: BO_GOC

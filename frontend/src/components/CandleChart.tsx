@@ -107,11 +107,11 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
 
   return (
     <div
-      className="w-full rounded-2xl border border-[#212636] bg-[#0c1017] flex flex-col overflow-hidden"
+      className="w-full rounded-2xl border border-vien bg-the flex flex-col overflow-hidden"
       style={{ height }}
     >
       {/* Thanh công cụ: khung thời gian + thông tin nến đang trỏ */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 border-b border-[#212636]">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 border-b border-vien">
         <div className="flex items-center gap-1">
           {TIMEFRAMES.map((tf) => (
             <button
@@ -119,8 +119,8 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
               onClick={() => setTimeframe(tf.id)}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-bold font-sans transition ${
                 timeframe === tf.id
-                  ? 'bg-emerald-500 text-slate-950'
-                  : 'text-slate-400 hover:text-white hover:bg-[#181d29]'
+                  ? 'bg-tot text-tren-nhan'
+                  : 'text-chu-phu hover:text-chu hover:bg-the'
               }`}
             >
               {tf.label}
@@ -129,7 +129,7 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
           <button
             onClick={() => setReloadToken((n) => n + 1)}
             title="Tải lại dữ liệu nến"
-            className="ml-1 p-1.5 rounded-lg text-slate-400 hover:text-emerald-300 hover:bg-[#181d29] transition"
+            className="ml-1 p-1.5 rounded-lg text-chu-phu hover:text-tot hover:bg-the transition"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${status === 'loading' ? 'animate-spin' : ''}`} />
           </button>
@@ -137,36 +137,36 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
 
         {active && (
           <div className="flex items-center gap-2.5 font-mono text-[11px]">
-            <span className="text-slate-500">{active.time}</span>
-            <span className="text-slate-400">
-              M <span className="text-slate-200">{fmt(active.open)}</span>
+            <span className="text-chu-mo">{active.time}</span>
+            <span className="text-chu-phu">
+              M <span className="text-chu">{fmt(active.open)}</span>
             </span>
-            <span className="text-slate-400">
-              C <span className="text-emerald-300">{fmt(active.high)}</span>
+            <span className="text-chu-phu">
+              C <span className="text-tot">{fmt(active.high)}</span>
             </span>
-            <span className="text-slate-400">
-              T <span className="text-rose-300">{fmt(active.low)}</span>
+            <span className="text-chu-phu">
+              T <span className="text-loi">{fmt(active.low)}</span>
             </span>
-            <span className="text-slate-400">
-              Đ <span className="text-white font-bold">{fmt(active.close)}</span>
+            <span className="text-chu-phu">
+              Đ <span className="text-chu font-bold">{fmt(active.close)}</span>
             </span>
-            <span className="text-slate-400 hidden sm:inline">
-              KL <span className="text-sky-300">{fmtVol(active.volume)}</span>
+            <span className="text-chu-phu hidden sm:inline">
+              KL <span className="text-nhan-chu">{fmtVol(active.volume)}</span>
             </span>
           </div>
         )}
 
         <div className="flex items-center gap-2 text-[10px] font-mono">
-          <span className="text-amber-300">MA20</span>
-          <span className="text-sky-300">MA50</span>
-          <span className="text-fuchsia-300">EMA9</span>
+          <span className="text-canh-bao">MA20</span>
+          <span className="text-nhan-chu">MA50</span>
+          <span className="text-nhan-chu">EMA9</span>
         </div>
       </div>
 
       {/* Vùng vẽ */}
       <div className="relative flex-1 min-h-0">
         {status === 'loading' && (
-          <div className="absolute inset-0 flex items-center justify-center gap-2 text-slate-400 text-sm">
+          <div className="absolute inset-0 flex items-center justify-center gap-2 text-chu-phu text-sm">
             <Loader2 className="h-4 w-4 animate-spin" />
             Đang tải nến {exchange}:{symbol}...
           </div>
@@ -174,18 +174,18 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
 
         {status === 'empty' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
-            <AlertTriangle className="h-8 w-8 text-amber-400" />
-            <p className="text-sm text-slate-300 font-semibold">
-              Chưa lấy được dữ liệu nến cho <span className="font-mono text-white">{symbol}</span>
+            <AlertTriangle className="h-8 w-8 text-canh-bao" />
+            <p className="text-sm text-chu-phu font-semibold">
+              Chưa lấy được dữ liệu nến cho <span className="font-mono text-chu">{symbol}</span>
             </p>
-            <p className="text-xs text-slate-500 max-w-md">
+            <p className="text-xs text-chu-mo max-w-md">
               Nguồn dữ liệu không phản hồi. App KHÔNG vẽ nến giả để lấp chỗ trống — thà không có
               biểu đồ còn hơn có biểu đồ sai.
             </p>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setReloadToken((n) => n + 1)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold hover:bg-emerald-500/25 transition"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-tot-nen border border-vien text-tot text-xs font-bold hover:bg-tot-nen transition"
               >
                 <RefreshCw className="h-3.5 w-3.5" />
                 Thử lại
@@ -194,7 +194,7 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
                 href={`https://www.tradingview.com/chart/?symbol=${encodeURIComponent(`${exchange}:${symbol}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-[#2b3245] text-slate-300 text-xs font-bold hover:text-white transition"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-the2 border border-vien text-chu-phu text-xs font-bold hover:text-chu transition"
               >
                 <ExternalLink className="h-3.5 w-3.5" />
                 Mở trên TradingView
@@ -213,8 +213,8 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
             {/* Lưới giá + nhãn trục phải */}
             {geometry.gridLines.map((g) => (
               <g key={g.price}>
-                <line x1={PAD.left} y1={g.y} x2={W - PAD.right} y2={g.y} stroke="#1b2030" strokeWidth={1} />
-                <text x={W - PAD.right + 6} y={g.y + 3.5} fill="#64748b" fontSize={10} fontFamily="monospace">
+                <line x1={PAD.left} y1={g.y} x2={W - PAD.right} y2={g.y} stroke="var(--vien)" strokeWidth={1} />
+                <text x={W - PAD.right + 6} y={g.y + 3.5} fill="var(--chu-mo)" fontSize={10} fontFamily="monospace">
                   {fmt(g.price)}
                 </text>
               </g>
@@ -230,21 +230,21 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
                   y={volTop + volH - h}
                   width={geometry.bodyW}
                   height={Math.max(0.5, h)}
-                  fill={c.close >= c.open ? '#0ecb81' : '#f6465d'}
+                  fill={c.close >= c.open ? 'var(--tot)' : 'var(--loi)'}
                   opacity={0.35}
                 />
               );
             })}
 
             {/* Đường trung bình */}
-            <path d={geometry.linePath('ma20')} fill="none" stroke="#fbbf24" strokeWidth={1.4} opacity={0.9} />
-            <path d={geometry.linePath('ma50')} fill="none" stroke="#38bdf8" strokeWidth={1.4} opacity={0.9} />
-            <path d={geometry.linePath('ema9')} fill="none" stroke="#e879f9" strokeWidth={1.2} opacity={0.75} />
+            <path d={geometry.linePath('ma20')} fill="none" stroke="var(--canh-bao)" strokeWidth={1.4} opacity={0.9} />
+            <path d={geometry.linePath('ma50')} fill="none" stroke="var(--vien)" strokeWidth={1.4} opacity={0.9} />
+            <path d={geometry.linePath('ema9')} fill="none" stroke="var(--vien)" strokeWidth={1.2} opacity={0.75} />
 
             {/* Nến */}
             {candles.map((c, i) => {
               const up = c.close >= c.open;
-              const color = up ? '#0ecb81' : '#f6465d';
+              const color = up ? 'var(--tot)' : 'var(--loi)';
               const x = geometry.xOf(i);
               const yHigh = geometry.yOf(c.high);
               const yLow = geometry.yOf(c.low);
@@ -283,7 +283,7 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
                 y1={0}
                 x2={geometry.xOf(hovered)}
                 y2={H - PAD.bottom}
-                stroke="#64748b"
+                stroke="var(--chu-mo)"
                 strokeWidth={1}
                 strokeDasharray="3 3"
               />
@@ -297,7 +297,7 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
                   y1={geometry.yOf(last.close)}
                   x2={W - PAD.right}
                   y2={geometry.yOf(last.close)}
-                  stroke={last.close >= last.open ? '#0ecb81' : '#f6465d'}
+                  stroke={last.close >= last.open ? 'var(--tot)' : 'var(--loi)'}
                   strokeWidth={1}
                   strokeDasharray="4 3"
                   opacity={0.8}
@@ -308,12 +308,12 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
                   width={PAD.right - 4}
                   height={16}
                   rx={3}
-                  fill={last.close >= last.open ? '#0ecb81' : '#f6465d'}
+                  fill={last.close >= last.open ? 'var(--tot)' : 'var(--loi)'}
                 />
                 <text
                   x={W - PAD.right + 6}
                   y={geometry.yOf(last.close) + 3.5}
-                  fill="#0c1017"
+                  fill="var(--the)"
                   fontSize={10}
                   fontWeight="bold"
                   fontFamily="monospace"
@@ -330,7 +330,7 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
                   key={`t${c.timestamp}`}
                   x={geometry.xOf(i)}
                   y={H - 8}
-                  fill="#64748b"
+                  fill="var(--chu-mo)"
                   fontSize={10}
                   fontFamily="monospace"
                   textAnchor="middle"
@@ -344,7 +344,7 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
       </div>
 
       {status === 'ready' && (
-        <div className="px-3 py-1.5 border-t border-[#212636] flex items-center justify-between text-[10px] text-slate-500 font-mono">
+        <div className="px-3 py-1.5 border-t border-vien flex items-center justify-between text-[10px] text-chu-mo font-mono">
           <span>
             {candles.length} nến · dữ liệu thật từ sàn · {exchange}:{symbol}
           </span>
@@ -352,7 +352,7 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
             href={`https://www.tradingview.com/chart/?symbol=${encodeURIComponent(`${exchange}:${symbol}`)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 hover:text-emerald-300 transition"
+            className="inline-flex items-center gap-1 hover:text-tot transition"
           >
             <ExternalLink className="h-3 w-3" />
             Xem sâu trên TradingView

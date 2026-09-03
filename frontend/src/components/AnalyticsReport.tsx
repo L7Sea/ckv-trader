@@ -103,16 +103,16 @@ export const AnalyticsReport: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800/80 rounded-3xl p-6 shadow-sm">
+    <div className="bg-the border border-vien rounded-3xl p-6 shadow-sm">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-vien">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 font-bold shadow-lg shadow-emerald-500/20">
+          <div className="p-3 rounded-2xl bg-gradient-to-tr from-tot to-tot text-chu font-bold shadow-lg shadow-md">
             <Award className="h-6 w-6" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">Báo Cáo Hiệu Suất & Xuất Dữ Liệu</h2>
-            <p className="text-xs text-slate-400">Đo lường các chỉ số giao dịch định lượng chuẩn Quant</p>
+            <h2 className="text-lg font-bold text-chu">Báo Cáo Hiệu Suất & Xuất Dữ Liệu</h2>
+            <p className="text-xs text-chu-phu">Đo lường các chỉ số giao dịch định lượng chuẩn Quant</p>
           </div>
         </div>
 
@@ -120,16 +120,16 @@ export const AnalyticsReport: React.FC = () => {
         <div className="flex items-center gap-2.5">
           <button
             onClick={exportToExcel}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition shadow-md shadow-emerald-500/20 active:scale-95"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-tot hover:bg-tot text-tren-nhan text-xs font-bold transition shadow-md shadow-md active:scale-95"
           >
             <Download className="h-4 w-4" />
             <span>Xuất File Excel (.xlsx)</span>
           </button>
           <button
             onClick={handlePrint}
-            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition active:scale-95"
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-the2 hover:bg-the2 text-chu text-xs font-medium border border-vien transition active:scale-95"
           >
-            <Printer className="h-4 w-4 text-slate-400" />
+            <Printer className="h-4 w-4 text-chu-phu" />
             <span>In Báo Cáo</span>
           </button>
         </div>
@@ -138,59 +138,59 @@ export const AnalyticsReport: React.FC = () => {
       {/* 4 Chỉ Số Cốt Lõi */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         {/* Win Rate */}
-        <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-2xl">
-          <div className="flex items-center justify-between text-xs text-slate-400">
+        <div className="p-4 bg-nen border border-vien rounded-2xl">
+          <div className="flex items-center justify-between text-xs text-chu-phu">
             <span className="font-semibold uppercase tracking-wider">Tỷ Lệ Thắng (Win Rate)</span>
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            <CheckCircle2 className="h-4 w-4 text-tot" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-emerald-400">{winRate.toFixed(1)}%</span>
-            <span className="text-[11px] text-slate-500 font-mono">({winTrades.length}/{sellTrades.length} lệnh)</span>
+            <span className="text-2xl font-bold font-mono text-tot">{winRate.toFixed(1)}%</span>
+            <span className="text-[11px] text-chu-mo font-mono">({winTrades.length}/{sellTrades.length} lệnh)</span>
           </div>
-          <div className="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
-            <div className="bg-emerald-500 h-full rounded-full transition-all" style={{ width: `${winRate}%` }} />
+          <div className="w-full bg-the2 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div className="bg-tot h-full rounded-full transition-all" style={{ width: `${winRate}%` }} />
           </div>
         </div>
 
         {/* Profit Factor */}
-        <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-2xl">
-          <div className="flex items-center justify-between text-xs text-slate-400">
+        <div className="p-4 bg-nen border border-vien rounded-2xl">
+          <div className="flex items-center justify-between text-xs text-chu-phu">
             <span className="font-semibold uppercase tracking-wider">Hệ Số Lợi Nhuận</span>
-            <Scale className="h-4 w-4 text-cyan-400" />
+            <Scale className="h-4 w-4 text-nhan-chu" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-cyan-300">{profitFactor.toFixed(2)}</span>
-            <span className="text-[11px] text-slate-500">Lãi / Lỗ</span>
+            <span className="text-2xl font-bold font-mono text-nhan-chu">{profitFactor.toFixed(2)}</span>
+            <span className="text-[11px] text-chu-mo">Lãi / Lỗ</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-3 truncate">
-            Tổng lãi: <span className="text-emerald-400 font-mono">{formatVND(totalWinAmount)}</span>
+          <p className="text-[11px] text-chu-phu mt-3 truncate">
+            Tổng lãi: <span className="text-tot font-mono">{formatVND(totalWinAmount)}</span>
           </p>
         </div>
 
         {/* Lệnh Lãi Lớn Nhất */}
-        <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-2xl">
-          <div className="flex items-center justify-between text-xs text-slate-400">
+        <div className="p-4 bg-nen border border-vien rounded-2xl">
+          <div className="flex items-center justify-between text-xs text-chu-phu">
             <span className="font-semibold uppercase tracking-wider">Lệnh Lãi Lớn Nhất</span>
-            <TrendingUp className="h-4 w-4 text-emerald-400" />
+            <TrendingUp className="h-4 w-4 text-tot" />
           </div>
           <div className="mt-2">
-            <span className="text-xl font-bold font-mono text-emerald-400">+{formatVND(maxWinTrade)}</span>
+            <span className="text-xl font-bold font-mono text-tot">+{formatVND(maxWinTrade)}</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-3">
-            Lỗ lớn nhất: <span className="text-rose-400 font-mono">{formatVND(maxLossTrade)}</span>
+          <p className="text-[11px] text-chu-phu mt-3">
+            Lỗ lớn nhất: <span className="text-loi font-mono">{formatVND(maxLossTrade)}</span>
           </p>
         </div>
 
         {/* Tổng Thuế & Phí Đã Nộp */}
-        <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-2xl">
-          <div className="flex items-center justify-between text-xs text-slate-400">
+        <div className="p-4 bg-nen border border-vien rounded-2xl">
+          <div className="flex items-center justify-between text-xs text-chu-phu">
             <span className="font-semibold uppercase tracking-wider">Tổng Thuế & Phí</span>
-            <Receipt className="h-4 w-4 text-amber-400" />
+            <Receipt className="h-4 w-4 text-canh-bao" />
           </div>
           <div className="mt-2">
-            <span className="text-xl font-bold font-mono text-amber-300">{formatVND(totalFeesPaid + totalTaxesPaid)}</span>
+            <span className="text-xl font-bold font-mono text-canh-bao">{formatVND(totalFeesPaid + totalTaxesPaid)}</span>
           </div>
-          <div className="flex justify-between text-[11px] text-slate-400 mt-3 font-mono">
+          <div className="flex justify-between text-[11px] text-chu-phu mt-3 font-mono">
             <span>Phí: {formatNumber(totalFeesPaid)}đ</span>
             <span>Thuế: {formatNumber(totalTaxesPaid)}đ</span>
           </div>

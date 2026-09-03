@@ -77,7 +77,7 @@ export const BackgroundProvider: React.FC<{ children: ReactNode }> = ({ children
           >
             {/* Dim Overlay */}
             <div
-              className="absolute inset-0 bg-[#0B0F19]"
+              className="absolute inset-0 bg-the"
               style={{ opacity: config.dim / 100 }}
             />
           </div>

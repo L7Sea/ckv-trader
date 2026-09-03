@@ -75,28 +75,28 @@ export const SupportChatModal: React.FC = () => {
   const selectedMember = regularMembers.find((m) => m.id === selectedMemberId);
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className={`bg-slate-900 border border-slate-800 rounded-3xl w-full ${
+    <div className="fixed inset-0 z-50 bg-nen backdrop-blur-sm flex items-center justify-center p-4">
+      <div className={`bg-the border border-vien rounded-3xl w-full ${
         isAdmin ? 'max-w-4xl h-[600px]' : 'max-w-lg h-[560px]'
       } p-5 shadow-2xl relative flex flex-col justify-between space-y-3`}>
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
+        <div className="flex items-center justify-between pb-3 border-b border-vien shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <div className="p-2.5 rounded-2xl bg-the2 text-nhan-chu border border-vien">
               <MessageSquare className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-white">
+                <h3 className="text-sm font-bold text-chu">
                   {isAdmin
                     ? `🛡️ HỘP THƯ HỖ TRỢ ADMIN (Đang chat với: ${selectedMember?.name || 'Thành viên'})`
                     : '💬 NHẮN TIN 1-1 VỚI ADMIN VIP (ANH HẢI)'}
                 </h3>
-                <span className="text-[9px] uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono font-bold">
+                <span className="text-[9px] uppercase px-2 py-0.5 rounded-full bg-tot-nen text-tot border border-vien font-mono font-bold">
                   Bảo Mật 1-1
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-chu-phu">
                 {isAdmin
                   ? 'Kênh trả lời riêng tư từng thành viên (các thành viên không nhìn thấy nhau)'
                   : 'Trao đổi chiến lược đầu tư & giải đáp thắc mắc trực tiếp với Chủ nhân'}
@@ -106,7 +106,7 @@ export const SupportChatModal: React.FC = () => {
 
           <button
             onClick={closeSupportChat}
-            className="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition"
+            className="text-chu-phu hover:text-chu p-1.5 rounded-xl hover:bg-the2 transition"
           >
             <X className="h-5 w-5" />
           </button>
@@ -116,14 +116,14 @@ export const SupportChatModal: React.FC = () => {
         <div className="flex-1 flex gap-3 overflow-hidden">
           {/* Cột Danh Sách Thành Viên (Chỉ Dành Cho Admin) */}
           {isAdmin && (
-            <div className="w-64 border-r border-slate-800/80 pr-2 flex flex-col space-y-2 overflow-y-auto shrink-0 text-xs">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 flex items-center gap-1.5">
-                <Users className="h-3.5 w-3.5 text-indigo-400" />
+            <div className="w-64 border-r border-vien pr-2 flex flex-col space-y-2 overflow-y-auto shrink-0 text-xs">
+              <div className="text-[11px] font-bold text-chu-phu uppercase tracking-wider px-2 flex items-center gap-1.5">
+                <Users className="h-3.5 w-3.5 text-nhan-chu" />
                 <span>Thành viên ({regularMembers.length})</span>
               </div>
 
               {regularMembers.length === 0 ? (
-                <div className="p-3 rounded-xl bg-slate-950/60 text-slate-500 text-[11px] text-center">
+                <div className="p-3 rounded-xl bg-nen text-chu-mo text-[11px] text-center">
                   Chưa có thành viên đăng ký
                 </div>
               ) : (
@@ -138,18 +138,18 @@ export const SupportChatModal: React.FC = () => {
                       }}
                       className={`w-full p-2.5 rounded-2xl text-left transition flex items-center justify-between gap-2 border ${
                         isSelected
-                          ? 'bg-indigo-500/20 border-indigo-500/50 text-white'
-                          : 'bg-slate-950/60 hover:bg-slate-800 border-slate-800/60 text-slate-300'
+                          ? 'bg-the2 border-vien text-chu'
+                          : 'bg-nen hover:bg-the2 border-vien text-chu-phu'
                       }`}
                     >
                       <div className="truncate">
                         <div className="font-bold truncate">{m.name}</div>
-                        <div className="text-[10px] text-slate-400 truncate">
+                        <div className="text-[10px] text-chu-phu truncate">
                           {m.nickname ? `@${m.nickname}` : m.email}
                         </div>
                       </div>
                       {unread > 0 && (
-                        <span className="h-4 w-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center shrink-0">
+                        <span className="h-4 w-4 rounded-full bg-loi text-tren-nhan text-[9px] font-bold flex items-center justify-center shrink-0">
                           {unread}
                         </span>
                       )}
@@ -164,8 +164,8 @@ export const SupportChatModal: React.FC = () => {
           <div className="flex-1 flex flex-col justify-between overflow-hidden">
             <div className="flex-1 overflow-y-auto space-y-3 pr-1 text-xs">
               {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-slate-500 space-y-2">
-                  <MessageSquare className="h-8 w-8 text-slate-600 opacity-50" />
+                <div className="h-full flex flex-col items-center justify-center text-chu-mo space-y-2">
+                  <MessageSquare className="h-8 w-8 text-chu-mo opacity-50" />
                   <p>Chưa có tin nhắn nào. Hãy gửi câu hỏi đầu tiên!</p>
                 </div>
               ) : (
@@ -177,10 +177,10 @@ export const SupportChatModal: React.FC = () => {
                       className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}
                     >
                       <div className="flex items-center gap-1.5 mb-0.5 px-1">
-                        <span className="text-[10px] text-slate-500 font-sans">
+                        <span className="text-[10px] text-chu-mo font-sans">
                           {m.isFromAdmin ? '👑 Hải (Admin VIP)' : m.userName}
                         </span>
-                        <span className="text-[9px] text-slate-600 font-mono">
+                        <span className="text-[9px] text-chu-mo font-mono">
                           {new Date(m.timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
@@ -188,8 +188,8 @@ export const SupportChatModal: React.FC = () => {
                       <div
                         className={`max-w-[85%] p-3 rounded-2xl leading-relaxed ${
                           isMine
-                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-medium rounded-tr-none'
-                            : 'bg-slate-950 border border-slate-800 text-slate-200 rounded-tl-none'
+                            ? 'bg-gradient-to-r from-tot to-tot text-chu font-medium rounded-tr-none'
+                            : 'bg-nen border border-vien text-chu rounded-tl-none'
                         }`}
                       >
                         <p className="whitespace-pre-wrap">{m.message}</p>
@@ -202,7 +202,7 @@ export const SupportChatModal: React.FC = () => {
             </div>
 
             {/* Input Bar */}
-            <form onSubmit={handleSend} className="pt-2 border-t border-slate-800 shrink-0 flex items-center gap-2">
+            <form onSubmit={handleSend} className="pt-2 border-t border-vien shrink-0 flex items-center gap-2">
               <input
                 type="text"
                 value={inputText}
@@ -212,12 +212,12 @@ export const SupportChatModal: React.FC = () => {
                     ? `Nhập câu trả lời cho ${selectedMember?.name || 'thành viên'}...`
                     : 'Nhập câu hỏi gửi riêng cho Admin Hải...'
                 }
-                className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                className="flex-1 bg-nen border border-vien rounded-2xl px-4 py-2.5 text-xs text-chu placeholder-the2 focus:outline-none focus:border-nhan-chu"
               />
               <button
                 type="submit"
                 disabled={!inputText.trim()}
-                className="p-2.5 rounded-2xl bg-indigo-500 hover:bg-indigo-400 text-white transition disabled:opacity-40 shadow-md shadow-indigo-500/20"
+                className="p-2.5 rounded-2xl bg-nhan hover:bg-nhan text-tren-nhan transition disabled:opacity-40 shadow-md shadow-md"
               >
                 <Send className="h-4 w-4" />
               </button>

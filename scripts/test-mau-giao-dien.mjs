@@ -20,6 +20,7 @@ import {
   BO_GOC,
   CAP_PHAI_DAT,
   CHU_TREN_NHAN,
+  MIEN_TRU,
   PHONG,
   SANG,
   THANG_CHU,
@@ -113,17 +114,29 @@ test('Không còn màu hex viết cứng trong mã giao diện', () => {
     return ra;
   };
 
+  const thuongHieu = new Set(MIEN_TRU.thuongHieu.map((m) => m.toLowerCase()));
   const viPham = [];
+  let tong = 0;
+
   for (const f of quet('frontend/src')) {
+    // File tranh minh hoạ có bảng màu riêng như một cái logo — không theo chế độ sáng/tối
+    if (MIEN_TRU.fileTranh.some((ten) => f.endsWith(ten))) continue;
+
     const noiDung = readFileSync(f, 'utf8');
-    const hex = noiDung.match(/#[0-9a-fA-F]{3,8}\b/g) || [];
-    const inline = noiDung.match(/style=\{\{[^}]*(?:color|background|fill|stroke)/g) || [];
+    const hex = (noiDung.match(/#[0-9a-fA-F]{3,8}\b/g) || []).filter(
+      (m) => !thuongHieu.has(m.toLowerCase())
+    );
+    /* Chỉ tính là vi phạm khi style inline gán màu THẬT. `style={{color:'var(--chu)'}}`
+       vẫn là token nên chấp nhận được — cái cấm là màu cứng mà @media không với tới. */
+    const inline = (noiDung.match(/style=\{\{[^}]*\}\}/g) || []).filter((khoi) =>
+      /(color|background|fill|stroke)\s*:\s*['"`]?(#|rgb|hsl)/i.test(khoi)
+    );
+
     if (hex.length + inline.length > 0) {
       viPham.push(`${f}: ${hex.length} hex, ${inline.length} inline`);
+      tong += hex.length + inline.length;
     }
   }
-
-  const tong = viPham.reduce((s, v) => s + Number(v.match(/(\d+) hex/)[1]) + Number(v.match(/(\d+) inline/)[1]), 0);
   assert.ok(
     tong <= NGUONG,
     `Còn ${tong} chỗ viết màu cứng (ngưỡng ${NGUONG}). Phải chuyển sang token:\n  ${viPham.slice(0, 25).join('\n  ')}`

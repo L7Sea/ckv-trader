@@ -19,24 +19,24 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
 
   if (positions.length === 0) {
     return (
-      <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 shadow-2xl relative text-center space-y-4">
+      <div className="fixed inset-0 z-50 bg-nen backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="bg-the border border-vien rounded-3xl w-full max-w-md p-6 shadow-2xl relative text-center space-y-4">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition"
+            className="absolute top-4 right-4 text-chu-phu hover:text-chu p-1.5 rounded-xl hover:bg-the2 transition"
           >
             <X className="h-5 w-5" />
           </button>
-          <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 inline-block">
+          <div className="p-3 rounded-2xl bg-canh-bao-nen text-canh-bao border border-vien inline-block">
             <Gift className="h-6 w-6" />
           </div>
-          <h3 className="text-lg font-bold text-white">Chưa Có Cổ Phiếu Nắm Giữ</h3>
-          <p className="text-xs text-slate-400">
+          <h3 className="text-lg font-bold text-chu">Chưa Có Cổ Phiếu Nắm Giữ</h3>
+          <p className="text-xs text-chu-phu">
             Tài khoản của bạn hiện tại chưa nắm giữ cổ phiếu nào để nhận quyền cổ tức tiền mặt hoặc cổ phiếu thưởng. Vui lòng khớp lệnh mua cổ phiếu trước!
           </p>
           <button
             onClick={onClose}
-            className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition"
+            className="w-full py-2.5 rounded-xl bg-the2 hover:bg-the2 text-chu font-bold text-xs transition"
           >
             Đã Hiểu
           </button>
@@ -88,33 +88,33 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 shadow-2xl relative">
+    <div className="fixed inset-0 z-50 bg-nen backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-the border border-vien rounded-3xl w-full max-w-md p-6 shadow-2xl relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition"
+          className="absolute top-4 right-4 text-chu-phu hover:text-chu p-1.5 rounded-xl hover:bg-the2 transition"
         >
           <X className="h-5 w-5" />
         </button>
 
-        <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
-          <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+        <div className="flex items-center gap-3 pb-4 border-b border-vien">
+          <div className="p-3 rounded-2xl bg-canh-bao-nen text-canh-bao border border-vien">
             <Gift className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white">Quản Lý Quyền Cổ Tức</h3>
-            <p className="text-xs text-slate-400">Tự động tính thuế 5% & điều chỉnh giá vốn</p>
+            <h3 className="text-lg font-bold text-chu">Quản Lý Quyền Cổ Tức</h3>
+            <p className="text-xs text-chu-phu">Tự động tính thuế 5% & điều chỉnh giá vốn</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           {/* Loại Cổ Tức */}
-          <div className="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-xl border border-slate-800">
+          <div className="grid grid-cols-2 gap-2 p-1 bg-nen rounded-xl border border-vien">
             <button
               type="button"
               onClick={() => setType('CASH')}
               className={`py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                type === 'CASH' ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-400 hover:text-white'
+                type === 'CASH' ? 'bg-canh-bao text-tren-nhan shadow-md shadow-md' : 'text-chu-phu hover:text-chu'
               }`}
             >
               <DollarSign className="h-4 w-4" />
@@ -124,7 +124,7 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
               type="button"
               onClick={() => setType('SHARE')}
               className={`py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                type === 'SHARE' ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20' : 'text-slate-400 hover:text-white'
+                type === 'SHARE' ? 'bg-nhan text-tren-nhan shadow-md shadow-md' : 'text-chu-phu hover:text-chu'
               }`}
             >
               <Layers className="h-4 w-4" />
@@ -134,13 +134,13 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
 
           {/* Chọn Mã Cổ Phiếu */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-chu-phu uppercase tracking-wider mb-1.5">
               Mã Cổ Phiếu Hưởng Quyền
             </label>
             <select
               value={symbol}
               onChange={(e) => setSymbol(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm font-bold font-mono text-white focus:outline-none focus:border-amber-500"
+              className="w-full bg-nen border border-vien rounded-xl px-4 py-2.5 text-sm font-bold font-mono text-chu focus:outline-none focus:border-canh-bao"
             >
               {positions.map((p) => (
                 <option key={p.symbol} value={p.symbol}>
@@ -154,7 +154,7 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
           {type === 'CASH' && (
             <>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-chu-phu uppercase tracking-wider mb-1.5">
                   Số Tiền Cổ Tức / 1 Cổ Phiếu (VNĐ)
                 </label>
                 <input
@@ -164,24 +164,24 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
                   placeholder="VD: 1500 (tức 15%)"
                   step="100"
                   min="100"
-                  className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-4 py-2.5 text-base font-bold font-mono text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-nen border border-vien rounded-xl px-4 py-2.5 text-base font-bold font-mono text-chu focus:outline-none focus:border-canh-bao"
                   required
                 />
               </div>
 
               {/* Tóm tắt tính toán tiền mặt */}
-              <div className="p-3.5 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2 text-xs font-mono">
-                <div className="flex justify-between text-slate-400">
+              <div className="p-3.5 bg-nen border border-vien rounded-xl space-y-2 text-xs font-mono">
+                <div className="flex justify-between text-chu-phu">
                   <span>Tổng tiền trước thuế:</span>
-                  <span className="text-slate-200">{formatNumber(grossCash)} đ</span>
+                  <span className="text-chu">{formatNumber(grossCash)} đ</span>
                 </div>
-                <div className="flex justify-between text-slate-400">
+                <div className="flex justify-between text-chu-phu">
                   <span>Thuế TNCN (5%):</span>
-                  <span className="text-rose-400">-{formatNumber(taxCash)} đ</span>
+                  <span className="text-loi">-{formatNumber(taxCash)} đ</span>
                 </div>
-                <div className="pt-2 border-t border-slate-800 flex justify-between font-bold text-sm">
-                  <span className="text-white">Thực nhận về tài khoản:</span>
-                  <span className="text-amber-400 font-bold">{formatNumber(netCashReceived)} đ</span>
+                <div className="pt-2 border-t border-vien flex justify-between font-bold text-sm">
+                  <span className="text-chu">Thực nhận về tài khoản:</span>
+                  <span className="text-canh-bao font-bold">{formatNumber(netCashReceived)} đ</span>
                 </div>
               </div>
             </>
@@ -191,7 +191,7 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
           {type === 'SHARE' && (
             <>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-chu-phu uppercase tracking-wider mb-1.5">
                   Tỷ Lệ Nhận Thêm (%)
                 </label>
                 <input
@@ -201,24 +201,24 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
                   placeholder="VD: 20 (tức tỷ lệ 100:20)"
                   step="1"
                   min="1"
-                  className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-4 py-2.5 text-base font-bold font-mono text-white focus:outline-none focus:border-sky-500"
+                  className="w-full bg-nen border border-vien rounded-xl px-4 py-2.5 text-base font-bold font-mono text-chu focus:outline-none focus:border-nhan-chu"
                   required
                 />
               </div>
 
               {/* Tóm tắt điều chỉnh giá vốn */}
-              <div className="p-3.5 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2 text-xs font-mono">
-                <div className="flex justify-between text-slate-400">
+              <div className="p-3.5 bg-nen border border-vien rounded-xl space-y-2 text-xs font-mono">
+                <div className="flex justify-between text-chu-phu">
                   <span>Số CP nhận thêm:</span>
-                  <span className="text-sky-400 font-bold">+{formatNumber(bonusShares)} CP</span>
+                  <span className="text-nhan-chu font-bold">+{formatNumber(bonusShares)} CP</span>
                 </div>
-                <div className="flex justify-between text-slate-400">
+                <div className="flex justify-between text-chu-phu">
                   <span>Tổng CP mới:</span>
-                  <span className="text-white font-bold">{formatNumber(newTotalShares)} CP</span>
+                  <span className="text-chu font-bold">{formatNumber(newTotalShares)} CP</span>
                 </div>
-                <div className="pt-2 border-t border-slate-800 flex justify-between font-bold text-xs">
-                  <span className="text-slate-300">Giá vốn sau điều chỉnh:</span>
-                  <span className="text-emerald-400">{formatNumber(Math.round(newAvgPrice))} đ/CP</span>
+                <div className="pt-2 border-t border-vien flex justify-between font-bold text-xs">
+                  <span className="text-chu-phu">Giá vốn sau điều chỉnh:</span>
+                  <span className="text-tot">{formatNumber(Math.round(newAvgPrice))} đ/CP</span>
                 </div>
               </div>
             </>
@@ -230,7 +230,7 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Ghi chú đợt chia cổ tức (tuỳ chọn)..."
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-300 placeholder:text-slate-600 focus:outline-none"
+              className="w-full bg-nen border border-vien rounded-xl px-3.5 py-2 text-xs text-chu-phu placeholder:text-chu-mo focus:outline-none"
             />
           </div>
 
@@ -240,8 +240,8 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
               disabled={isLoading}
               className={`w-full py-3 rounded-xl font-bold text-sm transition shadow-lg ${
                 type === 'CASH'
-                  ? 'bg-amber-500 hover:bg-amber-400 text-slate-950'
-                  : 'bg-sky-500 hover:bg-sky-400 text-white'
+                  ? 'bg-canh-bao hover:bg-canh-bao text-tren-nhan'
+                  : 'bg-nhan hover:bg-nhan text-tren-nhan'
               }`}
             >
               {isLoading ? 'Đang xử lý...' : `XÁC NHẬN GHI NHẬN CỔ TỨC`}

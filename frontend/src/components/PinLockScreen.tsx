@@ -37,19 +37,19 @@ export const PinLockScreen: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] bg-nen backdrop-blur-xl flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-sm text-center space-y-6 animate-in zoom-in-95">
         {/* Security Badge */}
-        <div className="inline-flex p-4 rounded-3xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-xl shadow-emerald-500/10 mb-2">
+        <div className="inline-flex p-4 rounded-3xl bg-the2 text-nhan-chu border border-vien shadow-xl shadow-md mb-2">
           <Lock className="h-8 w-8" />
         </div>
 
         <div>
-          <h2 className="text-xl font-bold text-white tracking-tight">CKV PRO SECURITY</h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <h2 className="text-xl font-bold text-chu tracking-tight">CKV PRO SECURITY</h2>
+          <p className="text-xs text-chu-phu mt-1">
             Ứng dụng đang được khóa bảo vệ. Nhập mã PIN để mở khóa.
           </p>
-          <p className="text-[11px] font-mono text-emerald-400 mt-0.5">Tài khoản: {user?.name || 'VIP Trader'}</p>
+          <p className="text-[11px] font-mono text-nhan-chu mt-0.5">Tài khoản: {user?.name || 'VIP Trader'}</p>
         </div>
 
         {/* PIN Mask Dots */}
@@ -61,8 +61,8 @@ export const PinLockScreen: React.FC = () => {
                 key={idx}
                 className={`h-4 w-4 rounded-full border-2 transition-all ${
                   isFilled
-                    ? 'bg-emerald-400 border-emerald-400 scale-110 shadow-md shadow-emerald-400/50'
-                    : 'border-slate-700 bg-slate-900'
+                    ? 'bg-nhan border-nhan-chu scale-110 shadow-md shadow-md'
+                    : 'border-vien bg-the'
                 }`}
               />
             );
@@ -70,7 +70,7 @@ export const PinLockScreen: React.FC = () => {
         </div>
 
         {errorMsg && (
-          <p className="text-xs font-semibold text-rose-400 animate-bounce">{errorMsg}</p>
+          <p className="text-xs font-semibold text-loi animate-bounce">{errorMsg}</p>
         )}
 
         {/* Numeric Keypad */}
@@ -80,7 +80,7 @@ export const PinLockScreen: React.FC = () => {
               key={digit}
               type="button"
               onClick={() => handleKeyPress(digit)}
-              className="h-14 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-lg font-bold font-mono text-white shadow-sm active:scale-95 transition"
+              className="h-14 rounded-2xl bg-the hover:bg-the2 border border-vien text-lg font-bold font-mono text-chu shadow-sm active:scale-95 transition"
             >
               {digit}
             </button>
@@ -88,27 +88,27 @@ export const PinLockScreen: React.FC = () => {
           <button
             type="button"
             onClick={handleClear}
-            className="h-14 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 text-xs font-semibold text-slate-400 active:scale-95 transition"
+            className="h-14 rounded-2xl bg-the hover:bg-the2 border border-vien text-xs font-semibold text-chu-phu active:scale-95 transition"
           >
             XÓA HẾT
           </button>
           <button
             type="button"
             onClick={() => handleKeyPress('0')}
-            className="h-14 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-lg font-bold font-mono text-white shadow-sm active:scale-95 transition"
+            className="h-14 rounded-2xl bg-the hover:bg-the2 border border-vien text-lg font-bold font-mono text-chu shadow-sm active:scale-95 transition"
           >
             0
           </button>
           <button
             type="button"
             onClick={handleDelete}
-            className="h-14 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 flex items-center justify-center text-slate-400 active:scale-95 transition"
+            className="h-14 rounded-2xl bg-the hover:bg-the2 border border-vien flex items-center justify-center text-chu-phu active:scale-95 transition"
           >
             <Delete className="h-5 w-5" />
           </button>
         </div>
 
-        <p className="text-[11px] text-slate-600 font-mono">Bảo mật mã hóa cấp độ thiết bị</p>
+        <p className="text-[11px] text-chu-mo font-mono">Bảo mật mã hóa cấp độ thiết bị</p>
       </div>
     </div>
   );

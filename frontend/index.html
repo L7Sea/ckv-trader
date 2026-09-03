@@ -1,22 +1,35 @@
 <!DOCTYPE html>
-<html lang="vi" class="dark">
+<!-- Không gán cứng class="dark" nữa: chế độ hiển thị do biến CSS trong
+     src/index.css quyết định, theo cài đặt của máy hoặc nút gạt của người dùng.
+     Ép "dark" ở đây là chặn luôn chế độ sáng. -->
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <meta name="theme-color" content="#020617" />
+
+    <!-- Thanh trạng thái điện thoại đổi theo chế độ, khớp với --nen của từng bảng -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F5F6F8" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0E1218" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
     <title>CKV Pro Trader - Nền Tảng Phân Tích & Quản Trị Vị Thế Chứng Khoán</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phông nạp trong src/index.css (Archivo + Be Vietnam Pro).
+         Bản cũ nạp Inter ở đây — skill cấm Inter vì là lựa chọn "an toàn" mặc
+         định, và nó cũng chẳng khớp với phông đã khai trong tailwind.config.js. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>
-  <body class="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-emerald-500 selection:text-white font-sans">
+  <!-- Màu nền và màu chữ do @layer base trong index.css lo, không gán class ở đây:
+       class tiện ích luôn thắng @layer base nên bg-slate-950 từng khoá chặt app
+       ở chế độ tối bất kể bảng màu. -->
+  <body class="min-h-screen antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

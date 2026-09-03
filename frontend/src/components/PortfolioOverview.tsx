@@ -62,32 +62,32 @@ export const PortfolioOverview: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* ══ MASTER ASSET CARD (SANG TRỌNG, GỌN GÀNG & CÂN ĐỐI TUYỆT ĐỐI) ══ */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950/60 to-slate-950 border border-indigo-500/30 p-5 sm:p-6 shadow-2xl backdrop-blur-xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-the via-nhan-chu to-nen border border-vien p-5 sm:p-6 shadow-2xl backdrop-blur-xl">
         {/* Ambient Glows */}
-        <div className="absolute -right-16 -top-16 w-64 h-64 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-16 -top-16 w-64 h-64 bg-the2 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-tot-nen rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 space-y-5">
           {/* Top Row: Balance & Profit/Loss Status */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-vien">
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold tracking-wide uppercase flex items-center gap-1.5">
-                  <Sparkles className="h-3 w-3 text-amber-400" />
+                <span className="px-2.5 py-0.5 rounded-full bg-the2 text-nhan-chu border border-vien text-[11px] font-bold tracking-wide uppercase flex items-center gap-1.5">
+                  <Sparkles className="h-3 w-3 text-canh-bao" />
                   {user?.role === 'ADMIN' ? 'VÍ TÀI SẢN TOÀN DIỆN (VIP MASTER)' : 'VÍ TÀI SẢN MÔ PHỎNG (KHÁCH TRẢI NGHIỆM)'}
                 </span>
                 <button
                   onClick={toggleBalanceVisibility}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition"
+                  className="p-1 rounded-lg text-chu-phu hover:text-chu hover:bg-the2 transition"
                   title={isBalanceHidden ? 'Hiện số dư' : 'Ẩn số dư bảo mật'}
                 >
-                  {isBalanceHidden ? <EyeOff className="h-4 w-4 text-slate-400" /> : <Eye className="h-4 w-4 text-indigo-300" />}
+                  {isBalanceHidden ? <EyeOff className="h-4 w-4 text-chu-phu" /> : <Eye className="h-4 w-4 text-nhan-chu" />}
                 </button>
               </div>
 
               <div>
-                <span className="text-xs font-medium text-slate-400">Tổng Tài Sản Ròng Thực Có (NAV)</span>
-                <div className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white mt-0.5 flex items-baseline gap-2">
+                <span className="text-xs font-medium text-chu-phu">Tổng Tài Sản Ròng Thực Có (NAV)</span>
+                <div className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-chu mt-0.5 flex items-baseline gap-2">
                   <span>{formatVND(totalEquity)}</span>
                 </div>
               </div>
@@ -98,8 +98,8 @@ export const PortfolioOverview: React.FC = () => {
               <div
                 className={`flex items-center gap-1.5 text-xs font-mono font-bold px-3 py-2 rounded-2xl border ${
                   isProfit
-                    ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                    : 'bg-rose-500/10 text-rose-300 border-rose-500/30'
+                    ? 'bg-tot-nen text-tot border-vien'
+                    : 'bg-loi-nen text-loi border-vien'
                 }`}
               >
                 {isProfit ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
@@ -115,13 +115,13 @@ export const PortfolioOverview: React.FC = () => {
                 return (
                   <div className={`px-3 py-2 rounded-2xl border text-xs font-mono flex items-center gap-1.5 ${
                     isForceSell
-                      ? 'bg-rose-950/80 border-rose-500/50 text-rose-300 animate-pulse'
+                      ? 'bg-loi-nen border-vien text-loi animate-pulse'
                       : isCallMargin
-                      ? 'bg-amber-950/80 border-amber-500/50 text-amber-300'
-                      : 'bg-slate-950/80 border-slate-800 text-slate-300'
+                      ? 'bg-canh-bao-nen border-vien text-canh-bao'
+                      : 'bg-nen border-vien text-chu-phu'
                   }`}>
                     <span>Tỷ lệ tự có:</span>
-                    <b className={isForceSell ? 'text-rose-400' : isCallMargin ? 'text-amber-400' : 'text-emerald-400'}>
+                    <b className={isForceSell ? 'text-loi' : isCallMargin ? 'text-canh-bao' : 'text-tot'}>
                       {equityRatio}%
                     </b>
                     <span className="text-[11px] font-sans">
@@ -138,30 +138,30 @@ export const PortfolioOverview: React.FC = () => {
             {/* Box 1 - Tiền Mặt KhẢ Dụng (Có nút Nạp / Rút) */}
             <div
               onClick={openCashModal}
-              className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 hover:border-emerald-500/50 cursor-pointer transition flex flex-col justify-between group"
+              className="p-3.5 rounded-2xl bg-nen border border-vien hover:border-vien cursor-pointer transition flex flex-col justify-between group"
               title="Nhấn để Nạp / Rút Tiền Mặt"
             >
-              <div className="flex items-center justify-between text-slate-400">
-                <span className="font-sans text-[11px] group-hover:text-emerald-400 transition">Tiền Mặt Khả Dụng</span>
-                <span className="text-[10px] text-emerald-400 font-sans font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+              <div className="flex items-center justify-between text-chu-phu">
+                <span className="font-sans text-[11px] group-hover:text-tot transition">Tiền Mặt Khả Dụng</span>
+                <span className="text-[10px] text-tot font-sans font-bold bg-tot-nen px-1.5 py-0.5 rounded border border-vien">
                   Nạp / Rút
                 </span>
               </div>
-              <b className="text-base text-emerald-400 font-bold mt-1.5 block">{formatVND(cash)}</b>
-              <span className="text-[10px] text-slate-500 font-sans mt-0.5 flex items-center justify-between">
+              <b className="text-base text-tot font-bold mt-1.5 block">{formatVND(cash)}</b>
+              <span className="text-[10px] text-chu-mo font-sans mt-0.5 flex items-center justify-between">
                 <span>Khả dụng tức thì</span>
-                <span className="text-emerald-400 opacity-0 group-hover:opacity-100 transition text-[9px] font-bold">Mở ví →</span>
+                <span className="text-tot opacity-0 group-hover:opacity-100 transition text-[9px] font-bold">Mở ví →</span>
               </span>
             </div>
 
             {/* Box 2 */}
-            <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 flex flex-col justify-between">
-              <div className="flex items-center justify-between text-slate-400">
+            <div className="p-3.5 rounded-2xl bg-nen border border-vien flex flex-col justify-between">
+              <div className="flex items-center justify-between text-chu-phu">
                 <span className="font-sans text-[11px]">Giá Trị Cổ Phiếu</span>
-                <PieChart className="h-4 w-4 text-cyan-400" />
+                <PieChart className="h-4 w-4 text-nhan-chu" />
               </div>
-              <b className="text-base text-cyan-300 font-bold mt-1.5 block">{formatVND(stockMarketValue)}</b>
-              <span className="text-[10px] text-slate-500 font-sans mt-0.5">
+              <b className="text-base text-nhan-chu font-bold mt-1.5 block">{formatVND(stockMarketValue)}</b>
+              <span className="text-[10px] text-chu-mo font-sans mt-0.5">
                 {positions.length > 0
                   ? `${positions[0].total_quantity.toLocaleString()} ${positions[0].symbol} @ ${(positions[0].market_price / 1000).toFixed(2)}`
                   : '1,000 TPB @ 14.50'}
@@ -169,59 +169,59 @@ export const PortfolioOverview: React.FC = () => {
             </div>
 
             {/* Box 3 */}
-            <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 flex flex-col justify-between">
-              <div className="flex items-center justify-between text-slate-400">
+            <div className="p-3.5 rounded-2xl bg-nen border border-vien flex flex-col justify-between">
+              <div className="flex items-center justify-between text-chu-phu">
                 <span className="font-sans text-[11px]">Tiền Chờ Về T+2.5</span>
-                <CalendarCheck className="h-4 w-4 text-amber-400" />
+                <CalendarCheck className="h-4 w-4 text-canh-bao" />
               </div>
-              <b className="text-base text-amber-400 font-bold mt-1.5 block">{formatVND(receivingCash)}</b>
-              <span className="text-[10px] text-slate-500 font-sans mt-0.5">Đang trong chu kỳ bù trừ</span>
+              <b className="text-base text-canh-bao font-bold mt-1.5 block">{formatVND(receivingCash)}</b>
+              <span className="text-[10px] text-chu-mo font-sans mt-0.5">Đang trong chu kỳ bù trừ</span>
             </div>
 
             {/* Box 4 - Nợ Vay Margin & Lãi Suất Thực Tế hoặc Chế độ Thuần Tiền Mặt */}
             {isCashAccount ? (
               <div
                 onClick={openCashModal}
-                className="p-3.5 rounded-2xl bg-slate-950/70 border border-emerald-500/30 hover:border-emerald-500/60 cursor-pointer transition flex flex-col justify-between group"
+                className="p-3.5 rounded-2xl bg-nen border border-vien hover:border-vien cursor-pointer transition flex flex-col justify-between group"
                 title="Tiểu khoản 01: Giao dịch 100% Tiền mặt, không phát sinh nợ vay"
               >
-                <div className="flex items-center justify-between text-emerald-400">
+                <div className="flex items-center justify-between text-tot">
                   <span className="font-sans text-[11px] font-semibold">Trạng Thái Ký Quỹ</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 font-mono">
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-tot-nen text-tot font-bold border border-vien font-mono">
                     TK 01 Thường
                   </span>
                 </div>
-                <b className="text-base text-emerald-400 font-bold mt-1.5 block">100% Tiền Mặt</b>
-                <div className="flex flex-col text-[10px] text-slate-400 font-sans mt-0.5 space-y-0.5">
-                  <span className="text-emerald-300/90 font-mono">Không nợ vay • 0đ lãi ngày</span>
-                  <span className="text-slate-500 flex justify-between items-center">
+                <b className="text-base text-tot font-bold mt-1.5 block">100% Tiền Mặt</b>
+                <div className="flex flex-col text-[10px] text-chu-phu font-sans mt-0.5 space-y-0.5">
+                  <span className="text-tot font-mono">Không nợ vay • 0đ lãi ngày</span>
+                  <span className="text-chu-mo flex justify-between items-center">
                     <span>An toàn tuyệt đối</span>
-                    <span className="text-emerald-400 opacity-0 group-hover:opacity-100 transition text-[9px] font-bold">Nạp tiền →</span>
+                    <span className="text-tot opacity-0 group-hover:opacity-100 transition text-[9px] font-bold">Nạp tiền →</span>
                   </span>
                 </div>
               </div>
             ) : (
               <div
                 onClick={openCashModal}
-                className="p-3.5 rounded-2xl bg-slate-950/70 border border-purple-500/30 hover:border-purple-500/60 cursor-pointer transition flex flex-col justify-between group"
+                className="p-3.5 rounded-2xl bg-nen border border-vien hover:border-vien cursor-pointer transition flex flex-col justify-between group"
                 title="Nhấn để Trả Nợ Deal hoặc Hiệu chỉnh số dư"
               >
-                <div className="flex items-center justify-between text-purple-300">
-                  <span className="font-sans text-[11px] font-semibold group-hover:text-purple-300 transition">
+                <div className="flex items-center justify-between text-nhan-chu">
+                  <span className="font-sans text-[11px] font-semibold group-hover:text-nhan-chu transition">
                     Nợ Margin ({brokerageName})
                   </span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 font-mono">
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-the2 text-nhan-chu font-bold border border-vien font-mono">
                     Trả Nợ Deal
                   </span>
                 </div>
-                <b className="text-base text-purple-300 font-bold mt-1.5 block">{formatVND(marginDebt)}</b>
-                <div className="flex flex-col text-[10px] text-slate-400 font-sans mt-0.5 space-y-0.5">
-                  <span className="text-amber-300/90 font-mono">
+                <b className="text-base text-nhan-chu font-bold mt-1.5 block">{formatVND(marginDebt)}</b>
+                <div className="flex flex-col text-[10px] text-chu-phu font-sans mt-0.5 space-y-0.5">
+                  <span className="text-canh-bao font-mono">
                     Lãi: {marginRate}%/năm (~{dailyInterest.toLocaleString('vi-VN')} đ/ngày)
                   </span>
-                  <span className="text-slate-500 flex justify-between items-center">
+                  <span className="text-chu-mo flex justify-between items-center">
                     <span>Gốc: {formatVND(marginDebt)}</span>
-                    <span className="text-purple-400 opacity-0 group-hover:opacity-100 transition text-[9px] font-bold">Trả nợ →</span>
+                    <span className="text-nhan-chu opacity-0 group-hover:opacity-100 transition text-[9px] font-bold">Trả nợ →</span>
                   </span>
                 </div>
               </div>

@@ -66,10 +66,10 @@ export const Pin6Input: React.FC<Pin6InputProps> = ({
 
   const borderClass =
     borderColor === 'emerald'
-      ? 'border-emerald-500/60 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 text-emerald-300'
+      ? 'border-vien focus:border-tot focus:ring-2 focus:ring-tot text-tot'
       : borderColor === 'indigo'
-      ? 'border-indigo-500/60 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30 text-indigo-300'
-      : 'border-amber-500/60 focus:border-amber-400 focus:ring-2 focus:ring-amber-500/30 text-amber-300';
+      ? 'border-vien focus:border-nhan-chu focus:ring-2 focus:ring-nhan-chu text-nhan-chu'
+      : 'border-vien focus:border-canh-bao focus:ring-2 focus:ring-canh-bao text-canh-bao';
 
   return (
     <div className="flex items-center justify-center gap-2 sm:gap-2.5 my-2" onPaste={handlePaste}>
@@ -85,8 +85,8 @@ export const Pin6Input: React.FC<Pin6InputProps> = ({
             value={mask && char ? '●' : char}
             onChange={(e) => handleChange(index, e.target.value)}
             onKeyDown={(e) => handleKeyDown(index, e)}
-            className={`w-11 h-13 sm:w-12 sm:h-14 text-center text-2xl font-mono font-black rounded-2xl bg-slate-950/90 border-2 transition shadow-inner select-none ${borderClass} ${
-              char ? 'bg-slate-900 shadow-lg' : ''
+            className={`w-11 h-13 sm:w-12 sm:h-14 text-center text-2xl font-mono font-black rounded-2xl bg-nen border-2 transition shadow-inner select-none ${borderClass} ${
+              char ? 'bg-the shadow-lg' : ''
             }`}
           />
         );
