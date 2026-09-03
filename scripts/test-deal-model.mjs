@@ -33,17 +33,27 @@ const REAL_SNAPSHOTS = [
   /* Mốc thứ tư — ảnh chụp 03/09/2026 11:39. Mốc này quan trọng nhất vì nó
      có ĐỦ cả 4 con số (giá · nợ · NAV · lãi/lỗ · %), nên khoá được cả mẫu số
      của phép tính phần trăm. Ba mốc trước thiếu vài trường. */
-  /* ⚠ MỐC NÀY CHƯA KHỚP CHÍNH XÁC — đã tìm ra nguyên nhân, CHỜ XÁC MINH.
-     Đo được: lãi ĐƠN khớp CHÍNH XÁC 0đ ở cả 3 mốc tháng 8 (lãi kép lệch
-     769–841đ) → mô hình lãi đơn của CKV ĐÚNG. Nhưng lãi thực mỗi ngày nhảy:
-        26→27/08: 2.362đ/ngày → 12,498%/năm
-        27→28/08: 2.363đ/ngày → 12,503%/năm
-        28/08→03/09: 2.409đ/ngày → 12,746%/năm   ← NHẢY
-     Tức là DNSE ĐỔI LÃI SUẤT quanh 28-29/08, không phải công thức sai.
-     KHÔNG tự đổi 12,5% thành 12,746% — sai lãi suất thì sai dồn mỗi ngày.
-     Chủ nhân cần xác nhận lãi suất mới với DNSE rồi mới sửa DEAL_CONFIG. */
-  { label: '03/09/2026 11:39', date: '2026-09-03', price: 14600, debt: 7021229, nav: 7578942, pnl: -1337269, pnlPct: -8.47,
-    chuaKhop: 'DNSE đổi lãi suất quanh 28-29/08 (12,50% → ~12,75%). Chờ Chủ nhân xác nhận rồi sửa DEAL_CONFIG.marginRateAnnual.' }
+  /* ✅ ĐÃ XÁC MINH BẰNG MÀN "CÁC KHOẢN VAY MARGIN" (ảnh 12:37 · 03/09/2026)
+
+     ⚠ ĐÍNH CHÍNH MỘT KẾT LUẬN SAI CỦA CHÍNH TÔI:
+     Trước đó tôi suy từ con số "Nợ" trên màn Tài sản rằng DNSE đã đổi lãi suất
+     lên ~12,75%. **SAI.** Màn khoản vay ghi rõ **12.5%/năm**, và:
+
+        Gốc vay còn lại DNSE  6.898.107  =  CKV principalLoan     ✓ khớp từng đồng
+        Lãi vay còn lại DNSE    122.843  =  CKV accruedInterest(52) ✓ khớp từng đồng
+
+     Mô hình lãi đơn 12,5% của CKV **đúng hoàn toàn**. Bài học: tôi suy diễn từ
+     một con số mình chưa hiểu rõ định nghĩa ("Nợ" trên màn Tài sản) thay vì đi
+     tìm con số có nhãn đúng ("Lãi vay còn lại"). Cùng lớp sai với vụ sql/38 —
+     đoán thay vì tra.
+
+     Chênh 279đ giữa "Nợ 7.021.229" (màn Tài sản) và "gốc + lãi = 7.020.950" là
+     một thành phần khác trong cách DNSE gộp Nợ, KHÔNG phải sai lãi suất.
+     Chưa đủ dữ liệu để biết nó là gì — ghi nhận, không đoán. */
+  { label: '03/09/2026 11:39', date: '2026-09-03', price: 14600, debt: 7021229, nav: 7578942,
+    pnl: -1337269, pnlPct: -8.47,
+    chuaKhop: 'Chênh 279đ ở trường "Nợ" màn Tài sản. Lãi suất 12,5% và lãi tích luỹ 122.843 '
+            + 'ĐÃ XÁC MINH khớp từng đồng qua màn Các khoản vay Margin 12:37 · 03/09.' },
 ];
 
 test('1. Cấu hình Deal khớp cơ cấu nguồn vốn thật (8,891,893 tự có + 6,898,107 vay = 15,790,000)', () => {
@@ -315,4 +325,27 @@ test('23. NAV = Giá trị cổ phiếu + Tiền mặt − Nợ (mốc 03/09 11:
   const GIA_TRI_CP = 14_600_000; // đọc từ ảnh: "Giá trị Cổ phiếu"
   assert.equal(GIA_TRI_CP + TIEN_MAT - moc.debt, moc.nav,
     'Ba con số trên ảnh phải cộng trừ ra đúng Tài sản ròng');
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   MÀN "CÁC KHOẢN VAY MARGIN" — nguồn sự thật về LÃI, ảnh 12:37 03/09/2026
+
+   Màn Tài sản chỉ cho con số "Nợ" gộp. Màn này tách bạch từng phần, nên nó
+   mới là chỗ đối chiếu đúng cho mô hình lãi:
+
+     Tổng tiền vay      6.997.221
+     Gốc vay còn lại    6.898.107   ← DEAL_CONFIG.principalLoan
+     Lãi vay còn lại      122.843   ← accruedInterest(52 ngày)
+     Gốc và lãi đã trả    100.370
+     Lãi suất           12.5%/năm   ← DEAL_CONFIG.marginRateAnnual
+   ═══════════════════════════════════════════════════════════════ */
+test('24. Lãi suất và lãi tích luỹ khớp màn Các khoản vay Margin (12:37 · 03/09/2026)', () => {
+  assert.equal(DEAL_CONFIG.marginRateAnnual, 12.5,
+    'DNSE ghi rõ 12.5%/năm trên màn khoản vay — đừng suy diễn lãi suất từ con số Nợ gộp');
+  assert.equal(DEAL_CONFIG.principalLoan, 6898107,
+    'Gốc vay còn lại trên màn khoản vay');
+
+  const ngay = daysSinceOpen('2026-09-03');
+  assert.equal(accruedInterest(ngay), 122843,
+    `Lãi vay còn lại phải là 122.843 như DNSE hiện, đang là ${accruedInterest(ngay)}`);
 });

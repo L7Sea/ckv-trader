@@ -518,3 +518,36 @@ Tôi chưa tìm được nguồn công khai cho **giá khớp trong phiên**. Ha
 
 `scripts/test-nguon-gia.cjs` — 5 bài canh 3 tham số này bằng cách **đọc mã nguồn**,
 chạy được cả khi mất mạng. Đã kiểm ngược.
+
+---
+
+## Cập nhật 03/09/2026 (5) — ĐÍNH CHÍNH: lãi suất KHÔNG hề đổi
+
+Ảnh màn **"Các khoản vay Margin"** (12:37 · 03/09/2026) bác bỏ kết luận tôi đưa
+ra hôm trước.
+
+| Trường trên màn DNSE | Giá trị | CKV tính | |
+|---|---|---|---|
+| Lãi suất | **12.5%/năm** | 12.5%/năm | ✓ |
+| Gốc vay còn lại | 6.898.107 | 6.898.107 | ✓ **khớp từng đồng** |
+| **Lãi vay còn lại** | **122.843** | **122.843** | ✓ **khớp từng đồng** |
+| Tổng tiền vay | 6.997.221 | — | |
+| Gốc và lãi đã trả | 100.370 | — | |
+| Đáo hạn | 11/01/27 | — | |
+
+**Mô hình lãi đơn 12,5% của CKV đúng hoàn toàn.**
+
+### Tôi đã sai ở đâu
+Hôm trước tôi suy từ con số **"Nợ" trên màn Tài sản** (7.021.229) rằng DNSE đã
+đổi lãi suất lên ~12,75%. **Sai.** Tôi suy diễn từ một con số **chưa hiểu rõ
+định nghĩa** thay vì đi tìm con số **có nhãn đúng** — mà nhãn đúng là *"Lãi vay
+còn lại"*, nằm ở một màn khác.
+
+Cùng lớp sai với vụ `sql/38`: **đoán thay vì tra**. Khác biệt là lần này lưới an
+toàn không bắt được, vì con số tôi suy ra vẫn "hợp lý về mặt số học".
+
+Chênh 279đ giữa "Nợ 7.021.229" và "gốc + lãi = 7.020.950" là một thành phần khác
+trong cách DNSE gộp Nợ. Chưa đủ dữ liệu để biết nó là gì — **ghi nhận, không đoán**.
+
+Bài **24** khoá cả ba con số đã xác minh: lãi suất 12,5% · gốc 6.898.107 ·
+lãi tích luỹ 122.843.
