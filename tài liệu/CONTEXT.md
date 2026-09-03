@@ -397,3 +397,60 @@ chẩn đoán để chạy TRƯỚC**, không đoán cấu trúc. Bốn phần:
 **Supabase Auth thật**. CKV đang tự quản người dùng trong `localStorage`, nên
 chạy PHẦN 4 trước khi sửa app là app **không đọc được gì** (dữ liệu không mất,
 chỉ là không đọc ra được). Thứ tự an toàn ghi rõ trong `sql/README.md`.
+
+---
+
+## Cập nhật 03/09/2026 (3) — Mốc số dư thật 11:39 · Phát hiện DNSE đổi lãi suất
+
+### Mốc thứ tư từ ảnh chụp thật
+| Trường | Giá trị |
+|---|---|
+| Tiền mặt | 171 |
+| Giá trị cổ phiếu | 14.600.000 |
+| Nợ | 7.021.229 |
+| Tài sản ròng | 7.578.942 |
+| Vốn thực có | 8.891.893 |
+| Vốn vay | 6.898.107 |
+| Lãi chưa chốt | −1.337.269 (−8,47%) |
+| TPB | 14.60 · KL 1.000 · hoà vốn 15.939 |
+
+### Khoá được MẪU SỐ của phép tính phần trăm
+Mốc này có đủ số để phân biệt **hai** cách chia, và chúng ra **hai kết quả khác nhau**:
+
+- chia cho **vốn triển khai** 15.790.000 → **−8,47%** ← DNSE dùng cái này
+- chia cho **giá vốn** 15.937.269 → −8,39%
+
+Chênh 147.269đ giữa hai mẫu số chính là **lãi margin đã cộng vào giá vốn** nhưng
+chưa nằm trong vốn triển khai. CKV **đang dùng đúng** (`disbursedCapital`).
+Bài 21 khoá lại: ai "sửa cho gọn" thành chia cho giá vốn là đỏ ngay.
+
+### Phát hiện: DNSE ĐỔI LÃI SUẤT quanh 28–29/08
+Đối chiếu lãi **ĐƠN** và lãi **KÉP** trên cả 4 mốc:
+
+| Ngày | DNSE thật | Lãi ĐƠN | Lệch | Lãi KÉP | Lệch |
+|---|---|---|---|---|---|
+| 26/08 | 7.002.051 | 7.002.051 | **0** | 7.002.820 | +769 |
+| 27/08 | 7.004.413 | 7.004.413 | **0** | 7.005.218 | +805 |
+| 28/08 | 7.006.776 | 7.006.776 | **0** | 7.007.617 | +841 |
+| 03/09 | 7.021.229 | 7.020.950 | −279 | 7.022.029 | +800 |
+
+→ **Mô hình lãi ĐƠN của CKV ĐÚNG** (khớp chính xác 0đ ở 3 mốc). Lãi kép sai hẳn.
+
+Nhưng lãi thực mỗi ngày **nhảy**:
+- 26→27/08: 2.362đ/ngày → **12,498%**/năm
+- 27→28/08: 2.363đ/ngày → **12,503%**/năm
+- 28/08→03/09: 2.409đ/ngày → **12,746%**/năm ← **NHẢY**
+
+Tức là **DNSE đổi lãi suất**, không phải công thức sai.
+
+⚠ **CỐ Ý KHÔNG tự đổi `DEAL_CONFIG.marginRateAnnual` từ 12,5% sang 12,746%.**
+Sai lãi suất thì sai dồn mỗi ngày, và tôi chỉ có một khoảng 6 ngày để suy ra —
+chưa đủ để biết đó là lãi suất mới cố định hay một khoản phí một lần. Đây đúng
+là kiểu đoán đã gây ra lỗi `sql/38` bên app Trần Long.
+
+**Việc Chủ nhân cần làm**: xác nhận lãi suất margin hiện tại với DNSE (xem thông
+báo hoặc hợp đồng), rồi sửa `DEAL_CONFIG.marginRateAnnual`.
+
+Bài test **ghi nhận khoảng trống** này chứ không giấu: mỗi lần chạy `test:deal`
+đều in cảnh báo kèm lý do, và **bài 22 khoá mức trôi tối đa 3.000đ** — trôi thêm
+là đỏ ngay.
