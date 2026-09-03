@@ -30,7 +30,7 @@ export const OnboardingTourModal: React.FC = () => {
       tag: 'BẮT ĐẦU CHƠI',
       content: (
         <div className="space-y-3.5 text-xs text-chu-phu leading-relaxed font-sans">
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-canh-bao via-canh-bao to-canh-bao border border-vien text-canh-bao">
+          <div className="p-4 rounded-2xl bg-the border border-vien text-canh-bao">
             <div className="flex items-center gap-2 font-black text-sm mb-1 text-canh-bao">
               <Gamepad2 className="h-5 w-5 text-canh-bao" />
               <span>CAPY GUNNY LÀ GÌ?</span>
@@ -161,7 +161,7 @@ export const OnboardingTourModal: React.FC = () => {
       tag: 'MINI-GAME GUNNY',
       content: (
         <div className="space-y-3 text-xs text-chu-phu leading-relaxed font-sans">
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-loi via-canh-bao to-loi border border-vien space-y-2.5">
+          <div className="p-4 rounded-2xl bg-the border border-vien space-y-2.5">
             <div className="flex items-center gap-2 font-bold text-loi text-sm">
               <Flame className="h-5 w-5 text-loi animate-pulse" />
               <span>BÍ KÍP KÍCH HOẠT GUNNY MODE:</span>
@@ -262,7 +262,7 @@ export const OnboardingTourModal: React.FC = () => {
             <button
               type="button"
               onClick={handleNext}
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-canh-bao to-canh-bao hover:from-canh-bao hover:to-canh-bao text-chu font-black text-xs transition shadow-lg shadow-md flex items-center gap-1.5 uppercase"
+              className="px-5 py-2 rounded-xl bg-the hover: hover: text-chu font-black text-xs transition shadow-lg shadow-md flex items-center gap-1.5 uppercase"
             >
               <span>{currentStep === capySteps.length - 1 ? 'BẮT ĐẦU CHƠI NGAY' : 'TIẾP THEO'}</span>
               <ArrowRight className="h-3.5 w-3.5" />

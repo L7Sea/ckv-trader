@@ -188,7 +188,7 @@ export const SupportChatModal: React.FC = () => {
                       <div
                         className={`max-w-[85%] p-3 rounded-2xl leading-relaxed ${
                           isMine
-                            ? 'bg-gradient-to-r from-tot to-tot text-chu font-medium rounded-tr-none'
+                            ? 'bg-the text-chu font-medium rounded-tr-none'
                             : 'bg-nen border border-vien text-chu rounded-tl-none'
                         }`}
                       >

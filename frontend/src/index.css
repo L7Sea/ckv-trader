@@ -98,6 +98,23 @@
     outline-offset: 2px;
     border-radius: 4px;
   }
+
+  /* Vùng chạm tối thiểu 44px trên điện thoại (sàn chất lượng mục 4).
+     Đặt một luật chung ở đây thay vì sửa tay từng nút: đo được 26 nút chỉ cao
+     34px, và cứ thêm nút mới là lại sót. Luật này bắt cả nút thêm sau này. */
+  @media (max-width: 767px) {
+    button,
+    [role='button'],
+    input[type='submit'],
+    input[type='button'] {
+      min-height: 44px;
+    }
+
+    /* Nút chỉ có biểu tượng thì cũng cần đủ rộng, không riêng chiều cao */
+    button:not(:has(span)):not(:has(p)) {
+      min-width: 44px;
+    }
+  }
 }
 
 /* Tôn trọng người đã tắt hiệu ứng chuyển động (sàn chất lượng mục 8) */

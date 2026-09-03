@@ -160,7 +160,7 @@ export const QuickRadarSearch: React.FC = () => {
       {/* ══ HEADER: THANH TÌM KIẾM & THÊM MÃ TỰ ĐỘNG (SHOPEE STYLE) ══ */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-nhan-chu to-tot text-chu shadow-md shadow-md">
+          <div className="p-2.5 rounded-2xl bg-the text-chu shadow-md shadow-md">
             <Zap className="h-6 w-6 stroke-[2.2]" />
           </div>
           <div>
@@ -194,7 +194,7 @@ export const QuickRadarSearch: React.FC = () => {
           <button
             type="submit"
             disabled={isAdding || !customTickerInput.trim()}
-            className="px-4 py-2 bg-gradient-to-r from-nhan-chu to-tot text-chu font-bold text-xs rounded-xl hover:opacity-95 transition disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5 shadow-md shadow-md"
+            className="px-4 py-2 bg-the text-chu font-bold text-xs rounded-xl hover:opacity-95 transition disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5 shadow-md shadow-md"
           >
             {isAdding ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <PlusCircle className="h-3.5 w-3.5" />}
             <span>Thêm Mã</span>
@@ -219,7 +219,7 @@ export const QuickRadarSearch: React.FC = () => {
               }}
               className={`px-3 py-1.5 rounded-xl font-mono text-xs font-bold transition flex items-center gap-1.5 shrink-0 border ${
                 isSelected
-                  ? 'bg-gradient-to-r from-nhan-chu to-tot text-chu border-transparent shadow-md shadow-md'
+                  ? 'bg-the text-chu border-transparent shadow-md shadow-md'
                   : 'bg-nen text-chu-phu border-vien hover:border-vien hover:text-chu'
               }`}
             >
@@ -291,7 +291,7 @@ export const QuickRadarSearch: React.FC = () => {
               {/* Visual Gauge Bar */}
               <div className="w-44 h-2 rounded-full bg-the2 overflow-hidden flex">
                 <div
-                  className="h-full bg-gradient-to-r from-loi via-canh-bao to-tot transition-all duration-500"
+                  className="h-full bg-the transition-all duration-500"
                   style={{ width: `${prediction.overallScore}%` }}
                 />
               </div>

@@ -82,7 +82,7 @@ export const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-tren-nhan flex flex-col font-sans selection:bg-tot selection:text-tren-nhan pb-20 md:pb-6">
+    <div className="min-h-screen bg-transparent text-chu flex flex-col font-sans selection:bg-tot selection:text-tren-nhan pb-20 md:pb-6">
       {/* Header Bar */}
       <Header />
 
@@ -236,8 +236,10 @@ export const AppContent: React.FC = () => {
         {activeTab === 'ANALYTICS' && <PerformanceAnalyticsPage />}
       </main>
 
-      {/* Floating Mascot Capy (Duy nhất 1 trợ lý) */}
-      <Capy />
+      {/* Linh vật Capy — trợ lý cho người ĐÃ đăng nhập. Không hiện ở cổng đăng
+          nhập: nó nổi đè lên tiêu đề của màn đó, và với người lạ lần đầu vào thì
+          một con linh vật che mất câu giới thiệu là phản tác dụng. */}
+      {user && <Capy />}
 
       {/* Mobile Bottom Navigation (Chuẩn Mobile Native 5 Nút & Bottom Sheet Khám Phá Đầy Đủ 8 Trang) */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-nen border-t border-vien backdrop-blur-2xl px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),10px)] shadow-2xl">

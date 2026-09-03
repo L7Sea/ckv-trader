@@ -107,7 +107,7 @@ export const AnalyticsReport: React.FC = () => {
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-vien">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-2xl bg-gradient-to-tr from-tot to-tot text-chu font-bold shadow-lg shadow-md">
+          <div className="p-3 rounded-2xl bg-the text-chu font-bold shadow-lg shadow-md">
             <Award className="h-6 w-6" />
           </div>
           <div>

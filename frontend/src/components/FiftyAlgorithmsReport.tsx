@@ -104,7 +104,7 @@ export const FiftyAlgorithmsReport: React.FC = () => {
       {/* ══ HEADER: CHỌN MÃ & TỔNG HỢP 150 THUẬT TOÁN ══ */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-4 border-b border-vien">
         <div className="flex items-center gap-3.5">
-          <div className="p-3 rounded-2xl bg-gradient-to-tr from-nhan-chu to-nhan-chu text-chu shadow-lg shadow-md">
+          <div className="p-3 rounded-2xl bg-the text-chu shadow-lg shadow-md">
             <Cpu className="h-7 w-7 stroke-[2.2]" />
           </div>
           <div>
@@ -166,7 +166,7 @@ export const FiftyAlgorithmsReport: React.FC = () => {
       {/* ══ BẢNG ĐỒNG THUẬN TỔNG HỢP (CONSENSUS GAUGE) ══ */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
         {/* Consensus Score Card */}
-        <div className="md:col-span-4 p-5 bg-gradient-to-br from-nen via-the to-nhan-chu rounded-3xl border border-vien flex flex-col justify-between shadow-lg">
+        <div className="md:col-span-4 p-5 bg-the rounded-3xl border border-vien flex flex-col justify-between shadow-lg">
           <div>
             <span className="text-xs font-bold text-chu-phu uppercase tracking-wider font-mono">
               ĐIỂM ĐỒNG THUẬN 150 THUẬT TOÁN
@@ -256,7 +256,7 @@ export const FiftyAlgorithmsReport: React.FC = () => {
                 onClick={() => setActiveCategory(cat.key)}
                 className={`px-3 py-2 rounded-2xl whitespace-nowrap transition font-medium ${
                   activeCategory === cat.key
-                    ? 'bg-gradient-to-r from-nhan-chu to-nhan-chu text-chu font-bold shadow-md shadow-md'
+                    ? 'bg-the text-chu font-bold shadow-md shadow-md'
                     : 'bg-nen text-chu-phu hover:text-chu border border-vien'
                 }`}
               >
@@ -311,7 +311,7 @@ export const FiftyAlgorithmsReport: React.FC = () => {
                   </div>
                   <div className="w-full h-1.5 rounded-full bg-the2 overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-nhan-chu to-tot rounded-full"
+                      className="h-full bg-the rounded-full"
                       style={{ width: `${algo.confidence}%` }}
                     />
                   </div>

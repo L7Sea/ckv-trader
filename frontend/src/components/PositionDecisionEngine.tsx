@@ -261,7 +261,7 @@ export const PositionDecisionEngine: React.FC = () => {
 
           <button
             onClick={() => useTradingStore.getState().navigateToStock(activeTicker, 'TRADE', 'BUY', extraPrice)}
-            className="w-full py-2 bg-gradient-to-r from-tot to-tot text-chu font-bold text-xs rounded-xl hover:opacity-95 transition flex items-center justify-center gap-1.5 font-sans shadow-md shadow-md"
+            className="w-full py-2 bg-the text-chu font-bold text-xs rounded-xl hover:opacity-95 transition flex items-center justify-center gap-1.5 font-sans shadow-md shadow-md"
           >
             <span>Thực Hiện Mua Gom (DCA)</span>
             <ArrowUpRight className="h-3.5 w-3.5" />

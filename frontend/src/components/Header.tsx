@@ -86,7 +86,7 @@ export const Header: React.FC = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           {/* Logo & Account Info (Left Side - Clean & Aligned) */}
           <div className="flex items-center gap-3 shrink-0">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-tot to-tot flex items-center justify-center shadow-lg shadow-md shrink-0">
+            <div className="h-10 w-10 rounded-2xl bg-the flex items-center justify-center shadow-lg shadow-md shrink-0">
               <TrendingUp className="h-6 w-6 text-chu stroke-[2.5]" />
             </div>
             <div>
@@ -109,7 +109,7 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Action Tools & Navigation Center (Right Side - Balanced & Clean) */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar max-w-full">
             {/* Switch Sub-account on Desktop */}
             <div className="hidden md:flex items-center gap-1 p-1 bg-the rounded-2xl border border-vien text-xs font-mono">
               <span className="text-chu-mo px-2 font-sans font-semibold text-[11px]">Tiểu khoản:</span>
@@ -141,7 +141,7 @@ export const Header: React.FC = () => {
             <button
               onClick={syncLiveMarketData}
               disabled={isLiveSyncing}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl bg-gradient-to-r from-tot to-nhan-chu hover:from-tot hover:to-nhan-chu text-tot border border-vien text-xs font-bold transition active:scale-95 disabled:opacity-50 shadow-md shadow-md shrink-0"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl bg-the hover: hover: text-tot border border-vien text-xs font-bold transition active:scale-95 disabled:opacity-50 shadow-md shadow-md shrink-0"
               title="Đồng bộ toàn diện: 300 mã giá thực + Lãi suất 20 Ngân hàng & FinTech + Tài sản NAV"
             >
               <RefreshCw className={`h-4 w-4 text-tot shrink-0 ${isLiveSyncing ? 'animate-spin' : ''}`} />

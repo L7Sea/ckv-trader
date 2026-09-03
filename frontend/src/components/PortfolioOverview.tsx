@@ -62,7 +62,7 @@ export const PortfolioOverview: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* ══ MASTER ASSET CARD (SANG TRỌNG, GỌN GÀNG & CÂN ĐỐI TUYỆT ĐỐI) ══ */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-the via-nhan-chu to-nen border border-vien p-5 sm:p-6 shadow-2xl backdrop-blur-xl">
+      <div className="relative overflow-hidden rounded-3xl bg-the border border-vien p-5 sm:p-6 shadow-2xl backdrop-blur-xl">
         {/* Ambient Glows */}
         <div className="absolute -right-16 -top-16 w-64 h-64 bg-the2 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-tot-nen rounded-full blur-3xl pointer-events-none" />

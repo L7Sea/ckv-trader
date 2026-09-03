@@ -195,7 +195,7 @@ export const HelpCenterModal: React.FC = () => {
                       closeHelpCenter();
                       openOnboarding();
                     }}
-                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-canh-bao to-canh-bao hover:from-canh-bao hover:to-canh-bao text-chu font-black text-xs transition shadow-lg shadow-md flex items-center justify-center gap-2 uppercase tracking-wide"
+                    className="w-full py-2.5 rounded-xl bg-the hover: hover: text-chu font-black text-xs transition shadow-lg shadow-md flex items-center justify-center gap-2 uppercase tracking-wide"
                   >
                     <Sparkles className="h-4 w-4" />
                     <span>🚀 Khởi Chạy Hướng Dẫn Tương Tác Capy Gunny (4 Bước Chi Tiết)</span>

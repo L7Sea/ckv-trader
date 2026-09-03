@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, ShieldCheck, Mail, Lock, LogIn, UserPlus, Sparkles, User, KeyRound, Calendar, Hash } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { Pin6Input } from './Pin6Input';
+import { NenBieuDoThat } from './NenBieuDoThat';
 
 export const AuthModal: React.FC = () => {
   const {
@@ -68,8 +69,44 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-nen backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-the border border-vien rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6 shadow-2xl relative space-y-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-nen">
+      <div className="mx-auto grid min-h-full w-full max-w-6xl grid-cols-1 items-stretch gap-0 lg:grid-cols-2">
+        {/* NỬA TRÁI — hình bằng dữ liệu thật + lời giới thiệu.
+            Ẩn trên điện thoại: ở đó ưu tiên đưa form lên ngay, không bắt cuộn. */}
+        <aside className="relative hidden flex-col justify-between border-r border-vien lg:flex">
+          <div className="p-8">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-md border border-vien bg-the px-3 py-1.5">
+              <ShieldCheck className="h-4 w-4 text-nhan-chu" />
+              <span className="text-xs font-semibold text-chu">CKV Pro Trader</span>
+            </div>
+            <h1 className="font-tieu-de text-2xl font-bold leading-tight text-chu">
+              Biết ngay tiền của mình<br />đang ở đâu.
+            </h1>
+            <p className="mt-3 max-w-[46ch] text-base text-chu-phu">
+              Theo dõi danh mục có vay ký quỹ theo đúng cách công ty chứng khoán tính:
+              lãi vay cộng theo ngày, giá hòa vốn nhích dần, lãi lỗ tính trên vốn đã giải ngân.
+            </p>
+            <ul className="mt-5 space-y-2 text-sm text-chu-phu">
+              <li className="flex items-start gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-nhan-chu" />
+                <span>Số liệu đối chiếu với ứng dụng công ty chứng khoán tới từng đồng</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-nhan-chu" />
+                <span>Giá lấy thẳng từ sàn, không có số liệu tự chế</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-nhan-chu" />
+                <span>Tự đồng bộ sáng, trưa, chiều, tối</span>
+              </li>
+            </ul>
+          </div>
+          <NenBieuDoThat className="min-h-[280px] flex-1 border-t border-vien" />
+        </aside>
+
+        {/* NỬA PHẢI — form. Trên điện thoại thì chiếm trọn màn. */}
+        <div className="flex items-center justify-center p-4 sm:p-8">
+      <div className="w-full max-w-md space-y-4 relative">
         {/* Chỉ hiện nút đóng nếu người dùng đã đăng nhập trước đó */}
         {user && (
           <button
@@ -81,13 +118,15 @@ export const AuthModal: React.FC = () => {
         )}
 
         {/* Header */}
-        <div className="flex items-center gap-3 pb-3 border-b border-vien">
-          <div className="p-3 rounded-2xl bg-the2 text-nhan-chu border border-vien">
+        <div className="flex items-center gap-3 border-b border-vien pb-3">
+          <div className="rounded-md border border-vien bg-the2 p-3 text-nhan-chu lg:hidden">
             <ShieldCheck className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-chu">CỔNG TRUY CẬP CKV PRO TRADER</h3>
-            <p className="text-xs text-chu-phu">Đăng nhập tài khoản thành viên để vào sổ lệnh</p>
+            <h2 className="font-tieu-de text-xl font-bold text-chu">Đăng nhập</h2>
+            <p className="text-sm text-chu-phu">
+              <span className="lg:hidden">CKV Pro Trader — </span>vào sổ lệnh của anh
+            </p>
           </div>
         </div>
 
@@ -312,6 +351,8 @@ export const AuthModal: React.FC = () => {
             </button>
           </div>
         </form>
+        </div>
+        </div>
       </div>
     </div>
   );

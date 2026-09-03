@@ -102,7 +102,7 @@ export default function MacroInterestRateEngine() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-vien">
         <div>
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-gradient-to-tr from-tot to-nhan-chu border border-vien rounded-xl text-tot">
+            <div className="p-2.5 bg-the border border-vien rounded-xl text-tot">
               <Landmark size={24} />
             </div>
             <div>
@@ -554,7 +554,7 @@ export default function MacroInterestRateEngine() {
               <div>
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-nhan-chu to-loi border border-vien flex items-center justify-center text-nhan-chu font-bold text-sm">
+                    <div className="w-9 h-9 rounded-xl bg-the border border-vien flex items-center justify-center text-nhan-chu font-bold text-sm">
                       {f.id.slice(0, 2)}
                     </div>
                     <div>
@@ -610,7 +610,7 @@ export default function MacroInterestRateEngine() {
           ═══════════════════════════════════════════════════════════════ */}
       {activeTab === 'VALUATION' && (
         <div className="mt-3 space-y-4">
-          <div className="bg-gradient-to-r from-nhan-chu via-the to-tot border border-vien rounded-xl p-3.5">
+          <div className="bg-the border border-vien rounded-xl p-3.5">
             <h4 className="text-xs font-bold text-nhan-chu flex items-center gap-1.5 uppercase">
               <Sparkles size={14} /> Công Thức Định Lượng Vĩ Mô: Equity Risk Premium (ERP)
             </h4>

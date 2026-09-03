@@ -55,7 +55,7 @@ export const CapyStylePickerModal: React.FC<CapyStylePickerModalProps> = ({ isOp
 
   return (
     <div className="fixed inset-0 z-[2147483001] bg-nen backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-gradient-to-b from-the via-the to-nen border border-vien rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-in zoom-in-95">
+      <div className="bg-the border border-vien rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-in zoom-in-95">
         <div className="text-center space-y-1.5">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-the2 text-nhan-chu border border-vien text-xs font-bold font-mono uppercase">
             <Sparkles className="h-3.5 w-3.5 text-canh-bao" />
@@ -105,7 +105,7 @@ export const CapyStylePickerModal: React.FC<CapyStylePickerModalProps> = ({ isOp
         <div className="pt-2 flex items-center justify-end gap-3">
           <button
             onClick={handleConfirm}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-tot via-tot to-tot text-chu font-bold text-sm shadow-lg shadow-md hover:opacity-95 transition active:scale-[0.99] flex items-center justify-center gap-2"
+            className="w-full py-3 rounded-xl bg-the text-chu font-bold text-sm shadow-lg shadow-md hover:opacity-95 transition active:scale-[0.99] flex items-center justify-center gap-2"
           >
             <Sparkles className="h-4 w-4" />
             <span>Xác Nhận & Bắt Đầu Trải Nghiệm</span>
