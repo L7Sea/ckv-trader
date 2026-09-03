@@ -17,7 +17,7 @@ import {
 import { useTradingStore } from '../store/useTradingStore';
 import { TOP_300_STOCKS, MarketStock300 } from '../services/top300Stocks';
 
-export const USER_WATCHLIST = TOP_300_STOCKS;
+
 export const VN50_WATCHLIST = TOP_300_STOCKS;
 export type WatchlistStock = MarketStock300;
 

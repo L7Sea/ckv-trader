@@ -1969,4 +1969,4 @@ export function run150PredictionAlgorithms(symbol: string, currentPrice: number,
 }
 
 // Giữ alias tương thích ngược
-export const run52PredictionAlgorithms = run150PredictionAlgorithms;
+

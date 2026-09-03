@@ -131,5 +131,4 @@ export function chonBoDo(
   return { bo, mat: bocBieuCam(bo.nhomMat) };
 }
 
-export const DS_NGU_CANH = Object.keys(TU_DO) as NguCanh[];
 export { TU_DO };

@@ -53,15 +53,6 @@ const MIENG_HOP_LE = new Set(BIEU_CAM.map((b) => b.mieng));
 const PHU_HOP_LE = new Set(BIEU_CAM.flatMap((b) => b.phu ?? []));
 const NHOM_HOP_LE = new Set(BIEU_CAM.map((b) => b.nhom));
 
-export const GOI_Y = {
-  tuThe: Object.keys(TU_THE),
-  mat: [...MAT_HOP_LE].sort(),
-  mieng: [...MIENG_HOP_LE].sort(),
-  phu: [...PHU_HOP_LE].sort(),
-  phuKien: Object.keys(PHU_KIEN),
-  nhom: [...NHOM_HOP_LE].sort(),
-};
-
 /* ═══ LỌC SVG — danh sách TRẮNG, mặc định từ chối ═══ */
 const THE_CHO_PHEP = new Set([
   'g', 'path', 'circle', 'ellipse', 'rect', 'line', 'polyline', 'polygon', 'text',
@@ -127,111 +118,8 @@ export interface KetQuaKiem {
   spec?: CongThucMeme;
 }
 
-export function kiemCongThuc(raw: unknown): KetQuaKiem {
-  const loi: string[] = [];
-  const canhBao: string[] = [];
-
-  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
-    return { ok: false, loi: ['Công thức phải là một đối tượng JSON { ... }'], canhBao };
-  }
-  const o = raw as Record<string, unknown>;
-
-  const ten = String(o.ten ?? '').trim();
-  if (!ten) loi.push('Thiếu "ten" — đặt tên cho dáng này để còn tìm lại');
-  if (ten.length > 60) loi.push('"ten" dài quá 60 ký tự');
-
-  const mat = String(o.mat ?? '');
-  if (!MAT_HOP_LE.has(mat as Mat)) {
-    loi.push(`"mat": "${mat}" không có. Chọn 1 trong: ${GOI_Y.mat.join(', ')}`);
-  }
-  const mieng = String(o.mieng ?? '');
-  if (!MIENG_HOP_LE.has(mieng as Mieng)) {
-    loi.push(`"mieng": "${mieng}" không có. Chọn 1 trong: ${GOI_Y.mieng.join(', ')}`);
-  }
-
-  const tuThe = o.tuThe === undefined ? 'dung' : String(o.tuThe);
-  if (!(tuThe in TU_THE)) {
-    loi.push(`"tuThe": "${tuThe}" không có. Chọn 1 trong: ${GOI_Y.tuThe.join(', ')}`);
-  }
-
-  const layMang = (k: string, hopLe: Set<string>, ds: string[]): string[] => {
-    const v = o[k];
-    if (v === undefined) return [];
-    if (!Array.isArray(v)) { loi.push(`"${k}" phải là mảng [...]`); return []; }
-    const ra: string[] = [];
-    for (const x of v) {
-      const s = String(x);
-      if (hopLe.has(s)) ra.push(s);
-      else loi.push(`"${k}" có "${s}" không tồn tại. Có sẵn: ${ds.join(', ')}`);
-    }
-    return ra;
-  };
-  const phu = layMang('phu', PHU_HOP_LE, GOI_Y.phu) as Phu[];
-  const phuKien = layMang('phuKien', new Set(GOI_Y.phuKien), GOI_Y.phuKien) as TenPhuKien[];
-
-  /* Lớp vẽ thêm — lọc an toàn */
-  const lopThem: LopThem[] = [];
-  if (o.lopThem !== undefined) {
-    if (!Array.isArray(o.lopThem)) loi.push('"lopThem" phải là mảng [...]');
-    else {
-      for (const l of o.lopThem as Record<string, unknown>[]) {
-        const svgRaw = String(l?.svg ?? '');
-        if (!svgRaw.trim()) { loi.push('"lopThem" có mục thiếu "svg"'); continue; }
-        if (svgRaw.length > 8000) { loi.push('Một lớp vẽ thêm dài quá 8000 ký tự'); continue; }
-        const { sach, boDi } = locSvg(svgRaw);
-        if (boDi.length) canhBao.push(`Đã bỏ phần không an toàn: ${boDi.slice(0, 6).join(', ')}`);
-        if (!sach) { loi.push('Một lớp vẽ thêm không còn gì sau khi lọc an toàn'); continue; }
-        lopThem.push({
-          neo: l?.neo === 'dau' ? 'dau' : 'canh',
-          z: l?.z === 'sau' ? 'sau' : 'truoc',
-          svg: sach,
-        });
-      }
-    }
-  }
-
-  const nhom = o.nhom === undefined ? undefined : String(o.nhom);
-  if (nhom !== undefined && !NHOM_HOP_LE.has(nhom as Nhom)) {
-    loi.push(`"nhom": "${nhom}" không có. Chọn 1 trong: ${GOI_Y.nhom.join(', ')}`);
-  }
-
-  const thoai = o.thoai === undefined ? undefined : String(o.thoai).slice(0, 120);
-
-  if (loi.length) return { ok: false, loi, canhBao };
-
-  return {
-    ok: true, loi, canhBao,
-    spec: {
-      ten, tuThe: tuThe as TuThe, mat: mat as Mat, mieng: mieng as Mieng,
-      ...(phu.length ? { phu } : {}),
-      ...(phuKien.length ? { phuKien } : {}),
-      ...(lopThem.length ? { lopThem } : {}),
-      ...(thoai ? { thoai } : {}),
-      ...(nhom ? { nhom: nhom as Nhom } : {}),
-    },
-  };
-}
-
 /* ═══ SO TRÙNG ═══
    Hai công thức khác TÊN nhưng cùng mọi thành phần thì vẽ ra hình y hệt.
    Chuẩn hoá rồi băm: bỏ tên/thoại (không ảnh hưởng hình), sắp xếp các
    mảng (thứ tự phụ kiện không đổi hình), rồi ghép thành chuỗi. */
-export function vanTay(s: CongThucMeme): string {
-  const phan = [
-    s.tuThe ?? 'dung',
-    s.mat,
-    s.mieng,
-    [...(s.phu ?? [])].sort().join('+'),
-    [...(s.phuKien ?? [])].sort().join('+'),
-    (s.lopThem ?? [])
-      .map((l) => `${l.neo}:${l.z ?? 'truoc'}:${l.svg.replace(/\s+/g, '')}`)
-      .sort().join('|'),
-  ];
-  return phan.join('~');
-}
-
 /** Trả về công thức đã có nếu trùng, ngược lại null */
-export function timTrung(s: CongThucMeme, kho: CongThucMeme[]): CongThucMeme | null {
-  const v = vanTay(s);
-  return kho.find((x) => vanTay(x) === v) ?? null;
-}

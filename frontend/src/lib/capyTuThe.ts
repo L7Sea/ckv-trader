@@ -168,4 +168,3 @@ export const TU_THE: Record<TuThe, HinhTuThe> = {
   },
 };
 
-export const DS_TU_THE = Object.keys(TU_THE) as TuThe[];

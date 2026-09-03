@@ -22,10 +22,6 @@ export interface TrangThaiVatLy {
   dichX: number; dichY: number;
 }
 
-export function taoTrangThai(x = 0, y = 0): TrangThaiVatLy {
-  return { x, y, vx: 0, vy: 0, xoay: 0, vXoay: 0, dichX: x, dichY: y };
-}
-
 /** Bé còn đang bay do lực ném hay đã dừng hẳn? */
 export function dangBay(s: TrangThaiVatLy): boolean {
   return Math.abs(s.vx) > NGUONG_BAY || Math.abs(s.vy) > NGUONG_BAY;

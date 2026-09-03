@@ -57,3 +57,61 @@ Bất cứ khi nào Chủ nhân cung cấp thông tin mới (ảnh chụp số d
 2. **Tự Động Đồng Bộ Bộ Test**: Bổ sung test case vào `scripts/test-deal-model.mjs` (mọi thứ liên quan đến tiền), `scripts/test-trading-formulas.cjs` hoặc `scripts/test-sql-schema.cjs`.
 3. **Sửa Code & Chạy Test 100% Pass**: Đảm bảo code và test luôn đồng bộ với bối cảnh mới nhất (khi ở Chế độ Thực thi).
 4. **Tự Động Đẩy Lên Cloudflare Pages**: Commit và `git push origin master` ngay lập tức.
+
+## 6. 🎨 LUẬT GIAO DIỆN (skill `giao-dien-ui-design`)
+
+Mỗi lần đụng vào giao diện phải theo công thức 7 bước trong skill
+`giao-dien-ui-design`. **Bước 6 (ĐO bằng máy) là bắt buộc** — chưa chạy
+`~/.claude/skills/giao-dien-ui-design/scripts/do-tuong-phan.js` thì chưa được
+nói là xong.
+
+**App này dùng Tailwind**, nên token nằm ở `frontend/tailwind.config.js` chứ
+không phải file CSS. Ba luật vẫn giữ nguyên:
+
+1. **Mỗi vai trò màu cần HAI token**: một cho NỀN, một cho CHỮ. Một màu không
+   gánh được hai vai — màu đủ sẫm để chữ trắng đọc được trên nút thì lại quá sẫm
+   để tự nó làm chữ trên nền sáng.
+2. **Không rải class màu tuỳ tiện.** Hiện có **2.140 lượt dùng class màu với 34
+   sắc khác nhau** — đó là con số của một hệ màu chưa được đặt tên. Màu mới phải
+   khai trong `tailwind.config.js` trước.
+3. **Tương phản chữ/nền ≥ 4,5** (chữ ≥24px hoặc ≥19px đậm thì 3,0).
+
+**Diện mạo app này PHẢI KHÁC app Trần Long Sales.** Dùng chung *kỷ luật*, không
+dùng chung *bảng màu*.
+
+## 7. 🧹 DỌN MÃ CHẾT
+
+```bash
+npm run tim:codechet          # chỉ BÁO, không xoá
+node scripts/xoa-code-chet.cjs <file> <tênExport> [...]   # xoá + tự build kiểm
+```
+
+`xoa-code-chet.cjs` **tự khôi phục nguyên vẹn nếu build hỏng** — đã cứu một lần
+thật khi bộ khớp ngoặc cắt nhầm giữa file.
+
+⚠ Ba thứ **KHÔNG** phải mã chết: gọi qua chuỗi động · điểm vào app · thứ nằm
+trong danh sách `MIEN_TRU` (có ghi lý do). Ví dụ `locSvg` là bộ lọc an toàn
+SVG — chưa ai gọi vì bảng meme chưa gắn, nhưng xoá nó là bỏ luôn lớp chặn.
+
+## 8. 🗺 SƠ ĐỒ APP
+
+```bash
+node ~/.claude/skills/ban-do-trang-route-map/scripts/quet-duong-dan.cjs . --mermaid
+```
+
+⚠ **App này chưa có router.** Chạy lệnh trên sẽ ra thông báo giải thích, không
+ra sơ đồ — vì 8 "trang" thực chất là component đổi qua biến `activeTab`.
+Xem mục hạn chế bên dưới.
+
+## 9. ⚠ HAI HẠN CHẾ LỚN NHẤT HIỆN TẠI
+
+**1. Không có router.** `package.json` không có `react-router`. Hậu quả thật:
+không có địa chỉ riêng cho từng màn → không lưu dấu trang, không gửi link được;
+nút Back của trình duyệt **thoát hẳn app**; F5 là mất chỗ đang xem; không mở hai
+màn cạnh nhau để so sánh. Tài liệu gọi đây là *"Kiến trúc 8 Trang Độc Lập"* —
+đó là **ý định**, không phải hiện trạng.
+
+**2. Phân quyền nằm trong máy người dùng.** `role: 'ADMIN'` lưu ở
+`localStorage`; sửa một chữ trong DevTools là thành admin. Chấp nhận được khi
+chỉ Chủ nhân dùng — **KHÔNG chấp nhận được** khi có khách hàng thật. Hàng rào
+duy nhất có tác dụng là **RLS bật trên MỌI bảng** ở phía Supabase.

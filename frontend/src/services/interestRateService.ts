@@ -230,45 +230,6 @@ export const BENCHMARK_RATES = {
 /**
  * HÀM TÍNH TIỀN LÃI TIẾT KIỆM THỰC TẾ THEO SỐ TIỀN & KỲ HẠN
  */
-export function tinhTienLaiTietKiem(
-  bank: BankInterestRate,
-  soTien: number,
-  kyHan: 'KKH' | '1M' | '3M' | '6M' | '9M' | '12M' | '18M' | '24M' | '36M',
-  tier: DepositTier = 'UNDER_1B'
-) {
-  let baseRate = bank.deposit12M;
-  let months = 12;
-
-  switch (kyHan) {
-    case 'KKH': baseRate = bank.depositKKH; months = 1 / 30; break;
-    case '1M': baseRate = bank.deposit1M; months = 1; break;
-    case '3M': baseRate = bank.deposit3M; months = 3; break;
-    case '6M': baseRate = bank.deposit6M; months = 6; break;
-    case '9M': baseRate = bank.deposit9M; months = 9; break;
-    case '12M': baseRate = bank.deposit12M; months = 12; break;
-    case '18M': baseRate = bank.deposit18M; months = 18; break;
-    case '24M': baseRate = bank.deposit24M; months = 24; break;
-    case '36M': baseRate = bank.deposit36M; months = 36; break;
-  }
-
-  // Cộng thêm theo số tiền
-  let bonus = 0;
-  if (tier === 'TIER_1B_5B') bonus = bank.tierBonus1B_5B;
-  else if (tier === 'OVER_5B') bonus = bank.tierBonusOver5B;
-  else if (tier === 'ONLINE') bonus = bank.onlineBonus;
-
-  const finalRate = baseRate + bonus;
-  const tongTienLai = Math.round((soTien * (finalRate / 100) * months) / 12);
-  const laiMoiThang = Math.round(tongTienLai / Math.max(1, months));
-
-  return {
-    finalRate: Number(finalRate.toFixed(2)),
-    tongTienLai,
-    laiMoiThang,
-    months,
-  };
-}
-
 /**
  * HÀM TÍNH TOÁN ĐỊNH GIÁ KẾT HỢP VĨ MÔ & 150 THUẬT TOÁN ĐỊNH LƯỢNG
  */

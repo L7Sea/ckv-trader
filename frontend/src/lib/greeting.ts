@@ -11,15 +11,6 @@ type Buoi = 'rang' | 'sang' | 'trua' | 'chieu' | 'toi' | 'dem';
 
 const LS_STYLE_KEY = 'ckv_greeting_style';
 
-export function getBuoiHienTai(h = new Date().getHours()): Buoi {
-  if (h < 5) return 'rang';
-  if (h < 11) return 'sang';
-  if (h < 14) return 'trua';
-  if (h < 18) return 'chieu';
-  if (h < 22) return 'toi';
-  return 'dem';
-}
-
 const TIME_GREETINGS: Record<GreetingStyle, Record<Buoi, string[]>> = {
   vui: {
     rang: ['Rạng sáng rồi, sớm thế này chắc đang soi chart săn siêu cổ', 'Chào bình minh sớm, chuẩn bị tinh thần đón phiên tím lịm nhé!'],
@@ -96,16 +87,3 @@ export function setGreetingStyle(style: GreetingStyle): void {
   } catch {}
 }
 
-export function getSmartGreeting(name = 'VIP Trader'): string {
-  const style = getGreetingStyle();
-  const buoi = getBuoiHienTai();
-  const list = TIME_GREETINGS[style][buoi] || TIME_GREETINGS.vui.sang;
-  const picked = list[Math.floor(Math.random() * list.length)];
-  return `${picked} (${name})`;
-}
-
-export function getCapyQuote(): string {
-  const style = getGreetingStyle();
-  const quotes = CAPY_QUOTES[style] || CAPY_QUOTES.vui;
-  return quotes[Math.floor(Math.random() * quotes.length)];
-}

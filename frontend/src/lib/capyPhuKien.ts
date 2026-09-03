@@ -181,4 +181,3 @@ const _PK = {
 
 export const PHU_KIEN: Record<TenPhuKien, PhuKien> = _PK;
 export type TenPhuKien = keyof typeof _PK;
-export const DS_PHU_KIEN = Object.keys(_PK) as TenPhuKien[];

@@ -285,3 +285,55 @@ Không hề có bộ hẹn giờ nào. Đã thêm `lib/useAutoSync.ts` + `lib/sy
 **Lưu ý về import:** module nào cần kiểm thử bằng Node phải viết đuôi `.ts` tường minh trong
 đường dẫn tương đối (`from '../services/dealModel.ts'`). Vite và `allowImportingTsExtensions`
 đều chấp nhận, còn Node ESM thì bắt buộc.
+
+---
+
+## Cập nhật 03/09/2026 — Dọn 953 dòng mã chết · Luật giao diện · Hai hạn chế lớn
+
+### Dọn mã chết — 953 dòng, build sạch, 21 bài test vẫn xanh
+
+**6 file mồ côi hoàn toàn (628 dòng)** — không file nào nhắc tới:
+`capy200Memes` · `capyMemeKho` · `capyService` · `capyThoaiHanhDong` ·
+`capyXuatAnh` · `supabaseService`.
+Năm file Capy là bản chép từ app Trần Long nhưng **chưa bao giờ đấu dây vào
+CKV** — `Capy.tsx` của CKV không nhập cái nào trong số đó. `supabaseService` đã
+bị `api.ts` thay thế (gọi REST thẳng).
+
+**18 hàm/hằng không ai gọi (325 dòng)**, đáng chú ý:
+- `run52PredictionAlgorithms` — bản 52 thuật toán bị bỏ lại sau khi chuyển sang
+  `run150PredictionAlgorithms`
+- `DS_100_MEMES` (126 dòng) · `kiemCongThuc` (85 dòng) · `tinhTienLaiTietKiem` (39 dòng)
+- `loadUserSettings` + `saveUserSetting` — hai hàm thiết lập không ai gọi
+
+**Giữ lại có lý do**: `locSvg` — bộ lọc an toàn cho SVG. Chưa ai gọi vì CKV chưa
+gắn bảng meme Capy, nhưng nếu gắn lại thì **chính nó là thứ chặn SVG độc**. Ghi
+vào `MIEN_TRU` trong `scripts/tim-code-chet.cjs` kèm lý do, thay vì xoá cho đẹp
+con số.
+
+### Hai công cụ mới
+- `scripts/tim-code-chet.cjs` — chỉ **báo**, không xoá. Dò được cả `src/` lẫn
+  `frontend/src/` nên dùng chung cho mọi app.
+- `scripts/xoa-code-chet.cjs` — xoá bằng **khớp ngoặc thật**, rồi **chạy build**;
+  build hỏng thì **khôi phục nguyên vẹn**.
+
+⚠ **Lưới an toàn đã cứu một lần thật.** Bản đầu của bộ khớp ngoặc đếm cả cặp `[]`
+trong *chú thích kiểu* (`TuThe[]`) là ngoặc thật, nên tưởng khối chỉ dài 1 dòng
+và cắt cụt giữa file. Build nổ → mọi file được khôi phục → không mất gì. Nếu
+dùng `sed` thì đã hỏng app mà không ai biết.
+
+### Luật giao diện (mới, xem `GEMINI.md` §6)
+App này dùng **Tailwind**, đo ra **2.140 lượt dùng class màu với 34 sắc khác
+nhau** — con số của một hệ màu chưa được đặt tên. Màu mới phải khai trong
+`tailwind.config.js` trước.
+
+**Diện mạo CKV phải KHÁC app Trần Long Sales.** Dùng chung *kỷ luật* (2 token
+mỗi vai trò màu, tương phản ≥4,5, nút ≥44px), **không** dùng chung bảng màu.
+
+### Hai hạn chế lớn nhất, ghi thẳng để không quên (xem `GEMINI.md` §9)
+1. **Không có router** — `package.json` không có `react-router`. 8 "trang" là
+   component đổi qua biến `activeTab`. Mất: địa chỉ riêng cho từng màn, nút Back,
+   giữ chỗ khi F5, mở hai màn cạnh nhau.
+2. **Phân quyền nằm trong `localStorage`** — `role: 'ADMIN'` sửa được từ
+   DevTools. Chủ nhân đã xác nhận **sẽ mở cho nhiều khách hàng thật**, nên đây
+   không còn là rủi ro lý thuyết. Hàng rào duy nhất có tác dụng là **RLS bật
+   trên MỌI bảng**.
