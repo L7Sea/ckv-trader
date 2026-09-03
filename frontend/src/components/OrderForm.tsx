@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { thongBao } from '../lib/thongBao';
 import { ShoppingCart, Tag, AlertCircle, Calculator, Calendar, Target, ShieldAlert, Sparkles, BookOpen } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 import { useAuthStore } from '../store/useAuthStore';
@@ -84,17 +85,9 @@ export const OrderForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!cleanSymbol) return alert('Vui lòng nhập mã cổ phiếu');
-    if (price <= 0) return alert('Giá phải lớn hơn 0');
-    if (quantity <= 0) return alert('Khối lượng phải lớn hơn 0');
-
-    if (type === 'BUY' && fundingSource === 'CASH' && cash < netAmount) {
-      return alert(`Không đủ tiền mặt khả dụng! Cần ${formatNumber(netAmount)}đ, hiện có ${formatNumber(cash)}đ. Anh có thể chọn "Vay Margin Deal (${marginRate}%)" để giải ngân!`);
-    }
-
-    if (type === 'SELL' && availableShares < quantity) {
-      return alert(`Không đủ cổ phiếu khả dụng để bán! Yêu cầu: ${formatNumber(quantity)}, Khả dụng: ${formatNumber(availableShares)} (Cổ phiếu T1: ${formatNumber(t1Shares)}, T2: ${formatNumber(t2Shares)} chưa về)`);
-    }
+    if (!cleanSymbol) return thongBao.canhBao('Vui lòng nhập mã cổ phiếu');
+    if (price <= 0) return thongBao.canhBao('Giá phải lớn hơn 0');
+    if (quantity <= 0) return thongBao.canhBao('Khối lượng phải lớn hơn 0');
 
     const success = await placeOrder({
       type,

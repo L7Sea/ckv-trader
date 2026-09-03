@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { thongBao } from '../lib/thongBao';
 import { X, Wallet, ArrowDownRight, ArrowUpRight, ShieldCheck, Edit3 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 
@@ -22,9 +23,9 @@ export const CashModal: React.FC = () => {
       return;
     }
 
-    if (amount <= 0) return alert('Số tiền phải lớn hơn 0');
+    if (amount <= 0) return thongBao.canhBao('Số tiền phải lớn hơn 0');
     if (action === 'WITHDRAW' && currentCash < amount) {
-      return alert('Số dư tiền mặt không đủ để rút!');
+      return thongBao.loi('Tiền mặt trong sổ không đủ để rút khoản này!');
     }
     
     if (action === 'REPAY_DEBT') {
@@ -56,7 +57,7 @@ export const CashModal: React.FC = () => {
             <Wallet className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-chu">Quản Lý Nguồn Vốn & Nợ Margin</h3>
+            <h3 className="text-base font-bold text-chu">Hiệu Chỉnh Vốn & Nợ Trong Sổ</h3>
             <p className="text-xs text-chu-phu">
               Tiền mặt: <b className="text-tot font-mono">{formatVND(currentCash)}</b> • Nợ Deal: <b className="text-nhan-chu font-mono">{formatVND(currentMarginDebt)}</b>
             </p>
@@ -73,7 +74,7 @@ export const CashModal: React.FC = () => {
                 action === 'DEPOSIT' ? 'bg-tot text-tren-nhan font-black' : 'text-chu-phu hover:text-chu'
               }`}
             >
-              <span>NẠP TIỀN</span>
+              <span>BỔ SUNG VỐN</span>
             </button>
             <button
               type="button"
@@ -82,7 +83,7 @@ export const CashModal: React.FC = () => {
                 action === 'WITHDRAW' ? 'bg-loi text-tren-nhan font-black' : 'text-chu-phu hover:text-chu'
               }`}
             >
-              <span>RÚT TIỀN</span>
+              <span>RÚT VỐN</span>
             </button>
             <button
               type="button"
@@ -137,11 +138,11 @@ export const CashModal: React.FC = () => {
               </div>
             </div>
           ) : (
-            /* Tabs Nạp / Rút / Trả Nợ Tiêu Chuẩn */
+            /* Tabs Bổ sung / Rút vốn / Trả nợ */
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-chu-phu uppercase tracking-wider mb-1.5">
-                  {action === 'REPAY_DEBT' ? 'Số Tiền Trả Nợ Margin (VNĐ)' : 'Số Tiền (VNĐ)'}
+                  {action === 'REPAY_DEBT' ? 'Số tiền trả nợ Margin (đ)' : 'Số vốn (đ)'}
                 </label>
                 <input
                   type="number"
@@ -192,11 +193,11 @@ export const CashModal: React.FC = () => {
               {isLoading
                 ? 'Đang xử lý...'
                 : action === 'DEPOSIT'
-                ? 'XÁC NHẬN NẠP TIỀN'
+                ? 'GHI BỔ SUNG VỐN'
                 : action === 'WITHDRAW'
-                ? 'XÁC NHẬN RÚT TIỀN'
+                ? 'GHI RÚT VỐN'
                 : action === 'REPAY_DEBT'
-                ? 'XÁC NHẬN TRẢ NỢ DEAL MARGIN'
+                ? 'GHI TRẢ NỢ MARGIN'
                 : 'LƯU HIỆU CHỈNH SỐ DƯ TÀI SẢN'}
             </button>
           </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { thongBao } from '../lib/thongBao';
 import { X, Send, MessageSquare, ShieldCheck, User, Sparkles, Clock, CheckCheck, Users } from 'lucide-react';
 import { useAuthStore, UserProfile } from '../store/useAuthStore';
 import { supportService, SupportMessage } from '../services/supportService';
@@ -55,7 +56,7 @@ export const SupportChatModal: React.FC = () => {
     if (!inputText.trim()) return;
 
     if (isAdmin && !selectedMemberId) {
-      alert('Vui lòng chọn một thành viên để gửi tin nhắn!');
+      thongBao.canhBao('Vui lòng chọn một thành viên để gửi tin nhắn!');
       return;
     }
 

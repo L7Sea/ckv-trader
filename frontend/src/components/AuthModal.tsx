@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { thongBao } from '../lib/thongBao';
 import { X, ShieldCheck, Mail, Lock, LogIn, UserPlus, Sparkles, User, KeyRound, Calendar, Hash } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { Pin6Input } from './Pin6Input';
@@ -41,10 +42,10 @@ export const AuthModal: React.FC = () => {
     setLoading(true);
     try {
       if (authMode === 'REGISTER') {
-        if (!firstName.trim()) return alert('Vui lòng nhập Tên của bạn (VD: Minh, Hải, Bá, Nam)!');
-        if (!nickname.trim()) return alert('Vui lòng nhập Tên gọi trong App (Nickname)!');
-        if (!email.trim()) return alert('Vui lòng nhập Email / Gmail!');
-        if (!dailyPin.trim() || dailyPin.length < 6) return alert('Vui lòng nhập đúng Mã PIN 6 số của ngày hôm nay (Liên hệ Admin Hải để nhận mã)!');
+        if (!firstName.trim()) return thongBao.canhBao('Vui lòng nhập Tên của bạn (VD: Minh, Hải, Bá, Nam)!');
+        if (!nickname.trim()) return thongBao.canhBao('Vui lòng nhập Tên gọi trong App (Nickname)!');
+        if (!email.trim()) return thongBao.canhBao('Vui lòng nhập Email / Gmail!');
+        if (!dailyPin.trim() || dailyPin.length < 6) return thongBao.canhBao('Vui lòng nhập đúng Mã PIN 6 số của ngày hôm nay (Liên hệ Admin Hải để nhận mã)!');
 
         const fullName = [lastName.trim(), middleName.trim(), firstName.trim()].filter(Boolean).join(' ') || firstName.trim();
 
@@ -60,7 +61,7 @@ export const AuthModal: React.FC = () => {
 
         if (!success) return;
       } else {
-        if (!email.trim()) return alert('Vui lòng nhập email!');
+        if (!email.trim()) return thongBao.canhBao('Vui lòng nhập email!');
         await loginWithEmail(email, password);
       }
     } finally {

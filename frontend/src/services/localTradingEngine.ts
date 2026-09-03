@@ -289,11 +289,21 @@ export const localTradingEngine = {
     return { portfolio, positions: [], transactions: [] };
   },
 
-  placeOrder(payload: OrderRequestPayload): { transaction: Transaction; position: Position; portfolio: Portfolio } {
+  placeOrder(payload: OrderRequestPayload): {
+    transaction: Transaction;
+    position: Position;
+    portfolio: Portfolio;
+    /** Những chỗ sổ không khớp thực tế. Lệnh VẪN được ghi. */
+    canhBao: string[];
+  } {
     const { symbol, type, quantity, price, strategy, target_price, stop_loss, trade_date, notes } = payload;
     const portfolio = this.getPortfolio();
     const positions = this.getPositions();
     const transactions = this.getTransactions();
+
+    /* Mọi điều không khớp đều đi vào đây rồi trả về cho giao diện — thay cho
+       việc ném lỗi và huỷ bản ghi. */
+    const canhBao: string[] = [];
 
     const grossAmount = quantity * price;
     const fee = grossAmount * 0.0015;
@@ -306,8 +316,17 @@ export const localTradingEngine = {
       const funding = payload.funding_source || (portfolio.cash >= totalRequired ? 'CASH' : 'MARGIN_DEAL');
 
       if (funding === 'CASH') {
+        /* CKV là sổ GHI CHÉP, không phải sàn. Lệnh đã khớp thật ngoài công ty
+           chứng khoán rồi — app không có quyền phủ nhận việc đã xảy ra.
+           Thiếu tiền mặt thì vẫn ghi, để số dư âm và CẢNH BÁO. Số âm chính là
+           dấu hiệu nhìn thấy được rằng sổ cần hiệu chỉnh; chặn ghi thì mất luôn
+           cả bản ghi lẫn dấu hiệu. */
         if (portfolio.cash < totalRequired) {
-          throw new Error(`Sức mua tiền mặt không đủ (${portfolio.cash.toLocaleString()}đ)! Anh có thể chọn nguồn vốn Vay Margin Deal hoặc Nạp tiền.`);
+          canhBao.push(
+            `Tiền mặt trong sổ (${portfolio.cash.toLocaleString('vi-VN')}đ) ít hơn số cần ` +
+            `(${totalRequired.toLocaleString('vi-VN')}đ). Đã ghi lệnh và để số dư âm — ` +
+            `hãy hiệu chỉnh vốn cho khớp thực tế.`
+          );
         }
         portfolio.cash -= totalRequired;
       } else if (funding === 'MARGIN_DEAL') {
@@ -366,9 +385,31 @@ export const localTradingEngine = {
       }
     } else {
       // BÁN
-      if (!existingPos || existingPos.available_quantity < quantity) {
-        const avail = existingPos ? existingPos.available_quantity : 0;
-        throw new Error(`Không đủ cổ phiếu khả dụng để bán! (Khả dụng: ${avail.toLocaleString()})`);
+      /* Bán nhiều hơn số khả dụng trong sổ: vẫn ghi. Chu kỳ T+2.5 trong app có
+         thể chậm hơn thực tế, và người dùng biết rõ mình đã bán gì. */
+      if (!existingPos) {
+        canhBao.push(`Sổ chưa có mã ${symbol}. Đã tạo vị thế từ chính lệnh bán này — hãy kiểm lại giá vốn.`);
+        existingPos = {
+          symbol,
+          total_quantity: quantity,
+          available_quantity: quantity,
+          t1_quantity: 0,
+          t2_quantity: 0,
+          avg_price: price,
+          breakeven_price: price,
+          market_price: price,
+          market_value: quantity * price,
+          unrealized_pnl: 0,
+          unrealized_pnl_pct: 0,
+          updated_at: new Date().toISOString()
+        };
+        positions.push(existingPos);
+      } else if (existingPos.available_quantity < quantity) {
+        canhBao.push(
+          `Khả dụng trong sổ chỉ ${existingPos.available_quantity.toLocaleString('vi-VN')} CP, ` +
+          `ít hơn số bán ${quantity.toLocaleString('vi-VN')} CP. Đã ghi lệnh — có thể chu kỳ T+2.5 ` +
+          `trong app chậm hơn thực tế, hãy bấm "Chốt ngày" hoặc hiệu chỉnh.`
+        );
       }
 
       const netProceeds = grossAmount - fee - tax;
@@ -378,8 +419,8 @@ export const localTradingEngine = {
       portfolio.receiving_cash += netProceeds;
       portfolio.total_profit_loss = (portfolio.total_profit_loss || 0) + realizedPnL;
 
-      existingPos.available_quantity -= quantity;
-      existingPos.total_quantity -= quantity;
+      existingPos.available_quantity = Math.max(0, existingPos.available_quantity - quantity);
+      existingPos.total_quantity = Math.max(0, existingPos.total_quantity - quantity);
       const remainingCost = existingPos.total_quantity * existingPos.avg_price;
       existingPos.market_value = existingPos.total_quantity * existingPos.market_price;
       existingPos.unrealized_pnl = existingPos.market_value - remainingCost;
@@ -430,7 +471,7 @@ export const localTradingEngine = {
       unrealized_pnl_pct: 0,
       updated_at: new Date().toISOString()
     };
-    return { transaction, position: activePos, portfolio };
+    return { transaction, position: activePos, portfolio, canhBao };
   },
 
   /**

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { thongBao } from '../lib/thongBao';
 import { X, ShieldCheck, Users, MessageSquare, LogIn, Trash2, CheckCircle2, User, KeyRound, Copy, Check } from 'lucide-react';
 import { useAuthStore, getDailyAccessPin, UserProfile } from '../store/useAuthStore';
 import { localTradingEngine } from '../services/localTradingEngine';
@@ -148,8 +149,8 @@ export const AdminPanelModal: React.FC = () => {
                       <div className="flex items-center justify-end gap-1.5">
                         {!isCurrent && (
                           <button
-                            onClick={() => {
-                              if (window.confirm(`Chuyển sang kiểm tra góc nhìn của thành viên "${u.name}"?`)) {
+                            onClick={async () => {
+                              if (await thongBao.hoi({ loi: `Xem góc nhìn của "${u.name}"?`, nhanDong: 'Xem', nhanHuy: 'Huỷ', nguyHiem: false })) {
                                 switchUserAccount(u.id);
                               }
                             }}
@@ -162,8 +163,8 @@ export const AdminPanelModal: React.FC = () => {
                         )}
                         {u.role !== 'ADMIN' && u.email !== 'leminhhaia5890@gmail.com' && (
                           <button
-                            onClick={() => {
-                              if (window.confirm(`⚠️ CẢNH BÁO ADMIN:\nChủ nhân có chắc chắn muốn XÓA VĨNH VIỄN tài khoản "${u.name}" (${u.email}) khỏi hệ thống?\nToàn bộ dữ liệu của thành viên này sẽ bị xóa sạch.`)) {
+                            onClick={async () => {
+                              if (await thongBao.hoi({ loi: `Xoá vĩnh viễn tài khoản "${u.name}"?`, chiTiet: `${u.email} — toàn bộ dữ liệu của thành viên này sẽ bị xoá sạch, không hoàn tác được.`, nhanDong: 'Xoá vĩnh viễn', nhanHuy: 'Huỷ', nguyHiem: true })) {
                                 deleteUser(u.id);
                               }
                             }}

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { thongBao } from '../lib/thongBao';
 import { api } from '../services/api';
 import { localTradingEngine } from '../services/localTradingEngine';
 import { marketDataService, StockMarketInfo } from '../services/marketDataService';
@@ -284,9 +285,19 @@ successMessage: `Đã nạp lại danh mục thực tế: ${exact.positions[0]?.
           positions: updatedPositions.filter((p) => p.total_quantity > 0),
           transactions: updatedTransactions,
           isLoading: false,
-          successMessage: `Đã ghi nhật ký: ${payload.type === 'BUY' ? 'MUA' : 'BÁN'} ${payload.quantity.toLocaleString()} ${payload.symbol.toUpperCase()} giá ${payload.price.toLocaleString()}đ`
+          successMessage: null
         };
       });
+
+      /* Lệnh LUÔN được ghi (B1: sổ không phủ nhận việc đã xảy ra). Báo "đã ghi",
+         rồi nếu có chỗ số liệu không khớp thì báo riêng bằng mức cảnh báo — mức
+         này KHÔNG tự tắt, để người dùng kịp đọc và hiệu chỉnh. */
+      thongBao.tot(
+        `Đã ghi ${payload.type === 'BUY' ? 'MUA' : 'BÁN'} ${payload.quantity.toLocaleString('vi-VN')} ${payload.symbol.toUpperCase()} giá ${payload.price.toLocaleString('vi-VN')}đ`
+      );
+      if (result.canhBao && result.canhBao.length > 0) {
+        thongBao.canhBao('Đã ghi lệnh, nhưng sổ chưa khớp thực tế:', result.canhBao);
+      }
       return true;
     } catch (err: any) {
       set({ error: err.message || 'Lỗi ghi sổ lệnh', isLoading: false });

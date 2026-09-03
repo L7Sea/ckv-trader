@@ -14,6 +14,7 @@ import { PerformanceAnalyticsPage } from './pages/PerformanceAnalyticsPage';
 import { CashModal } from './components/CashModal';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
 import { PinLockScreen } from './components/PinLockScreen';
+import { KhayThongBao } from './components/KhayThongBao';
 import { CapyStylePickerModal } from './components/CapyStylePickerModal';
 import Capy from './components/Capy';
 import { BackgroundProvider } from './lib/backgroundContext';
@@ -404,6 +405,9 @@ export const AppContent: React.FC = () => {
 
       {/* Screen PIN Lock Modal */}
       <PinLockScreen />
+
+      {/* Khay thông báo + hộp hỏi/nhập của chính app — thay window.alert/confirm/prompt */}
+      <KhayThongBao />
     </div>
   );
 };

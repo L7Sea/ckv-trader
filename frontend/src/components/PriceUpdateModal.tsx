@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { thongBao } from '../lib/thongBao';
 import { X, TrendingUp } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 
@@ -23,7 +24,7 @@ export const PriceUpdateModal: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newPrice <= 0) return alert('Giá thị trường phải lớn hơn 0');
+    if (newPrice <= 0) return thongBao.canhBao('Giá thị trường phải lớn hơn 0');
     await updatePrice(priceModalSymbol.toUpperCase().trim(), newPrice);
   };
 

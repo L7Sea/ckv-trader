@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { thongBao } from '../lib/thongBao';
 import { X, Gift, Percent, DollarSign, Layers, CheckCircle2 } from 'lucide-react';
 import { useTradingStore } from '../store/useTradingStore';
 
@@ -62,15 +63,15 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentPos) return alert('Vui lòng chọn một mã cổ phiếu đang sở hữu');
+    if (!currentPos) return thongBao.canhBao('Vui lòng chọn một mã cổ phiếu đang sở hữu');
 
     if (type === 'CASH') {
-      if (cashPerShare <= 0) return alert('Số tiền cổ tức phải lớn hơn 0');
+      if (cashPerShare <= 0) return thongBao.canhBao('Số tiền cổ tức phải lớn hơn 0');
       // Nạp tiền cổ tức thực nhận vào tài khoản
       await adjustCash(netCashReceived, 'DEPOSIT');
-      alert(`Đã nhận ${formatNumber(netCashReceived)}đ cổ tức tiền mặt từ mã ${symbol} (Đã trừ 5% thuế TNCN: ${formatNumber(taxCash)}đ)`);
+      thongBao.tot(`Đã nhận ${formatNumber(netCashReceived)}đ cổ tức tiền mặt từ mã ${symbol} (đã trừ 5% thuế TNCN: ${formatNumber(taxCash)}đ)`);
     } else {
-      if (bonusShares <= 0) return alert('Tỷ lệ cổ phiếu thưởng phải lớn hơn 0');
+      if (bonusShares <= 0) return thongBao.canhBao('Tỷ lệ cổ phiếu thưởng phải lớn hơn 0');
       // Thêm cổ phiếu thưởng vào rổ
       await placeOrder({
         type: 'BUY',
@@ -81,7 +82,7 @@ export const DividendModal: React.FC<DividendModalProps> = ({ isOpen, onClose })
         tax: 0,
         notes: notes || `Nhận cổ tức cổ phiếu tỷ lệ ${shareRatioPct}% (${bonusShares} CP)`
       });
-      alert(`Đã nhận ${formatNumber(bonusShares)} CP cổ tức mã ${symbol}. Giá vốn đã tự động điều chỉnh thành ${formatNumber(Math.round(newAvgPrice))}đ/CP.`);
+      thongBao.tot(`Đã nhận ${formatNumber(bonusShares)} CP cổ tức mã ${symbol}. Giá vốn tự điều chỉnh thành ${formatNumber(Math.round(newAvgPrice))}đ/CP.`);
     }
 
     onClose();

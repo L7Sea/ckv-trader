@@ -1,4 +1,5 @@
 import React from 'react';
+import { thongBao } from '../lib/thongBao';
 import {
   Award,
   TrendingUp,
@@ -92,9 +93,9 @@ export const AnalyticsReport: React.FC = () => {
 
       const fileName = `Bao_Cao_CKV_${new Date().toISOString().slice(0, 10)}.xlsx`;
       XLSX.writeFile(wb, fileName);
-      alert(`Đã xuất báo cáo kiểm toán thành công file: ${fileName}`);
+      thongBao.tot(`Đã xuất báo cáo kiểm toán thành công file: ${fileName}`);
     } catch (err: any) {
-      alert('Lỗi xuất Excel: ' + err.message);
+      thongBao.loi('Lỗi xuất Excel: ' + err.message);
     }
   };
 

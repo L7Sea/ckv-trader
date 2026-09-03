@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { thongBao } from '../lib/thongBao';
 import {
   X,
   BookOpen,
@@ -47,7 +48,7 @@ export const HelpCenterModal: React.FC = () => {
 
   const handleSaveBrokerage = () => {
     updateBrokerage(selectedBroker as any, customRate);
-    alert(`Đã lưu cấu hình CTCK: ${selectedBroker} với lãi suất Margin ${customRate}%/năm thành công!`);
+    thongBao.tot(`Đã lưu cấu hình CTCK: ${selectedBroker} với lãi suất Margin ${customRate}%/năm thành công!`);
   };
 
   return (
@@ -280,7 +281,7 @@ export const HelpCenterModal: React.FC = () => {
                   type="button"
                   onClick={() => {
                     switchSubAccount('01');
-                    alert('Đã chuyển sang Tiểu khoản 01: Giao dịch thuần tiền mặt (Không Margin)!');
+                    thongBao.tot('Đã chuyển sang Tiểu khoản 01: Giao dịch thuần tiền mặt (Không Margin)!');
                   }}
                   className="px-4 py-1.5 rounded-xl bg-tot text-tren-nhan font-bold text-xs shadow-md shadow-md"
                 >

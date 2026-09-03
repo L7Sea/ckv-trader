@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { thongBao } from '../lib/thongBao';
 import { CheDoMau, NHAN_CHE_DO, cheDoKeTiep, docCheDo, luuCheDo } from '../lib/cheDoMau';
 import {
   Sun,
@@ -64,23 +65,28 @@ export const Header: React.FC = () => {
   const unreadCount = isAdmin ? supportService.getUnreadCountForAdmin() : (user ? supportService.getUnreadCountForUser(user.id) : 0);
 
   const handleSettle = async () => {
-    if (
-      window.confirm(
-        'Anh có chắc muốn thực hiện Chuyển trạng thái ngày mới (T+2.5)?\n- Cổ phiếu T+1 sẽ chuyển sang Khả dụng (sẵn sàng bán)\n- Cổ phiếu T+2 sẽ chuyển sang T+1\n- Tiền chờ về sẽ chuyển sang Tiền mặt khả dụng.'
-      )
-    ) {
-      await settleDay();
-    }
+    const dong = await thongBao.hoi({
+      loi: 'Chuyển sang ngày mới (T+2.5)?',
+      chiTiet:
+        'Cổ phiếu T+1 → Khả dụng · Cổ phiếu T+2 → T+1 · Tiền chờ về → Tiền mặt khả dụng.',
+      nhanDong: 'Chuyển ngày',
+      nhanHuy: 'Huỷ',
+      nguyHiem: false
+    });
+    if (dong) await settleDay();
   };
 
-  const handleResetSlate = () => {
-    const input = window.prompt(
-      'NHẬP SỐ TIỀN VỐN KHỞI ĐẦU ĐỂ BẮT ĐẦU SỔ GHI CHÉP THẬT (VND):\n(Để trống hoặc nhập 0 nếu muốn bắt đầu từ 0đ để nạp tiền thủ công sau)',
-      '0'
-    );
-    if (input !== null) {
-      const cleanNum = Number(input.replace(/[^0-9]/g, '')) || 0;
-      resetCleanSlate(cleanNum);
+  const handleResetSlate = async () => {
+    const von = await thongBao.hoiNhap({
+      loi: 'Bắt đầu sổ ghi chép mới',
+      chiTiet: 'Xoá toàn bộ vị thế hiện có và mở sổ trắng. Nhập vốn khởi đầu, hoặc 0 để bổ sung vốn sau.',
+      nhan: 'Vốn khởi đầu (VND)',
+      giaTriDau: '0',
+      goiY: 'VD: 100000000',
+      nhanDong: 'Mở sổ mới'
+    });
+    if (von !== null) {
+      resetCleanSlate(von);
       setIsUserMenuOpen(false);
     }
   };

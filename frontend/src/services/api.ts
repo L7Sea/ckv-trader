@@ -182,7 +182,7 @@ export const api = {
   },
 
   // 4. Đặt lệnh giao dịch Mua / Bán & Đồng bộ lên Supabase
-  async placeOrder(payload: OrderRequestPayload): Promise<{ transaction: Transaction; position: Position; portfolio: Portfolio }> {
+  async placeOrder(payload: OrderRequestPayload): Promise<{ transaction: Transaction; position: Position; portfolio: Portfolio; canhBao: string[] }> {
     const localResult = localTradingEngine.placeOrder(payload);
     await Promise.all([
       writeToSupabase('portfolios', pick({ id: 'default', ...localResult.portfolio }, PORTFOLIO_COLUMNS)),
