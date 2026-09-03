@@ -35,3 +35,21 @@ sẽ bị test chặn lại ngay.
 
 Các con số tiền trong `02` chỉ là **điểm khởi đầu**, không phải nguồn sự thật.
 Nguồn sự thật duy nhất là [`frontend/src/services/dealModel.ts`](../frontend/src/services/dealModel.ts).
+
+
+## ⚠ `04-phan-quyen-nhieu-nguoi.sql` — đọc trước khi chạy
+
+**Vấn đề nó sửa:** `01-cau-truc.sql` bật RLS nhưng mọi chính sách là
+`USING (true)` — **bật rào rồi mở toang cổng**. Và không bảng nào có cột
+`user_id`, nên hiện tại **mọi người dùng chung MỘT danh mục**.
+
+**Thứ tự BẮT BUỘC:**
+
+```
+PHẦN 1 (chẩn đoán)  →  PHẦN 2 (thêm user_id)  →  PHẦN 3 (hồ sơ + vai trò)
+   →  LÀM PHẦN APP (chuyển sang Supabase Auth thật)  →  PHẦN 4 (siết policy)
+```
+
+**Chạy PHẦN 4 trước khi làm phần app là app không đọc được gì** — vì
+`auth.uid()` sẽ là NULL khi app còn tự quản người dùng trong `localStorage`.
+Dữ liệu KHÔNG mất, chỉ là không đọc ra được cho tới khi đăng nhập thật.

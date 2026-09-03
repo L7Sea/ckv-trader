@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { PortfolioOverview } from './components/PortfolioOverview';
+import { useDongBoDiaChi } from '@/lib/useDongBoDiaChi';
 import { TradePositionsPage } from './pages/TradePositionsPage';
 import { PositionRiskPage } from './pages/PositionRiskPage';
 import { RadarAlgorithmsPage } from './pages/RadarAlgorithmsPage';
@@ -41,6 +42,9 @@ import {
 
 export const AppContent: React.FC = () => {
   const { activeTab, setActiveTab, fetchData, error, successMessage, clearMessages } = useTradingStore();
+
+  /* Nối địa chỉ ↔ activeTab. Không component nào bên dưới phải biết đến router. */
+  useDongBoDiaChi();
   const { user } = useAuthStore();
   const [isMobileMoreOpen, setIsMobileMoreOpen] = useState(false);
   const [isStylePickerOpen, setIsStylePickerOpen] = useState(false);

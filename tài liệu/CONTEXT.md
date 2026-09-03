@@ -337,3 +337,63 @@ mỗi vai trò màu, tương phản ≥4,5, nút ≥44px), **không** dùng chun
    DevTools. Chủ nhân đã xác nhận **sẽ mở cho nhiều khách hàng thật**, nên đây
    không còn là rủi ro lý thuyết. Hàng rào duy nhất có tác dụng là **RLS bật
    trên MỌI bảng**.
+
+---
+
+## Cập nhật 03/09/2026 (2) — THÊM ROUTER · Đường phân quyền thật
+
+### Router — hết hẳn ba mất mát
+App chạy nhiều tháng **không có router**. Nay có, và **8 component không phải
+sửa một dòng nào**: giữ `activeTab` làm thứ quyết định render, chỉ nối nó
+**hai chiều** với địa chỉ (`lib/useDongBoDiaChi.ts`).
+
+| Địa chỉ | Màn hình |
+|---|---|
+| `/dat-lenh` | Đặt lệnh & Danh mục |
+| `/rui-ro` | Quyết định & Rủi ro |
+| `/thuat-toan` | Radar thuật toán |
+| `/bang-gia` | Bảng giá & Biểu đồ |
+| `/lai-suat` | Lãi suất vĩ mô |
+| `/tin-tuc` | Tin tức thị trường |
+| `/phan-bo` | Phân bổ danh mục |
+| `/hieu-suat` | Hiệu suất đầu tư |
+
+**Đã kiểm thật trên trình duyệt**, cả ba đều chạy:
+- Mở thẳng `/lai-suat` → đúng màn đó, địa chỉ giữ nguyên
+- `/phan-bo` → bấm **Back** → về `/bang-gia`, **vẫn trong app** (trước đây thoát hẳn)
+- **F5** ở `/bang-gia` → vẫn ở `/bang-gia` (trước đây về tab mặc định)
+
+Vòng lặp vô hạn (địa chỉ đổi → tab đổi → lại đẩy địa chỉ) được chặn bằng cách
+chỉ hành động khi hai bên thật sự lệch, và nhớ lần đẩy cuối.
+
+**Bài test mới `test-dinh-tuyen.cjs` — 13 bài**: không trùng địa chỉ · không
+trùng tab · địa chỉ không dấu (dấu bị mã hoá thành `%C3%A1…`, dán link cho ai
+là một chuỗi rác) · đi-về khớp · địa chỉ lạ về màn mặc định · App.tsx render đủ
+8 tab · router có **nhập VÀ dùng**.
+
+Kiểm ngược lộ ra bài test yếu: bản đầu chỉ tìm chữ `BrowserRouter`, mà xoá dòng
+`import` thì thẻ JSX vẫn còn chữ đó → test xanh trong khi app không dựng được.
+Nay kiểm cả hai.
+
+### `sql/04-phan-quyen-nhieu-nguoi.sql` — đường sửa phân quyền
+
+**Phát hiện nghiêm trọng hơn dự đoán.** `01-cau-truc.sql` đã BẬT RLS trên cả 4
+bảng, nhưng mọi chính sách là `USING (true) WITH CHECK (true)` — **bật rào rồi
+mở toang cổng**. Và **không bảng nào có cột `user_id`**.
+
+Nghĩa là hiện tại không phải "khách A xem được của khách B", mà là **mọi người
+dùng chung MỘT danh mục**. Chấp nhận được khi chỉ Chủ nhân dùng; **không chấp
+nhận được** khi mở cho khách hàng thật.
+
+File `04` viết theo đúng bài học từ `sql/38` bên Trần Long: **PHẦN 1 là câu hỏi
+chẩn đoán để chạy TRƯỚC**, không đoán cấu trúc. Bốn phần:
+1. Chẩn đoán — xem chính sách hiện tại, cột nào đã có, lấy UUID Chủ nhân
+2. Thêm `user_id` + gán dữ liệu đang có cho Chủ nhân + đánh chỉ mục
+3. Bảng `ho_so` + enum `vai_tro_ckv` (**khai 4 bậc ngay từ đầu**: admin,
+   khach, khach_vip, khach_bac2 — thêm bậc sau chỉ là thêm giá trị enum)
+4. Thay `USING(true)` bằng `USING (user_id = auth.uid())`
+
+⚠ **SQL một mình KHÔNG đủ.** `auth.uid()` chỉ có giá trị khi app đăng nhập bằng
+**Supabase Auth thật**. CKV đang tự quản người dùng trong `localStorage`, nên
+chạy PHẦN 4 trước khi sửa app là app **không đọc được gì** (dữ liệu không mất,
+chỉ là không đọc ra được). Thứ tự an toàn ghi rõ trong `sql/README.md`.
