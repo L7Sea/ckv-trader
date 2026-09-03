@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
+import { CheDoMau, NHAN_CHE_DO, cheDoKeTiep, docCheDo, luuCheDo } from '../lib/cheDoMau';
 import {
+  Sun,
+  Moon,
+  MonitorSmartphone,
   RefreshCw,
   Calendar,
   Wallet,
@@ -37,6 +41,7 @@ import { DEAL_CONFIG } from '../services/dealModel';
 
 export const Header: React.FC = () => {
   const { fetchData, settleDay, resetCleanSlate, isLoading, syncLiveMarketData, isLiveSyncing } = useTradingStore();
+  const [cheDoMau, setCheDoMau] = useState<CheDoMau>(() => docCheDo());
   const {
     user,
     openAuthModal,
@@ -83,7 +88,7 @@ export const Header: React.FC = () => {
   return (
     <>
       <header className="border-b border-vien bg-nen backdrop-blur-xl sticky top-0 z-40 px-3 sm:px-6 py-2.5 shadow-md">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+        <div className="mx-auto flex w-full max-w-[1720px] flex-wrap items-center justify-between gap-3">
           {/* Logo & Account Info (Left Side - Clean & Aligned) */}
           <div className="flex items-center gap-3 shrink-0">
             <div className="h-10 w-10 rounded-2xl bg-the flex items-center justify-center shadow-lg shadow-md shrink-0">
@@ -109,7 +114,7 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Action Tools & Navigation Center (Right Side - Balanced & Clean) */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar max-w-full">
+          <div className="flex flex-wrap items-center justify-end gap-2 min-w-0">
             {/* Switch Sub-account on Desktop */}
             <div className="hidden md:flex items-center gap-1 p-1 bg-the rounded-2xl border border-vien text-xs font-mono">
               <span className="text-chu-mo px-2 font-sans font-semibold text-[11px]">Tiểu khoản:</span>
@@ -194,6 +199,31 @@ export const Header: React.FC = () => {
                 <span>Quản Trị User</span>
               </button>
             )}
+
+            {/* Nút gạt chế độ màu: Sáng → Tối → Theo máy.
+                Mặc định là SÁNG vì "giấy tài chính" là bản sắc app — không để cài
+                đặt hệ điều hành quyết định diện mạo sản phẩm. */}
+            <button
+              onClick={() => {
+                const moi = cheDoKeTiep(cheDoMau);
+                setCheDoMau(moi);
+                luuCheDo(moi);
+              }}
+              className="min-h-[44px] min-w-[44px] justify-center p-2 rounded-xl bg-the hover:bg-the2 text-chu-phu border border-vien transition active:scale-95 shrink-0 inline-flex items-center gap-1.5"
+              title={`Chế độ màu: ${NHAN_CHE_DO[cheDoMau]} — bấm để đổi`}
+              aria-label={`Chế độ màu hiện tại: ${NHAN_CHE_DO[cheDoMau]}`}
+            >
+              {cheDoMau === 'sang' ? (
+                <Sun className="h-4 w-4 text-canh-bao" />
+              ) : cheDoMau === 'toi' ? (
+                <Moon className="h-4 w-4 text-nhan-chu" />
+              ) : (
+                <MonitorSmartphone className="h-4 w-4 text-chu-phu" />
+              )}
+              <span className="hidden lg:inline text-[11px] font-sans font-semibold">
+                {NHAN_CHE_DO[cheDoMau]}
+              </span>
+            </button>
 
             {/* Nút Cài Đặt (Settings) */}
             <button

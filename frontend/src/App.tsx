@@ -87,7 +87,7 @@ export const AppContent: React.FC = () => {
       <Header />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-5">
+      <main className="flex-1 w-full max-w-[1720px] mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-5">
         {/* Toast / Notification Banner */}
         {error && (
           <div className="flex items-center justify-between p-4 bg-loi-nen border border-vien rounded-2xl text-loi text-sm shadow-lg animate-in fade-in">
