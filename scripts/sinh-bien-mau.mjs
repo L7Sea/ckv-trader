@@ -1,4 +1,43 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+/* ═══════════════════════════════════════════════════════════════════════════
+   SINH BIẾN MÀU CSS TỪ BẢNG MÀU
+   ───────────────────────────────────────────────────────────────────────────
+   Đọc `frontend/src/theme/bang-mau.js` rồi ghi khối biến vào
+   `frontend/src/index.css`. Gõ tay hai nơi là kiểu gì cũng lệch — lỗi thật đã
+   xảy ra: đổi bảng màu nhưng 12 chỗ viết cứng vẫn giữ màu cũ.
+
+   Chạy: node scripts/sinh-bien-mau.mjs
+   Sau đó: node scripts/test-mau-giao-dien.mjs   (kiểm lại tương phản)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+import { writeFileSync } from 'node:fs';
+import { CHU_TREN_NHAN, SANG, TOI } from '../frontend/src/theme/bang-mau.js';
+
+/** Tên khoá trong bảng màu → tên biến CSS. */
+const KHOA_CSS = {
+  nen: '--nen',
+  the: '--the',
+  the2: '--the-2',
+  vien: '--vien',
+  vienRo: '--vien-ro',
+  chu: '--chu',
+  chuPhu: '--chu-phu',
+  chuMo: '--chu-mo',
+  nhan: '--nhan',
+  nhanChu: '--nhan-chu',
+  tot: '--tot',
+  totNen: '--tot-nen',
+  loi: '--loi',
+  loiNen: '--loi-nen',
+  canhBao: '--canh-bao',
+  canhBaoNen: '--canh-bao-nen'
+};
+
+const bien = (bang, trenNhan, thut) =>
+  Object.entries(KHOA_CSS)
+    .map(([khoa, ten]) => `${thut}${ten}: ${bang[khoa]};`)
+    .join('\n') + `\n${thut}--tren-nhan: ${trenNhan};`;
+
+const css = `@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,7 +48,7 @@
    Nguồn: frontend/src/theme/bang-mau.js
    Sinh lại: node scripts/sinh-bien-mau.mjs
 
-   Luật: bảng SÁNG định nghĩa ĐẦY ĐỦ mọi biến ở `:root` trần. Hai khối tối CHỈ
+   Luật: bảng SÁNG định nghĩa ĐẦY ĐỦ mọi biến ở \`:root\` trần. Hai khối tối CHỈ
    định nghĩa lại giá trị, không thêm biến mới. Biến nào chỉ tồn tại trong khối
    tối thì ở chế độ mặc định nó không tồn tại — chữ chế độ này sẽ nằm trên nền
    chế độ kia. Đó là lỗi giao diện phổ biến nhất.
@@ -17,67 +56,19 @@
 :root {
   color-scheme: light dark;
 
-  --nen: #F5F6F8;
-  --the: #FFFFFF;
-  --the-2: #EEF0F4;
-  --vien: #DCE0E7;
-  --vien-ro: #818A99;
-  --chu: #0F1520;
-  --chu-phu: #414A59;
-  --chu-mo: #646D7C;
-  --nhan: #12386E;
-  --nhan-chu: #12386E;
-  --tot: #0A7A45;
-  --tot-nen: #E4F5EC;
-  --loi: #A00F24;
-  --loi-nen: #FCE9EC;
-  --canh-bao: #8A5A00;
-  --canh-bao-nen: #FBF0DC;
-  --tren-nhan: #FFFFFF;
+${bien(SANG, CHU_TREN_NHAN.sang, '  ')}
 }
 
 /* Máy để chế độ tối, và người dùng CHƯA tự chọn sáng */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --nen: #0E1218;
-    --the: #161C25;
-    --the-2: #1E2733;
-    --vien: #2A3441;
-    --vien-ro: #697585;
-    --chu: #EEF1F5;
-    --chu-phu: #B3BCC9;
-    --chu-mo: #8B95A3;
-    --nhan: #5B9BF0;
-    --nhan-chu: #7FB4F5;
-    --tot: #3DD68C;
-    --tot-nen: #12301F;
-    --loi: #F2596D;
-    --loi-nen: #3A1620;
-    --canh-bao: #F2B950;
-    --canh-bao-nen: #332506;
-    --tren-nhan: #0E1218;
+${bien(TOI, CHU_TREN_NHAN.toi, '    ')}
   }
 }
 
 /* Người dùng tự gạt sang tối — thắng cả cài đặt của máy */
 :root[data-theme='dark'] {
-  --nen: #0E1218;
-  --the: #161C25;
-  --the-2: #1E2733;
-  --vien: #2A3441;
-  --vien-ro: #697585;
-  --chu: #EEF1F5;
-  --chu-phu: #B3BCC9;
-  --chu-mo: #8B95A3;
-  --nhan: #5B9BF0;
-  --nhan-chu: #7FB4F5;
-  --tot: #3DD68C;
-  --tot-nen: #12301F;
-  --loi: #F2596D;
-  --loi-nen: #3A1620;
-  --canh-bao: #F2B950;
-  --canh-bao-nen: #332506;
-  --tren-nhan: #0E1218;
+${bien(TOI, CHU_TREN_NHAN.toi, '  ')}
 }
 
 @layer base {
@@ -182,3 +173,8 @@
   animation: khungXuong 1.4s ease-in-out infinite;
   @apply bg-the2 rounded-md;
 }
+`;
+
+writeFileSync(new URL('../frontend/src/index.css', import.meta.url), css);
+console.log('✅ Đã sinh frontend/src/index.css từ bang-mau.js');
+console.log('   Tiếp theo: node scripts/test-mau-giao-dien.mjs');
