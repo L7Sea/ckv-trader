@@ -13,6 +13,7 @@ import {
 import { useTradingStore } from '../store/useTradingStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { DEAL_CONFIG, disbursedCapital } from '../services/dealModel';
+import { SoTien } from './SoTien';
 
 export const PortfolioOverview: React.FC = () => {
   const {
@@ -54,6 +55,9 @@ export const PortfolioOverview: React.FC = () => {
 
   const isProfit = unrealizedPnL >= 0;
 
+  const dinhDangTien = (val: number) =>
+    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.round(val || 0));
+
   const formatVND = (val: number) => {
     if (isBalanceHidden) return '•••••••• đ';
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.round(val || 0));
@@ -61,13 +65,12 @@ export const PortfolioOverview: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* ══ MASTER ASSET CARD (SANG TRỌNG, GỌN GÀNG & CÂN ĐỐI TUYỆT ĐỐI) ══ */}
-      <div className="relative overflow-hidden rounded-3xl bg-the border border-vien p-5 sm:p-6 shadow-2xl backdrop-blur-xl">
-        {/* Ambient Glows */}
-        <div className="absolute -right-16 -top-16 w-64 h-64 bg-the2 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-tot-nen rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 space-y-5">
+      {/* ══ THẺ TÀI SẢN CHÍNH ══
+          Bỏ hai khối phát sáng trang trí (`blur-3xl` tràn ra ngoài khung thẻ):
+          giấy tài chính không phát sáng, và chúng là thứ đáng bỏ theo bước 7 của
+          skill — "trước khi giao, bỏ đi một thứ trang trí". */}
+      <div className="relative overflow-hidden rounded-lg bg-the border border-vien p-5 sm:p-6">
+        <div className="relative space-y-5">
           {/* Top Row: Balance & Profit/Loss Status */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-vien">
             <div className="space-y-1.5">
@@ -88,7 +91,7 @@ export const PortfolioOverview: React.FC = () => {
               <div>
                 <span className="text-xs font-medium text-chu-phu">Tổng Tài Sản Ròng Thực Có (NAV)</span>
                 <div className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-chu mt-0.5 flex items-baseline gap-2">
-                  <span>{formatVND(totalEquity)}</span>
+                  <SoTien giaTri={totalEquity} dinhDang={dinhDangTien} che={isBalanceHidden} />
                 </div>
               </div>
             </div>
@@ -104,7 +107,9 @@ export const PortfolioOverview: React.FC = () => {
               >
                 {isProfit ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
                 <span>
-                  Lãi/Lỗ: {isProfit ? '+' : ''}{formatVND(unrealizedPnL)} ({isProfit ? '+' : ''}{unrealizedPnLPct.toFixed(2)}%)
+                  <span aria-hidden="true">{isProfit ? '▲' : '▼'}</span> Lãi/Lỗ:{' '}
+                  <SoTien giaTri={unrealizedPnL} dinhDang={dinhDangTien} che={isBalanceHidden} />{' '}
+                  ({isProfit ? '+' : ''}{unrealizedPnLPct.toFixed(2)}%)
                 </span>
               </div>
 

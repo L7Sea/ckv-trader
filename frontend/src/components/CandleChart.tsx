@@ -352,7 +352,7 @@ export const CandleChart: React.FC<Props> = ({ symbol, exchange, height = 560 })
             href={`https://www.tradingview.com/chart/?symbol=${encodeURIComponent(`${exchange}:${symbol}`)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 hover:text-tot transition"
+            className="inline-flex min-h-[44px] items-center gap-1 hover:text-tot transition sm:min-h-0"
           >
             <ExternalLink className="h-3 w-3" />
             Xem sâu trên TradingView

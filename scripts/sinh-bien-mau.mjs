@@ -90,6 +90,17 @@ ${bien(TOI, CHU_TREN_NHAN.toi, '  ')}
     border-radius: 4px;
   }
 
+  /* Ô nhập và ô chọn mặc định có \`min-width: auto\`, nên trong hộp flex chúng
+     KHÔNG co lại được và đẩy tràn cả trang. Đo thật: một thẻ select 30 lựa chọn
+     ở trang Radar đẩy trang rộng 377px trong khung 375px, kéo theo cả thanh
+     điều hướng cố định. Một luật ở đây chặn cả lớp lỗi đó. */
+  select,
+  input,
+  textarea {
+    min-width: 0;
+    max-width: 100%;
+  }
+
   /* Vùng chạm tối thiểu 44px trên điện thoại (sàn chất lượng mục 4).
      Đặt một luật chung ở đây thay vì sửa tay từng nút: đo được 26 nút chỉ cao
      34px, và cứ thêm nút mới là lại sót. Luật này bắt cả nút thêm sau này. */

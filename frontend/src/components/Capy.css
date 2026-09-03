@@ -103,7 +103,7 @@
   top: 50%;
   left: 50%;
   height: 4px;
-  background: linear-gradient(90deg, #E11D48, #F59E0B, #10B981);
+  background: var(--nhan);
   transform-origin: 0 50%;
   border-radius: 4px;
   box-shadow: 0 0 12px rgba(225, 29, 72, 0.8);
@@ -119,7 +119,7 @@
   height: 0;
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
-  border-left: 14px solid #10B981;
+  border-left: 14px solid var(--nhan);
 }
 
 .cp__power-badge {
@@ -127,14 +127,14 @@
   top: -28px;
   left: 50%;
   translate: -50% 0;
-  background: #E11D48;
-  color: #FFFFFF;
+  background: var(--loi);
+  color: var(--tren-nhan);
   font-family: monospace;
   font-size: 11px;
   font-weight: 900;
   padding: 2px 8px;
   border-radius: 999px;
-  border: 1.5px solid #FFFFFF;
+  border: 1.5px solid var(--the);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
   white-space: nowrap;
   pointer-events: none;
@@ -146,9 +146,9 @@
   position: absolute;
   width: max-content;
   max-width: min(290px, 78vw);
-  background: #FFFFFF;
-  color: #0F172A;
-  border: 2.5px solid #1E293B;
+  background: var(--the);
+  color: var(--chu);
+  border: 2px solid var(--vien-ro);
   border-radius: 18px;
   padding: 9px 13px 8px;
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45), 0 0 0 2px rgba(255, 255, 255, 0.9);
@@ -166,9 +166,9 @@
   bottom: -8px;
   width: 14px;
   height: 14px;
-  background: #FFFFFF;
-  border-right: 2.5px solid #1E293B;
-  border-bottom: 2.5px solid #1E293B;
+  background: var(--the);
+  border-right: 2px solid var(--vien-ro);
+  border-bottom: 2px solid var(--vien-ro);
   transform: rotate(45deg);
 }
 
@@ -182,7 +182,7 @@
   top: -8px;
   width: 14px;
   height: 14px;
-  background: #FFFFFF;
+  background: var(--the);
   border-left: 2.5px solid #1E293B;
   border-top: 2.5px solid #1E293B;
   transform: rotate(45deg);
@@ -244,7 +244,7 @@
   font-size: 13px;
   font-weight: 700;
   line-height: 1.42;
-  color: #0F172A;
+  color: var(--chu);
   word-break: break-word;
 }
 
