@@ -454,3 +454,67 @@ báo hoặc hợp đồng), rồi sửa `DEAL_CONFIG.marginRateAnnual`.
 Bài test **ghi nhận khoảng trống** này chứ không giấu: mỗi lần chạy `test:deal`
 đều in cảnh báo kèm lý do, và **bài 22 khoá mức trôi tối đa 3.000đ** — trôi thêm
 là đỏ ngay.
+
+---
+
+## Cập nhật 03/09/2026 (4) — LỖI NẶNG NHẤT: app chưa bao giờ lấy được giá thật
+
+Anh Hải báo: *"TPB đang 14.60 mà nhấn đồng bộ vẫn 14.45"*. Đào ra một lỗi
+nghiêm trọng hơn nhiều so với triệu chứng.
+
+### Ba tầng của lỗi
+
+**Tầng 1 — tham số gọi nguồn sai, luôn trả RỖNG.**
+Đo trực tiếp trên Entrade, cùng mã TPB, ngày 03/09/2026:
+
+| Tham số | Kết quả |
+|---|---|
+| `resolution=1` (nến 1 phút) ← **app đang dùng** | **RỖNG** |
+| `resolution=15` · `60` · `D` | RỖNG |
+| `resolution=1D`, cửa sổ 5 ngày | **RỖNG** |
+| `resolution=1D`, cửa sổ 7 ngày | 1 nến |
+| `resolution=1D`, cửa sổ 30 ngày | 18 nến, giá cuối 14.7 ✓ |
+
+Chú thích trong mã ghi *"dùng nến 1 phút để có giá trong phiên"* — nghe hợp lý,
+nhưng **chưa ai đo**. Nó luôn trả rỗng.
+
+**Tầng 2 — rơi về hằng số viết cứng.** Nhận mảng rỗng → `fetchLivePrices` bỏ
+qua mã → `syncAllLivePrices` dùng `topMatch.price` = **`14450` viết cứng** trong
+`top300Stocks.ts`. Đó chính là con số 14.45 anh Hải thấy.
+
+**Tầng 3 — vẫn đóng dấu giờ hiện tại.** `lastUpdated: new Date()` chạy **bất kể**
+lấy được giá hay không. Người dùng nhìn "11:39" tưởng vừa đồng bộ xong, trong khi
+con số đã cũ hàng tháng.
+
+**Đây là lớp lỗi tệ nhất trong một app giao dịch: số bịa trông như số thật.**
+Người dùng ra quyết định mua bán trên nó.
+
+### Còn một chỗ bịa nữa
+`refPrice = price × 0.995`, `ceilPrice = refPrice × 1.07`, `floorPrice = refPrice × 0.93`.
+Biên độ 7% đúng với HOSE nhưng **HNX là 10%, UPCOM là 15%** — công thức cứng sai
+cho 2 sàn. Và tính từ một giá đã bịa thì kết quả cũng bịa.
+
+### Đã sửa
+1. `resolution=1D`, cửa sổ **45 ngày**
+2. Thêm `fetchThongTinMa()` lấy **tham chiếu/trần/sàn THẬT** từ
+   `/dnse-financial-product/securities/<mã>`
+3. `lastUpdated` **chỉ đổi khi thật sự lấy được** — thà thấy giờ cũ còn hơn bị lừa
+
+**Kiểm thật, khớp chính xác 100% với DNSE:**
+
+| | Nguồn mới | DNSE thật |
+|---|---|---|
+| Tham chiếu | 14.650 | 14.650 ✓ |
+| Trần | 15.650 | 15.650 ✓ |
+| Sàn | 13.650 | 13.650 ✓ |
+
+### Điều còn CHƯA giải quyết — nói thẳng
+**Nguồn OHLC của Entrade đứng im ở 28/08/2026**, không có nến nào cho 29/08–03/09.
+Nên giá lấy được là **14.700 (đóng cửa 28/08)**, không phải 14.600 (giá trong
+phiên hôm nay anh Hải thấy).
+
+Tôi chưa tìm được nguồn công khai cho **giá khớp trong phiên**. Hai nguồn tìm
+được chỉ cho: nến ngày (trễ) và tham chiếu/trần/sàn (đúng thời điểm).
+
+`scripts/test-nguon-gia.cjs` — 5 bài canh 3 tham số này bằng cách **đọc mã nguồn**,
+chạy được cả khi mất mạng. Đã kiểm ngược.

@@ -9,9 +9,10 @@
     "test:deal": "node scripts/test-deal-model.mjs",
     "test:formulas": "node scripts/test-trading-formulas.cjs",
     "test:sql": "node scripts/test-sql-schema.cjs",
-    "test:all": "npm run test:deal && npm run test:sync && npm run test:formulas && npm run test:sql && npm run test:dinhtuyen && npm run tim:codechet",
+    "test:all": "npm run test:deal && npm run test:sync && npm run test:formulas && npm run test:sql && npm run test:dinhtuyen && npm run test:gia && npm run tim:codechet",
     "test:sync": "node scripts/test-auto-sync.mjs",
     "tim:codechet": "node scripts/tim-code-chet.cjs",
-    "test:dinhtuyen": "node scripts/test-dinh-tuyen.cjs"
+    "test:dinhtuyen": "node scripts/test-dinh-tuyen.cjs",
+    "test:gia": "node scripts/test-nguon-gia.cjs"
   }
 }

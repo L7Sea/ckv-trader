@@ -297,13 +297,76 @@ class MarketDataService {
    * proxy không dùng được mới gọi thẳng Entrade. Phiên bản cũ chỉ gọi thẳng từ trình
    * duyệt nên gần như luôn bị CORS chặn, rơi vào catch rỗng và âm thầm dùng giá tĩnh.
    *
-   * Dùng resolution=1 (nến 1 phút) thay vì 1D để có giá trong phiên, không phải giá
-   * đóng cửa ngày hôm trước.
+   * ⚠ PHẢI DÙNG `resolution=1D`, KHÔNG PHẢI `1`.
+   *
+   * Chú thích cũ ở đây ghi "dùng nến 1 phút để có giá trong phiên" — nghe hợp
+   * lý, nhưng ĐO THẬT trên chính nguồn Entrade ngày 03/09/2026, cùng mã TPB:
+   *
+   *   resolution=1   (nến 1 phút)  →  {"t":[],"o":[],"c":[]}   RỖNG
+   *   resolution=15                →  RỖNG
+   *   resolution=60                →  RỖNG
+   *   resolution=D                 →  RỖNG
+   *   resolution=1D                →  18 nến, giá cuối 14.7    ✓
+   *
+   * Nghĩa là app **CHƯA BAO GIỜ** lấy được giá thật. Mỗi lần bấm "Đồng Bộ"
+   * đều nhận mảng rỗng → `fetchLivePrices` bỏ qua mã đó → `syncAllLivePrices`
+   * âm thầm rơi về hằng số `14450` viết cứng trong `top300Stocks.ts`, NHƯNG
+   * vẫn đóng dấu `lastUpdated` giờ hiện tại. Nhìn như vừa đồng bộ xong.
+   *
+   * Đó chính là lý do anh Hải thấy 14.45 trong khi DNSE hiện 14.60.
+   *
+   * Đây là lớp lỗi tệ nhất trong một app giao dịch: **số bịa trông như số thật**.
+   * Người dùng ra quyết định mua bán trên nó.
    */
+  /* ═══ GIÁ THAM CHIẾU / TRẦN / SÀN THẬT ═══
+
+     Ba con số này app đang BỊA:
+        refPrice   = price * 0.995
+        ceilPrice  = refPrice * 1.07
+        floorPrice = refPrice * 0.93
+     Biên độ 7% thì đúng với HOSE, nhưng tính từ một giá đã bịa nên kết quả
+     cũng bịa. Và HNX là 10%, UPCOM là 15% — công thức cứng 7% sai cho 2 sàn.
+
+     Entrade có nguồn THẬT, đo ngày 03/09/2026 mã TPB:
+        basicPrice   14650  ← đúng bằng tham chiếu DNSE hiện (14.60 với −0.05)
+        floorPrice   13650
+        ceilingPrice 15650
+     Lấy thẳng, đừng tính. */
+  public async fetchThongTinMa(symbol: string): Promise<{
+    refPrice: number; ceilPrice: number; floorPrice: number;
+  } | null> {
+    try {
+      const res = await fetch(
+        `https://services.entrade.com.vn/dnse-financial-product/securities/${symbol}`,
+        { signal: AbortSignal.timeout(5000) },
+      );
+      if (!res.ok) return null;
+      const d = await res.json();
+      const ref = Number(d?.basicPrice);
+      const ceil = Number(d?.ceilingPrice);
+      const floor = Number(d?.floorPrice);
+      if (!Number.isFinite(ref) || ref <= 0) return null;
+      return {
+        refPrice: Math.round(ref),
+        ceilPrice: Number.isFinite(ceil) && ceil > 0 ? Math.round(ceil) : Math.round(ref * 1.07),
+        floorPrice: Number.isFinite(floor) && floor > 0 ? Math.round(floor) : Math.round(ref * 0.93),
+      };
+    } catch {
+      return null;
+    }
+  }
+
   public async fetchLiveStockPrice(symbol: string): Promise<number | null> {
-    const from = Math.floor(Date.now() / 1000) - 86400 * 5;
+    /* ⚠ CỬA SỔ PHẢI ĐỦ RỘNG — 5 ngày là RỖNG.
+       Đo thật 03/09/2026, cùng mã TPB, cùng resolution=1D:
+          5 ngày → RỖNG        7 ngày → 1 nến
+         30 ngày → 18 nến     60 ngày → 40 nến
+       Và nến cuối cùng luôn là **28/08/2026** — nguồn OHLC của Entrade đứng
+       im 6 ngày. Cửa sổ 5 ngày không chạm tới nến nào nên trả rỗng.
+       Lấy 45 ngày để luôn có ít nhất vài nến, kể cả sau kỳ nghỉ lễ dài. */
+    const from = Math.floor(Date.now() / 1000) - 86400 * 45;
     const to = Math.floor(Date.now() / 1000) + 3600;
-    const query = `symbol=${symbol}&resolution=1&from=${from}&to=${to}`;
+    const query = `symbol=${symbol}&resolution=1D&from=${from}&to=${to}`;
 
     const endpoints = [
       // 1. Proxy cùng origin (Pages Function) — đường đi mặc định, luôn có sau khi deploy
@@ -361,27 +424,48 @@ class MarketDataService {
     const symbols = [...extraSymbols, ...this.watchlist.map((s) => s.symbol)];
     const livePrices = await this.fetchLivePrices(symbols);
 
+    /* Giá tham chiếu/trần/sàn THẬT cho các mã ĐANG NẮM GIỮ.
+       Chỉ lấy cho mã nắm giữ để không bắn 30 lời gọi mỗi lần đồng bộ — đó là
+       chỗ con số phải đúng nhất, vì lãi/lỗ tính từ đó. */
+    const thongTin: Record<string, { refPrice: number; ceilPrice: number; floorPrice: number }> = {};
+    for (const sym of Array.from(new Set(extraSymbols)).slice(0, 10)) {
+      const t = await this.fetchThongTinMa(sym);
+      if (t) thongTin[sym] = t;
+    }
+
     this.watchlist = this.watchlist.map((s) => {
       const topMatch = TOP_300_STOCKS.find((t) => t.symbol === s.symbol);
       let price = topMatch ? topMatch.price : s.price;
       if (livePrices[s.symbol]) {
         price = livePrices[s.symbol];
       }
-      const refPrice = topMatch ? topMatch.refPrice : s.refPrice;
+      /* Ưu tiên tham chiếu THẬT lấy từ nguồn; không có thì mới dùng bảng cứng.
+         Bản cũ luôn dùng bảng cứng nên % tăng/giảm tính từ một mốc bịa. */
+      const tt = thongTin[s.symbol];
+      const refPrice = tt ? tt.refPrice : (topMatch ? topMatch.refPrice : s.refPrice);
       const change = price - refPrice;
       const changePct = refPrice > 0 ? Number(((change / refPrice) * 100).toFixed(2)) : 0;
 
+      /* ⚠ CHỈ ĐÓNG DẤU GIỜ KHI THẬT SỰ LẤY ĐƯỢC GIÁ MỚI.
+         Bản cũ luôn ghi `lastUpdated: new Date()` kể cả khi lấy giá hỏng và
+         giá vẫn là hằng số viết cứng. Người dùng nhìn thấy "11:39" tưởng vừa
+         đồng bộ xong, trong khi con số đã cũ hàng tháng.
+         Không lấy được thì GIỮ NGUYÊN dấu giờ cũ — thà thấy giờ cũ còn hơn bị
+         lừa là mới. */
+      const layDuoc = Boolean(livePrices[s.symbol] || tt);
       return {
         ...s,
         price,
         refPrice,
-        ceilPrice: topMatch ? topMatch.ceilPrice : s.ceilPrice,
-        floorPrice: topMatch ? topMatch.floorPrice : s.floorPrice,
+        ceilPrice: tt ? tt.ceilPrice : (topMatch ? topMatch.ceilPrice : s.ceilPrice),
+        floorPrice: tt ? tt.floorPrice : (topMatch ? topMatch.floorPrice : s.floorPrice),
         change,
         changePct,
         volume: topMatch ? topMatch.volume : s.volume,
-        lastUpdated: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-        isLivePrice: Boolean(livePrices[s.symbol])
+        lastUpdated: layDuoc
+          ? new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+          : s.lastUpdated,
+        isLivePrice: layDuoc
       };
     });
     this.saveWatchlist();
