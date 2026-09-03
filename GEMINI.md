@@ -4,7 +4,7 @@
 ## 1. 🎯 Bối Cảnh & Kiến Trúc Dự Án
 - **Chủ dự án**: CKV Pro Trader VIP.
 - **Bản chất App**: Nền tảng giao dịch và phân tích định lượng chứng khoán Việt Nam (HOSE, HNX, UPCOM - 300 mã), Sổ lệnh 3 cấp thời gian thực (DNSE style), Biểu đồ nến Pro đa khung thời gian, Hệ thống Lãi suất vĩ mô 20 Ngân hàng & Top 10 FinTech, Trợ lý Capy Gunny.
-- **Kiến trúc 8 Trang Độc Lập**: `/src/pages/` gồm 8 file trang riêng biệt (`TradePositionsPage`, `PositionRiskPage`, `RadarAlgorithmsPage`, `MarketBoardChartPage`, `MacroRatesPage`, `MarketIntelligencePage`, `PortfolioAllocationPage`, `PerformanceAnalyticsPage`).
+- **Kiến trúc 9 Trang Độc Lập**: `/src/pages/` gồm 9 file trang riêng biệt (`TradePositionsPage`, `PositionRiskPage`, `RadarAlgorithmsPage`, `MarketBoardChartPage`, `MacroRatesPage`, `MarketIntelligencePage`, `PortfolioAllocationPage`, `PerformanceAnalyticsPage`, `NhatKyLuanDiemPage`).
 - **Tech Stack**: React 19 + TypeScript + Vite 6 + Tailwind CSS + Lucide Icons + Cloudflare Pages.
 - **Tài liệu bối cảnh chi tiết**: Bắt buộc đọc [tài liệu/CONTEXT.md](tài liệu/CONTEXT.md), [tài liệu/HUONG_DAN_SU_DUNG_SKILLS_VA_RULES_AKIDEVRULE.md](tài liệu/HUONG_DAN_SU_DUNG_SKILLS_VA_RULES_AKIDEVRULE.md) và [README.md](README.md).
 
@@ -108,7 +108,7 @@ Xem mục hạn chế bên dưới.
 **1. Không có router.** `package.json` không có `react-router`. Hậu quả thật:
 không có địa chỉ riêng cho từng màn → không lưu dấu trang, không gửi link được;
 nút Back của trình duyệt **thoát hẳn app**; F5 là mất chỗ đang xem; không mở hai
-màn cạnh nhau để so sánh. Tài liệu gọi đây là *"Kiến trúc 8 Trang Độc Lập"* —
+màn cạnh nhau để so sánh. Tài liệu gọi đây là *"Kiến trúc 9 Trang Độc Lập"* —
 đó là **ý định**, không phải hiện trạng.
 
 **2. Phân quyền nằm trong máy người dùng.** `role: 'ADMIN'` lưu ở

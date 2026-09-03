@@ -38,8 +38,8 @@ console.log('\n🧭 ĐỊNH TUYẾN — 8 màn hình\n');
 const dd = napThuan('frontend/src/lib/duongDan.ts');
 const app = fs.readFileSync(path.join(goc, 'frontend/src/App.tsx'), 'utf8');
 
-/* 1. Đủ 8 màn, không thiếu không thừa */
-ok(`Khai đủ 8 màn hình (đang có ${dd.MAN_HINH.length})`, dd.MAN_HINH.length === 8);
+/* 1. Đủ 9 màn, không thiếu không thừa */
+ok(`Khai đủ 9 màn hình (đang có ${dd.MAN_HINH.length})`, dd.MAN_HINH.length === 9);
 
 /* 2. Không trùng địa chỉ — hai màn cùng địa chỉ thì một cái vĩnh viễn không vào được */
 const duong = dd.MAN_HINH.map((m) => m.duong);
@@ -59,7 +59,7 @@ ok('Địa chỉ đều dạng /chu-thuong-khong-dau', xauD.length === 0, 'sai: 
 
 /* 5. Đi và về phải khớp — tabCuaDuong(duongCuaTab(x)) === x */
 const lech = tab.filter((t) => dd.tabCuaDuong(dd.duongCuaTab(t)) !== t);
-ok('Đi và về khớp nhau với cả 8 tab', lech.length === 0, 'lệch: ' + lech.join(', '));
+ok('Đi và về khớp nhau với cả 9 tab', lech.length === 0, 'lệch: ' + lech.join(', '));
 
 /* 6. Địa chỉ lạ → về màn mặc định, KHÔNG ra màn trắng */
 ok('Địa chỉ lạ rơi về màn mặc định', dd.tabCuaDuong('/khong-co-that') === dd.TAB_MAC_DINH);
@@ -69,7 +69,7 @@ ok('Bỏ được tham số truy vấn', dd.tabCuaDuong('/bang-gia?ma=TPB') === 
 
 /* 7. App.tsx phải render ĐỦ 8 tab đã khai — khai mà không render là màn trắng */
 const thieuRender = tab.filter((t) => !app.includes(`activeTab === '${t}'`));
-ok('App.tsx render đủ 8 tab đã khai', thieuRender.length === 0,
+ok('App.tsx render đủ 9 tab đã khai', thieuRender.length === 0,
   'khai mà không render (vào là màn trắng): ' + thieuRender.join(', '));
 
 /* 8. Router phải thật sự được lắp — thiếu là mọi thứ trên vô nghĩa */

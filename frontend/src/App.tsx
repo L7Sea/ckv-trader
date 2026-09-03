@@ -10,6 +10,7 @@ import { MacroRatesPage } from './pages/MacroRatesPage';
 import { MarketIntelligencePage } from './pages/MarketIntelligencePage';
 import { PortfolioAllocationPage } from './pages/PortfolioAllocationPage';
 import { PerformanceAnalyticsPage } from './pages/PerformanceAnalyticsPage';
+import { NhatKyLuanDiemPage } from './pages/NhatKyLuanDiemPage';
 
 import { CashModal } from './components/CashModal';
 import { PriceUpdateModal } from './components/PriceUpdateModal';
@@ -38,7 +39,8 @@ import {
   Compass,
   FileSpreadsheet,
   Flame,
-  Landmark
+  Landmark,
+  BookOpen
 } from 'lucide-react';
 
 export const AppContent: React.FC = () => {
@@ -223,10 +225,23 @@ export const AppContent: React.FC = () => {
               <Award className="h-4 w-4" />
               <span>HIỆU SUẤT EXCEL</span>
             </button>
+
+            <button
+              data-tab="NHATKY"
+              onClick={() => setActiveTab('NHATKY')}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap shrink-0 ${
+                activeTab === 'NHATKY'
+                  ? 'bg-nhan text-tren-nhan font-bold shadow-md shadow-md'
+                  : 'text-chu-phu hover:text-chu hover:bg-the2'
+              }`}
+            >
+              <BookOpen className="h-4 w-4" />
+              <span>NHẬT KÝ NHẬN ĐỊNH</span>
+            </button>
           </div>
         </div>
 
-        {/* 8 TRANG ĐỘC LẬP TƯƠNG ỨNG TỪNG FILE TRONG /src/pages/ */}
+        {/* 9 TRANG ĐỘC LẬP TƯƠNG ỨNG TỪNG FILE TRONG /src/pages/ */}
         {activeTab === 'TRADE' && <TradePositionsPage />}
         {activeTab === 'DECISION' && <PositionRiskPage />}
         {activeTab === 'ALGORITHMS' && <RadarAlgorithmsPage />}
@@ -235,6 +250,7 @@ export const AppContent: React.FC = () => {
         {activeTab === 'INTELLIGENCE' && <MarketIntelligencePage />}
         {activeTab === 'CHARTS' && <PortfolioAllocationPage />}
         {activeTab === 'ANALYTICS' && <PerformanceAnalyticsPage />}
+        {activeTab === 'NHATKY' && <NhatKyLuanDiemPage />}
       </main>
 
       {/* Linh vật Capy — trợ lý cho người ĐÃ đăng nhập. Không hiện ở cổng đăng
@@ -369,6 +385,24 @@ export const AppContent: React.FC = () => {
                 <div>
                   <div className="font-bold">Hiệu Suất & Excel</div>
                   <div className="text-[10px] text-chu-phu font-normal">Xuất file kiểm toán</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('NHATKY');
+                  setIsMobileMoreOpen(false);
+                }}
+                className={`p-3 rounded-2xl border text-left flex items-center gap-2.5 transition ${
+                  activeTab === 'NHATKY'
+                    ? 'bg-the2 border-vien text-nhan-chu'
+                    : 'bg-nen border-vien text-chu-phu'
+                }`}
+              >
+                <BookOpen className="h-5 w-5 text-nhan-chu shrink-0" />
+                <div>
+                  <div className="font-bold">Nhật Ký Nhận Định</div>
+                  <div className="text-[10px] text-chu-phu font-normal">Ghi & đối chiếu luận điểm</div>
                 </div>
               </button>
 

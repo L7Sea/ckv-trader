@@ -22,7 +22,7 @@
 
 export type TabType =
   | 'TRADE' | 'DECISION' | 'ALGORITHMS' | 'MARKET'
-  | 'MACRO' | 'INTELLIGENCE' | 'CHARTS' | 'ANALYTICS';
+  | 'MACRO' | 'INTELLIGENCE' | 'CHARTS' | 'ANALYTICS' | 'NHATKY';
 
 export interface ManHinh {
   tab: TabType;
@@ -41,6 +41,7 @@ export const MAN_HINH: ManHinh[] = [
   { tab: 'INTELLIGENCE', duong: '/tin-tuc',     ten: 'Tin tức thị trường' },
   { tab: 'CHARTS',       duong: '/phan-bo',     ten: 'Phân bổ danh mục' },
   { tab: 'ANALYTICS',    duong: '/hieu-suat',   ten: 'Hiệu suất đầu tư' },
+  { tab: 'NHATKY',       duong: '/nhat-ky',     ten: 'Nhật ký nhận định' },
 ];
 
 const THEO_TAB = new Map(MAN_HINH.map((m) => [m.tab, m]));

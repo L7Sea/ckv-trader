@@ -6,7 +6,7 @@ import { marketDataService, StockMarketInfo } from '../services/marketDataServic
 import { computePositionPnL, daysSinceOpen, marginDebtAt, vnDateString } from '../services/dealModel';
 import { OrderRequestPayload, Portfolio, Position, Transaction } from '../types';
 
-export type TabType = 'TRADE' | 'DECISION' | 'ALGORITHMS' | 'MARKET' | 'MACRO' | 'INTELLIGENCE' | 'CHARTS' | 'ANALYTICS';
+export type TabType = 'TRADE' | 'DECISION' | 'ALGORITHMS' | 'MARKET' | 'MACRO' | 'INTELLIGENCE' | 'CHARTS' | 'ANALYTICS' | 'NHATKY';
 
 interface TradingState {
   portfolio: Portfolio | null;
